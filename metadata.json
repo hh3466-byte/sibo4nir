@@ -1,0 +1,10 @@
+{
+  "name": "SIBO Safe - סורק מזון לסיבו עבור ניר",
+  "description": "אפליקציה רפואית מותאמת אישית לניר לזיהוי וסריקת מאכלים לסיבו (SIBO) עם רמזור אדום/ירוק, פירוט FODMAP, שלבי דיאטה ומאמרים רפואיים",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

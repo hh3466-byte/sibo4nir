@@ -1,0 +1,375 @@
+import React, { useState, useEffect } from 'react';
+import { FoodAnalysisResult, MealLogEntry, SiboPhase } from './types';
+import { Header } from './components/Header';
+import { CameraScanner } from './components/CameraScanner';
+import { TrafficLightResult } from './components/TrafficLightResult';
+import { FoodDatabaseView } from './components/FoodDatabaseView';
+import { MealAnalyzer } from './components/MealAnalyzer';
+import { MedicalGuideView } from './components/MedicalGuideView';
+import { SymptomDiary } from './components/SymptomDiary';
+import { SIBOAssistantModal } from './components/SIBOAssistantModal';
+import { SiboPrinciplesModal } from './components/SiboPrinciplesModal';
+import { AllowedForbiddenModal } from './components/AllowedForbiddenModal';
+import { MealSuggestionsModal } from './components/MealSuggestionsModal';
+import { InstallShareModal } from './components/InstallShareModal';
+import { FloatingActionButtons } from './components/FloatingActionButtons';
+import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug } from 'lucide-react';
+
+export default function App() {
+  // State for Diet Phase (Default to Phase 1 Strict as requested for Nir)
+  const [currentPhase, setCurrentPhase] = useState<SiboPhase>(() => {
+    const saved = localStorage.getItem('sibo_nir_phase');
+    return (saved as SiboPhase) || 'phase1_strict';
+  });
+
+  const [activeTab, setActiveTab] = useState<string>('scanner');
+  const [analysisResult, setAnalysisResult] = useState<FoodAnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isPrinciplesModalOpen, setIsPrinciplesModalOpen] = useState(false);
+  const [isAllowedForbiddenOpen, setIsAllowedForbiddenOpen] = useState(false);
+  const [isMealSuggestionsOpen, setIsMealSuggestionsOpen] = useState(false);
+  const [isInstallShareOpen, setIsInstallShareOpen] = useState(false);
+  const [isSavedInDiary, setIsSavedInDiary] = useState(false);
+
+  // Diary Entries
+  const [diaryEntries, setDiaryEntries] = useState<MealLogEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem('sibo_nir_diary_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse diary entries from storage', e);
+    }
+    // Default initial example logs for Nir
+    return [
+      {
+        id: '1',
+        foodName: 'חזה עוף צלוי עם שמן זית, מלפפון וגזר מבושל',
+        status: 'GREEN',
+        mealType: 'lunch',
+        timestamp: Date.now() - 1000 * 60 * 60 * 4,
+        notes: 'הבטן הייתה שטוחה ורגועה, תחושה קלה ונעימה',
+        symptoms: { bloating: 0, pain: 0, energy: 5 },
+      },
+    ];
+  });
+
+  // Save phase to local storage
+  useEffect(() => {
+    localStorage.setItem('sibo_nir_phase', currentPhase);
+  }, [currentPhase]);
+
+  // Save diary to local storage
+  useEffect(() => {
+    localStorage.setItem('sibo_nir_diary_v1', JSON.stringify(diaryEntries));
+  }, [diaryEntries]);
+
+  // Handle Food & Image Analysis
+  const handleAnalyze = async (payload: {
+    imageBase64?: string;
+    textPrompt?: string;
+    mimeType?: string;
+  }) => {
+    setIsLoading(true);
+    setErrorMsg(null);
+    setIsSavedInDiary(false);
+
+    try {
+      const response = await fetch('/api/analyze-food', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...payload,
+          phase: currentPhase,
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || errData.details || 'שגיאה בניתוח המאכל');
+      }
+
+      const result: FoodAnalysisResult = await response.json();
+      setAnalysisResult(result);
+      setActiveTab('scanner'); // ensure we are on scanner tab to see result
+
+      // Play soft audio tone for traffic light feedback
+      playFeedbackTone(result.status);
+    } catch (err: any) {
+      console.error('Error analyzing food:', err);
+      setErrorMsg(err.message || 'לא הצלחנו לנתח את המאכל. אנא נסה שוב עם תמונה ברורה יותר.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Play audio tone (green / yellow / red)
+  const playFeedbackTone = (status: string) => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (status === 'GREEN') {
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.setValueAtTime(880.0, audioCtx.currentTime + 0.1); // A5
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } else if (status === 'RED') {
+        osc.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
+        osc.frequency.setValueAtTime(261.63, audioCtx.currentTime + 0.12); // C4
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } else {
+        osc.frequency.setValueAtTime(440.0, audioCtx.currentTime); // A4
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      }
+    } catch (e) {
+      // Audio context might be restricted before interaction
+    }
+  };
+
+  // Save current result to diary
+  const handleSaveToDiary = (res: FoodAnalysisResult) => {
+    const newEntry: MealLogEntry = {
+      id: Date.now().toString(),
+      foodName: res.foodName,
+      status: res.status,
+      mealType: 'lunch',
+      timestamp: Date.now(),
+      notes: `${res.shortVerdict}. כמות בטוחה: ${res.maxSafePortion}`,
+      symptoms: {
+        bloating: res.status === 'RED' ? 3 : 0,
+        pain: res.status === 'RED' ? 2 : 0,
+        energy: res.status === 'GREEN' ? 5 : 4,
+      },
+    };
+    setDiaryEntries((prev) => [newEntry, ...prev]);
+    setIsSavedInDiary(true);
+  };
+
+  // Add manual entry to diary
+  const handleAddDiaryEntry = (entry: Omit<MealLogEntry, 'id' | 'timestamp'>) => {
+    const newEntry: MealLogEntry = {
+      ...entry,
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+    };
+    setDiaryEntries((prev) => [newEntry, ...prev]);
+  };
+
+  // Delete diary entry
+  const handleDeleteDiaryEntry = (id: string) => {
+    setDiaryEntries((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Explore alternative query in scanner
+  const handleExploreAlternative = (altQuery: string) => {
+    handleAnalyze({ textPrompt: altQuery });
+  };
+
+  return (
+    <div className="min-h-screen bg-stone-100/70 text-stone-900 font-sans antialiased flex flex-col selection:bg-emerald-200 selection:text-emerald-900">
+      {/* Top Main Navigation Header */}
+      <Header
+        currentPhase={currentPhase}
+        onPhaseChange={(phase) => {
+          setCurrentPhase(phase);
+          if (analysisResult) {
+            setAnalysisResult(null);
+          }
+        }}
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setErrorMsg(null);
+        }}
+        onOpenHelp={() => setIsPrinciplesModalOpen(true)}
+        onOpenInstallShare={() => setIsInstallShareOpen(true)}
+      />
+
+      {/* Main App Content Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-28">
+        {/* Error Alert if any */}
+        {errorMsg && (
+          <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-sm flex items-center justify-between gap-3 animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              onClick={() => setErrorMsg(null)}
+              className="text-xs font-bold text-rose-700 hover:text-rose-900 underline"
+            >
+              סגור
+            </button>
+          </div>
+        )}
+
+        {/* TAB 1: SCANNER & TRAFFIC LIGHT RESULTS */}
+        {activeTab === 'scanner' && (
+          <div>
+            {analysisResult ? (
+              <TrafficLightResult
+                result={analysisResult}
+                onReset={() => {
+                  setAnalysisResult(null);
+                  setErrorMsg(null);
+                }}
+                onSaveToDiary={handleSaveToDiary}
+                onExploreAlternative={handleExploreAlternative}
+                isSaved={isSavedInDiary}
+              />
+            ) : (
+              <CameraScanner
+                currentPhase={currentPhase}
+                onAnalyze={handleAnalyze}
+                isLoading={isLoading}
+                onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
+              />
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: SEARCHABLE FOOD DATABASE */}
+        {activeTab === 'database' && (
+          <FoodDatabaseView
+            currentPhase={currentPhase}
+            onSelectFoodForAnalysis={(foodName) => {
+              setActiveTab('scanner');
+              handleAnalyze({ textPrompt: foodName });
+            }}
+          />
+        )}
+
+        {/* TAB 3: MEAL & RECIPE CHECKER */}
+        {activeTab === 'recipe' && (
+          <MealAnalyzer
+            currentPhase={currentPhase}
+            onAnalyzeRecipe={async (recipeText) => {
+              await handleAnalyze({ textPrompt: recipeText });
+            }}
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* TAB 4: MEDICAL ARTICLES & PROTOCOLS */}
+        {activeTab === 'articles' && <MedicalGuideView />}
+
+        {/* TAB 5: SYMPTOM & FOOD DIARY */}
+        {activeTab === 'diary' && (
+          <SymptomDiary
+            entries={diaryEntries}
+            onAddEntry={handleAddDiaryEntry}
+            onDeleteEntry={handleDeleteDiaryEntry}
+          />
+        )}
+
+        {/* TAB 6: AI SIBO NUTRITION CONSULTANT */}
+        {activeTab === 'consult' && <SIBOAssistantModal currentPhase={currentPhase} />}
+      </main>
+
+      {/* Floating Action Button: הצעות לארוחות בלבד */}
+      <FloatingActionButtons
+        onOpenMealSuggestions={() => setIsMealSuggestionsOpen(true)}
+      />
+
+      {/* Allowed & Forbidden Modal */}
+      <AllowedForbiddenModal
+        isOpen={isAllowedForbiddenOpen}
+        onClose={() => setIsAllowedForbiddenOpen(false)}
+        currentPhase={currentPhase}
+      />
+
+      {/* Meal Suggestions & Recipes Modal */}
+      <MealSuggestionsModal
+        isOpen={isMealSuggestionsOpen}
+        onClose={() => setIsMealSuggestionsOpen(false)}
+        currentPhase={currentPhase}
+      />
+
+      {/* Medical Principles Modal */}
+      <SiboPrinciplesModal
+        isOpen={isPrinciplesModalOpen}
+        onClose={() => setIsPrinciplesModalOpen(false)}
+      />
+
+      {/* Install & Share Guide Modal */}
+      <InstallShareModal
+        isOpen={isInstallShareOpen}
+        onClose={() => setIsInstallShareOpen(false)}
+      />
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-stone-200 py-8 mt-12 text-center text-xs text-stone-500 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 space-y-4">
+          {/* Main Credits and Bug reporting */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-stone-50 border border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-right">
+            <div className="space-y-1 text-center sm:text-right">
+              <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                <span className="font-extrabold text-stone-900 text-sm">
+                  פותח ע&quot;י חגי הילמן
+                </span>
+                <span className="text-stone-400">•</span>
+                <a
+                  href="tel:0543200007"
+                  className="font-bold text-emerald-700 hover:text-emerald-900 hover:underline flex items-center gap-1"
+                  dir="ltr"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>054-3200007</span>
+                </a>
+              </div>
+              <p className="text-xs text-stone-600">
+                על מנת שאם יש באגים, אוכל לדעת ולתקן מיד.
+              </p>
+            </div>
+
+            {/* Quick Action Links */}
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              <a
+                href="https://api.whatsapp.com/send?phone=972543200007&text=%D7%94%D7%99%D7%99%20%D7%97%D7%92%D7%99%2C%20%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A9%D7%90%D7%9C%D7%94%2F%D7%93%D7%99%D7%95%D7%95%D7%97%20%D7%A2%D7%9C%20%D7%91%D7%90%D7%92%20%D7%91%D7%A1%D7%95%D7%A8%D7%A7%20SIBO"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>דיווח בוואטסאפ (054-3200007)</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsInstallShareOpen(true)}
+                className="px-3.5 py-2 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-teal-600" />
+                <span>התקנה בטלפון 📲</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-stone-400 text-[11px] pt-2">
+            <div className="flex items-center gap-2">
+              <Heart className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600" />
+              <span className="font-semibold text-stone-600">נבנה באהבה עבור ניר</span>
+              <span>•</span>
+              <span>מבוסס ספרות רפואית: Dr. Siebecker, Dr. Jacobi, Monash FODMAP</span>
+            </div>
+            <div>
+              המידע באפליקציה נועד לסייע בניהול התזונה ואינו מחליף ייעוץ רפואי אישי.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
