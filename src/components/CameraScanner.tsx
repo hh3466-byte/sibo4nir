@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { SiboPhase } from '../types';
 import {
   Camera,
   Upload,
   Search,
   Sparkles,
-  RefreshCw,
   AlertCircle,
   Image as ImageIcon,
-  CheckCircle,
+  Loader2,
+  CameraOff,
 } from 'lucide-react';
 
 interface CameraScannerProps {
@@ -26,81 +26,169 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 }) => {
   const [mode, setMode] = useState<'camera' | 'upload' | 'text'>('camera');
   const [cameraActive, setCameraActive] = useState(false);
+  const [isInitializingCamera, setIsInitializingCamera] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [textInput, setTextInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [isFlashActive, setIsFlashActive] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const nativeCameraInputRef = useRef<HTMLInputElement | null>(null);
 
-  const isPhase1 = currentPhase === 'phase1_strict';
-
-  // Start Camera
-  const startCamera = async () => {
-    setCameraError(null);
-    try {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
+  // Stop camera tracks safely
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      try {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+      } catch (err) {
+        console.warn('Error stopping camera tracks:', err);
       }
-      const stream = await navigator.mediaDevices.getUserMedia({
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+    setIsInitializingCamera(false);
+  }, []);
+
+  // Start Camera with robust fallback constraints (Mobile back camera -> any camera)
+  const startCamera = useCallback(async () => {
+    setCameraError(null);
+    setIsInitializingCamera(true);
+    stopCamera();
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setCameraError('המצלמה אינה נתמכת ישירות בדפדפן זה. ניתן לצלם ישירות באמצעות כפתור מצלמת הטלפון או להעלות תמונה.');
+      setIsInitializingCamera(false);
+      return;
+    }
+
+    let stream: MediaStream | null = null;
+
+    // Strategy 1: Back camera with ideal high-res
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // Prefer back camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
         audio: false,
       });
+    } catch (e1) {
+      console.warn('Strategy 1 (ideal environment high-res) failed, attempting fallback...', e1);
+    }
+
+    // Strategy 2: Back camera standard
+    if (!stream) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+          },
+          audio: false,
+        });
+      } catch (e2) {
+        console.warn('Strategy 2 (ideal environment) failed, attempting fallback...', e2);
+      }
+    }
+
+    // Strategy 3: Any available video device (Front camera / Webcams / Desktop)
+    if (!stream) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      } catch (e3: any) {
+        console.error('All camera strategies failed:', e3);
+        let errorMsg = 'לא ניתן להפעיל את המצלמה. אנא ודאי שנתת הרשאת מצלמה בדפדפן, או השתמשי בצילום מהטלפון/גלריה.';
+        if (e3?.name === 'NotAllowedError' || e3?.name === 'PermissionDeniedError') {
+          errorMsg = 'הרשאת המצלמה נדחתה. יש לאשר גישה למצלמה בהגדרות הדפדפן כדי לצפות במצלמה החיה.';
+        } else if (e3?.name === 'NotFoundError' || e3?.name === 'DevicesNotFoundError') {
+          errorMsg = 'לא נמצאה מצלמה מחוברת במכשיר זה. ניתן להעלות תמונה או להקליד מאכל.';
+        }
+        setCameraError(errorMsg);
+        setIsInitializingCamera(false);
+        setCameraActive(false);
+        return;
+      }
+    }
+
+    if (stream) {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        try {
+          await videoRef.current.play();
+          setCameraActive(true);
+        } catch (playErr) {
+          console.warn('Play was interrupted, will resume on metadata loaded', playErr);
+        }
       }
-      setCameraActive(true);
-    } catch (err: any) {
-      console.warn('Camera access error:', err);
-      setCameraError('לא ניתן להפעיל את המצלמה. ניתן להעלות תמונה מהגלריה או להקליד את שם המאכל.');
-      setCameraActive(false);
+      setIsInitializingCamera(false);
     }
-  };
+  }, [stopCamera]);
 
-  // Stop Camera
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setCameraActive(false);
-  };
-
+  // Open camera immediately when mode is camera
   useEffect(() => {
-    if (mode === 'camera') {
+    if (mode === 'camera' && !isLoading) {
       startCamera();
     } else {
       stopCamera();
     }
+
     return () => {
       stopCamera();
     };
-  }, [mode]);
+  }, [mode, isLoading, startCamera, stopCamera]);
 
-  // Capture image from video stream
+  // Attach stream when video element renders
+  const handleVideoMetadataLoaded = () => {
+    if (videoRef.current) {
+      videoRef.current.play().then(() => {
+        setCameraActive(true);
+        setIsInitializingCamera(false);
+      }).catch((e) => {
+        console.warn('Video play on metadata loaded error:', e);
+      });
+    }
+  };
+
+  // Capture snapshot from live video
   const captureSnapshot = () => {
     if (!videoRef.current) return;
+    const video = videoRef.current;
+
+    // Trigger visual shutter flash
+    setIsFlashActive(true);
+    setTimeout(() => setIsFlashActive(false), 200);
+
     const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth || 640;
-    canvas.height = videoRef.current.videoHeight || 480;
+    const width = video.videoWidth > 0 ? video.videoWidth : 1280;
+    const height = video.videoHeight > 0 ? video.videoHeight : 720;
+    canvas.width = width;
+    canvas.height = height;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+    // Draw video frame to canvas
+    ctx.drawImage(video, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
     setPreviewImage(dataUrl);
     stopCamera();
     onAnalyze({ imageBase64: dataUrl, mimeType: 'image/jpeg' });
   };
 
-  // Handle file select
+  // Handle file select (Gallery or native camera)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -113,6 +201,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       setPreviewImage(dataUrl);
+      stopCamera();
       onAnalyze({ imageBase64: dataUrl, mimeType: file.type || 'image/jpeg' });
     };
     reader.readAsDataURL(file);
@@ -162,6 +251,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           <span className="text-rose-700 font-bold">אור אדום (אסור)</span>.
         </p>
       </div>
+
+      {/* Hidden Native Mobile Camera Input (Direct Smartphone Camera Trigger) */}
+      <input
+        ref={nativeCameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+        className="hidden"
+      />
 
       {/* Input Mode Selector Tabs & Allowed/Forbidden Quick Button */}
       <div className="flex flex-wrap items-center justify-center gap-2.5">
@@ -218,7 +317,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           </button>
         </div>
 
-        {/* מותר / אסור Button positioned right in the top line next to the food typing option */}
+        {/* מותר / אסור Button positioned right in the top line */}
         {onOpenAllowedForbidden && (
           <button
             id="btn-allowed-forbidden-top-row"
@@ -267,57 +366,95 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           {mode === 'camera' && (
             <div className="space-y-4">
               <div className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-4/3 sm:aspect-16/9 flex items-center justify-center shadow-inner">
+                {/* Visual Shutter Flash Effect */}
+                {isFlashActive && (
+                  <div className="absolute inset-0 bg-white z-20 animate-fade-out pointer-events-none" />
+                )}
+
                 {cameraError ? (
-                  <div className="p-6 text-center space-y-3 text-stone-300">
-                    <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
-                    <p className="text-sm font-medium">{cameraError}</p>
-                    <button
-                      onClick={() => setMode('upload')}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold"
-                    >
-                      העלאת תמונה במקום
-                    </button>
+                  <div className="p-6 sm:p-8 text-center space-y-4 text-stone-300 max-w-md">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto text-amber-400">
+                      <CameraOff className="w-7 h-7" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold text-white">לא ניתן לפתוח מצלמה חיה</p>
+                      <p className="text-xs text-stone-400 leading-relaxed">{cameraError}</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => nativeCameraInputRef.current?.click()}
+                        className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <Camera className="w-4 h-4" />
+                        <span>צלמי במצלמת הטלפון 📷</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMode('upload')}
+                        className="w-full sm:w-auto px-4 py-2.5 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 border border-stone-700"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        <span>בחירת תמונה מהגלריה</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <>
                     <video
                       ref={videoRef}
+                      autoPlay
                       playsInline
                       muted
+                      onLoadedMetadata={handleVideoMetadataLoaded}
                       className="w-full h-full object-cover"
                     />
 
-                    {/* Viewfinder Target Overlay Guide */}
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-8">
-                      <div className="w-64 h-64 border-2 border-dashed border-white/60 rounded-3xl flex items-center justify-center">
-                        <span className="bg-stone-900/70 text-white/90 text-xs px-3 py-1 rounded-full font-medium backdrop-blur-xs">
-                          כווני את המצלמה למאכל
-                        </span>
+                    {/* Camera Loading Spinner Overlay */}
+                    {isInitializingCamera && !cameraActive && (
+                      <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-3 text-stone-300">
+                        <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                        <span className="text-xs font-medium">פותח את המצלמה...</span>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Viewfinder Target Overlay Guide */}
+                    {cameraActive && (
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-8">
+                        <div className="w-64 h-64 border-2 border-dashed border-white/60 rounded-3xl flex items-center justify-center shadow-lg">
+                          <span className="bg-stone-900/70 text-white/90 text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-xs">
+                            כווני את המצלמה למאכל
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
 
-              {/* Camera Action Buttons */}
+              {/* Camera Action Buttons (Clean hero capture button - No Refresh button) */}
               {!cameraError && (
-                <div className="flex items-center justify-center gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                   <button
                     id="capture-photo-btn"
+                    type="button"
                     onClick={captureSnapshot}
                     disabled={!cameraActive}
-                    className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center gap-2"
+                    className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
                   >
-                    <Camera className="w-5 h-5" />
+                    <Camera className="w-6 h-6" />
                     <span>צלם ובדוק ברמזור 🚦</span>
                   </button>
 
+                  {/* Quick smartphone camera fallback trigger */}
                   <button
-                    onClick={startCamera}
-                    title="הפעל מחדש מצלמה"
-                    className="p-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-2xl transition-colors"
+                    type="button"
+                    onClick={() => nativeCameraInputRef.current?.click()}
+                    className="text-xs text-stone-500 hover:text-emerald-700 py-2 px-3 rounded-xl hover:bg-stone-100 transition-colors flex items-center gap-1.5"
+                    title="פתיחת מצלמת הטלפון המלאה"
                   >
-                    <RefreshCw className="w-5 h-5" />
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>או צלמי ישירות מהטלפון / גלריה</span>
                   </button>
                 </div>
               )}

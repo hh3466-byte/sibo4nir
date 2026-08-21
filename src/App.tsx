@@ -192,6 +192,9 @@ export default function App() {
         onTabChange={(tab) => {
           setActiveTab(tab);
           setErrorMsg(null);
+          if (tab === 'scanner') {
+            setAnalysisResult(null);
+          }
         }}
         onOpenHelp={() => setIsPrinciplesModalOpen(true)}
         onOpenInstallShare={() => setIsInstallShareOpen(true)}

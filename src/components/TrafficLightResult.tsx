@@ -10,7 +10,7 @@ import {
   BookmarkPlus,
   ArrowRight,
   ShieldCheck,
-  RefreshCw,
+  Camera,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -293,10 +293,10 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           <button
             id="reset-scan-btn"
             onClick={onReset}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-2xs"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>סרוק מאכל נוסף</span>
+            <Camera className="w-4 h-4 text-emerald-700" />
+            <span>סריקת מאכל נוסף 📸</span>
           </button>
 
           <button

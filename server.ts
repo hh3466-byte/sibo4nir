@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -62,8 +63,8 @@ async function startServer() {
       const parts: any[] = [];
 
       if (imageBase64) {
-        // Strip data:image/...;base64, prefix if present
-        const cleanBase64 = imageBase64.replace(/^data:image\/[a-zA-Z+]+;base64,/, '');
+        // Safely strip data:image/...;base64, prefix if present
+        const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
         parts.push({
           inlineData: {
             mimeType: mimeType || 'image/jpeg',
