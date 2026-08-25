@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   ZoomIn,
   ZoomOut,
+  RotateCcw,
   Zap,
   ZapOff,
 } from 'lucide-react';

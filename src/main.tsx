@@ -1,4 +1,4 @@
-import React, { StrictMode, Component, ErrorInfo, ReactNode } from 'react';
+import React, { StrictMode, Component, ReactNode, ErrorInfo } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
@@ -13,10 +13,10 @@ interface ErrorBoundaryState {
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null,
+  };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -27,7 +27,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   handleReload = () => {
-    localStorage.removeItem('sibo_nir_cached_state');
+    try {
+      localStorage.removeItem('sibo_nir_cached_state');
+    } catch {
+      // ignore
+    }
     window.location.reload();
   };
 

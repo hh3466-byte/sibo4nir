@@ -25,6 +25,7 @@ export interface FoodAnalysisResult {
   imageUrl?: string;
   isPackagedProduct?: boolean;
   barcode?: string;
+  riskScore?: number;
   timestamp: number;
 }
 

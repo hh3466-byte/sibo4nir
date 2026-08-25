@@ -7,7 +7,7 @@ import { analyzeFoodClinically } from './src/services/siboClinicalEngine';
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
 
   // Increase payload limit for image uploads
   app.use(express.json({ limit: '20mb' }));
