@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { SiboPhase, SiboFoodItem, TrafficLightStatus, FoodCategory } from '../types';
 import { SIBO_FOOD_DATABASE, SIBO_CATEGORIES_INFO } from '../data/siboDatabase';
+import { fuzzyHebrewMatch } from '../utils/textUtils';
+import { analyzeFoodClinically } from '../services/siboClinicalEngine';
 import {
   Search,
   CheckCircle2,
@@ -11,6 +13,8 @@ import {
   Sparkles,
   ArrowRight,
   Info,
+  ChefHat,
+  RotateCcw,
 } from 'lucide-react';
 
 interface FoodDatabaseViewProps {
@@ -43,19 +47,26 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
         return false;
       }
 
-      // Search term filter
+      // Search term filter with resilient Hebrew fuzzy matching (handles 'קוט'ג', 'קוטג'', 'קוטג', etc.)
       if (searchTerm.trim()) {
-        const query = searchTerm.toLowerCase().trim();
-        const matchNameHe = item.nameHe.toLowerCase().includes(query);
-        const matchNameEn = item.nameEn.toLowerCase().includes(query);
-        const matchNotes = item.notesHe.toLowerCase().includes(query);
-        const matchFodmap = item.fodmapGroup.toLowerCase().includes(query);
-        return matchNameHe || matchNameEn || matchNotes || matchFodmap;
+        const query = searchTerm.trim();
+        return (
+          fuzzyHebrewMatch(item.nameHe, query) ||
+          fuzzyHebrewMatch(item.nameEn, query) ||
+          fuzzyHebrewMatch(item.notesHe, query) ||
+          fuzzyHebrewMatch(item.fodmapGroup, query)
+        );
       }
 
       return true;
     });
   }, [searchTerm, selectedCategory, statusFilter, isPhase1]);
+
+  // Real-time clinical engine analysis for any typed food term
+  const dynamicClinicalResult = useMemo(() => {
+    if (!searchTerm || searchTerm.trim().length < 2) return null;
+    return analyzeFoodClinically(searchTerm.trim(), currentPhase);
+  }, [searchTerm, currentPhase]);
 
   const stats = useMemo(() => {
     const total = SIBO_FOOD_DATABASE.length;
@@ -111,17 +122,26 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="חיפוש מאכל בעברית או באנגלית (למשל: שום, אורז, תות, אבוקדו, פרמזן)..."
-              className="w-full pl-4 pr-11 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+              placeholder="חיפוש מאכל בעברית או באנגלית (למשל: קוטג', חלב דל לקטוז, במבה, אורז, תות, אבוקדו)..."
+              className="w-full pl-10 pr-11 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
             />
             <Search className="w-5 h-5 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-xs font-bold w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {/* Status Filter Buttons */}
           <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-2xl border border-stone-200 text-xs font-semibold overflow-x-auto">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-2 rounded-xl transition-all ${
+              className={`px-3 py-2 rounded-xl transition-all cursor-pointer ${
                 statusFilter === 'all' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -129,7 +149,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('GREEN')}
-              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 ${
+              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer ${
                 statusFilter === 'GREEN'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-emerald-700 hover:bg-emerald-50'
@@ -140,7 +160,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('YELLOW')}
-              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 ${
+              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer ${
                 statusFilter === 'YELLOW'
                   ? 'bg-yellow-400 text-stone-950 font-bold shadow-xs'
                   : 'text-yellow-800 hover:bg-yellow-100'
@@ -151,7 +171,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('RED')}
-              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 ${
+              className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer ${
                 statusFilter === 'RED'
                   ? 'bg-rose-600 text-white shadow-xs'
                   : 'text-rose-700 hover:bg-rose-50'
@@ -167,7 +187,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === 'all'
                 ? 'bg-stone-900 text-white'
                 : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
@@ -179,7 +199,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             <button
               key={catKey}
               onClick={() => setSelectedCategory(catKey)}
-              className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === catKey
                   ? 'bg-emerald-700 text-white'
                   : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
@@ -190,6 +210,76 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Dynamic Clinical SIBO Instant Analysis Box (Active whenever user searches) */}
+      {searchTerm.trim().length >= 2 && dynamicClinicalResult && (
+        <div
+          className={`p-5 rounded-3xl border-2 shadow-sm space-y-3 transition-all ${
+            dynamicClinicalResult.status === 'GREEN'
+              ? 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-emerald-300'
+              : dynamicClinicalResult.status === 'YELLOW'
+              ? 'bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 border-yellow-400'
+              : 'bg-gradient-to-r from-rose-50 via-red-50 to-rose-50 border-rose-300'
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-xs font-black px-3 py-1.5 rounded-xl shadow-xs ${
+                  dynamicClinicalResult.status === 'GREEN'
+                    ? 'bg-emerald-600 text-white'
+                    : dynamicClinicalResult.status === 'YELLOW'
+                    ? 'bg-yellow-400 text-yellow-950 font-bold'
+                    : 'bg-rose-600 text-white'
+                }`}
+              >
+                {dynamicClinicalResult.status === 'GREEN'
+                  ? '🟢 אור ירוק — מותר לניר'
+                  : dynamicClinicalResult.status === 'YELLOW'
+                  ? '🟡 אור צהוב — מוגבל'
+                  : '🔴 אור אדום — אסור בסיבו'}
+              </span>
+              <div>
+                <h4 className="text-base font-extrabold text-stone-900">
+                  ניתוח קליני מיידי: {dynamicClinicalResult.foodName}
+                </h4>
+                <p className="text-xs text-stone-600 mt-0.5">{dynamicClinicalResult.shortVerdict}</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onSelectFoodForAnalysis(searchTerm.trim())}
+              className="w-full sm:w-auto px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <span>פתח ניתוח רפואי מלא 🚦</span>
+              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+            </button>
+          </div>
+
+          {/* Safe Substitutions if available */}
+          {dynamicClinicalResult.safeSubstitutions && dynamicClinicalResult.safeSubstitutions.length > 0 && (
+            <div className="pt-2 border-t border-stone-200/60">
+              <span className="text-xs font-bold text-stone-700 flex items-center gap-1.5 mb-1.5">
+                <ChefHat className="w-3.5 h-3.5 text-emerald-700" />
+                <span>חלופות מותאמות לקטגוריה זו:</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {dynamicClinicalResult.safeSubstitutions.map((sub, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => onSelectFoodForAnalysis(sub)}
+                    className="px-2.5 py-1 bg-white/90 hover:bg-emerald-100 text-stone-800 text-xs font-medium rounded-lg border border-stone-200 shadow-2xs transition-colors"
+                  >
+                    {sub}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Food Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -208,7 +298,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
                   isGreen
                     ? 'border-emerald-200 hover:border-emerald-400'
                     : isYellow
-                    ? 'border-amber-200 hover:border-amber-400'
+                    ? 'border-yellow-300 hover:border-yellow-400'
                     : 'border-rose-200 hover:border-rose-400'
                 }`}
               >
@@ -219,13 +309,13 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
                       isGreen
                         ? 'bg-emerald-100 text-emerald-800'
                         : isYellow
-                        ? 'bg-amber-100 text-amber-800'
+                        ? 'bg-yellow-300 text-yellow-950'
                         : 'bg-rose-100 text-rose-800'
                     }`}
                   >
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-rose-500'
+                        isGreen ? 'bg-emerald-500' : isYellow ? 'bg-yellow-600' : 'bg-rose-500'
                       }`}
                     />
                     <span>{isGreen ? 'מותר (ירוק)' : isYellow ? 'מוגבל (צהוב)' : 'אסור (אדום)'}</span>
@@ -259,11 +349,13 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             );
           })
         ) : (
-          <div className="col-span-full py-12 text-center bg-white rounded-3xl border border-stone-200 text-stone-500 space-y-2">
-            <Search className="w-8 h-8 mx-auto text-stone-300" />
-            <p className="text-base font-semibold">לא נמצאו מאכלים התואמים את החיפוש</p>
-            <p className="text-xs text-stone-400">נסי לשנות את מילת החיפוש או לבחור בקטגוריה אחרת.</p>
-          </div>
+          !dynamicClinicalResult && (
+            <div className="col-span-full py-12 text-center bg-white rounded-3xl border border-stone-200 text-stone-500 space-y-2">
+              <Search className="w-8 h-8 mx-auto text-stone-300" />
+              <p className="text-base font-semibold">לא נמצאו מאכלים התואמים את החיפוש</p>
+              <p className="text-xs text-stone-400">נסי לשנות את מילת החיפוש או לבחור בקטגוריה אחרת.</p>
+            </div>
+          )
         )}
       </div>
 
@@ -278,7 +370,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
                     (isPhase1 ? selectedItem.statusPhase1 : selectedItem.statusPhase2) === 'GREEN'
                       ? 'bg-emerald-100 text-emerald-800'
                       : (isPhase1 ? selectedItem.statusPhase1 : selectedItem.statusPhase2) === 'YELLOW'
-                      ? 'bg-amber-100 text-amber-800'
+                      ? 'bg-yellow-300 text-yellow-950 font-bold'
                       : 'bg-rose-100 text-rose-800'
                   }`}
                 >
@@ -294,7 +386,7 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
 
               <button
                 onClick={() => setSelectedItem(null)}
-                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center font-bold"
+                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -322,34 +414,39 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
               </div>
 
               {selectedItem.alternativesHe && selectedItem.alternativesHe.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
-                    חלופות מומלצות לניר:
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-stone-500 uppercase tracking-wider block">
+                    חלופות בטוחות שמתאימות לניר:
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="space-y-1.5">
                     {selectedItem.alternativesHe.map((alt, idx) => (
-                      <span
+                      <div
                         key={idx}
-                        className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-lg text-xs font-medium"
+                        className="p-2.5 bg-emerald-50 text-emerald-950 rounded-xl text-xs font-medium border border-emerald-200/60"
                       >
-                        ✓ {alt}
-                      </span>
+                        {alt}
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-3">
+            <div className="pt-2 flex gap-3">
               <button
                 onClick={() => {
-                  const foodName = selectedItem.nameHe;
+                  onSelectFoodForAnalysis(selectedItem.nameHe);
                   setSelectedItem(null);
-                  onSelectFoodForAnalysis(foodName);
                 }}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-xs"
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                סרוק ונתח לעומק ברמזור 🚦
+                <span>סרוק / נתח ברמזור 🚦</span>
+              </button>
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="px-4 py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                סגור
               </button>
             </div>
           </div>

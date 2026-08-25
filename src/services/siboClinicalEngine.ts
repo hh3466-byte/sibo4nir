@@ -1,5 +1,6 @@
 import { SIBO_FOOD_DATABASE } from '../data/siboDatabase';
 import { FoodAnalysisResult, SiboPhase, TrafficLightStatus } from '../types';
+import { normalizeHebrew, fuzzyHebrewMatch } from '../utils/textUtils';
 
 interface ClinicalRule {
   keywords: string[];
@@ -25,7 +26,7 @@ interface ClinicalRule {
  */
 export function getSmartCategoricalSubstitutions(query: string): string[] {
   if (!query || !query.trim()) return [];
-  const q = query.toLowerCase().trim();
+  const q = normalizeHebrew(query);
 
   // If generic placeholder query, return NO substitutions
   if (
@@ -555,15 +556,11 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
   const normalizedQuery = query.toLowerCase().trim();
   const isPhase1 = phase === 'phase1_strict';
 
-  // 1. Direct search in SIBO_FOOD_DATABASE
+  // 1. Direct search in SIBO_FOOD_DATABASE with Hebrew fuzzy normalization
   const dbMatch = SIBO_FOOD_DATABASE.find((item) => {
-    const nameHe = item.nameHe.toLowerCase();
-    const nameEn = item.nameEn.toLowerCase();
     return (
-      nameHe.includes(normalizedQuery) ||
-      normalizedQuery.includes(nameHe) ||
-      nameEn.includes(normalizedQuery) ||
-      normalizedQuery.includes(nameEn)
+      fuzzyHebrewMatch(item.nameHe, query) ||
+      fuzzyHebrewMatch(item.nameEn, query)
     );
   });
 
@@ -609,7 +606,7 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
 
   // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES
   for (const rule of CLINICAL_SIBO_RULES) {
-    const matchedKeyword = rule.keywords.find((kw) => normalizedQuery.includes(kw.toLowerCase()));
+    const matchedKeyword = rule.keywords.find((kw) => fuzzyHebrewMatch(query, kw) || fuzzyHebrewMatch(kw, query));
     if (matchedKeyword) {
       const status = isPhase1 ? rule.statusPhase1 : rule.statusPhase2;
       return {
