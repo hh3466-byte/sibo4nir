@@ -435,25 +435,35 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
       {/* Loading Overlay State */}
       {isLoading ? (
-        <div className="bg-white rounded-3xl p-8 sm:p-12 border-2 border-emerald-500/40 shadow-lg text-center space-y-6 animate-pulse">
-          <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
-            {/* Pulsing ring */}
-            <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-75" />
-            <div className="relative w-20 h-20 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md">
-              <Sparkles className="w-10 h-10 animate-spin" />
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-emerald-500/40 shadow-lg text-center space-y-5">
+          {previewImage && (
+            <div className="w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-emerald-400 relative">
+              <img src={previewImage} alt="תמונת המאכל שצולם" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-emerald-950/20 backdrop-blur-xs flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-emerald-300 animate-spin" />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-stone-900">
+          {!previewImage && (
+            <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-emerald-100 animate-ping opacity-75" />
+              <div className="relative w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                <Sparkles className="w-8 h-8 animate-spin" />
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <h3 className="text-lg sm:text-xl font-extrabold text-stone-900">
               מנתח את המאכל על פי פרוטוקול SIBO קליני...
             </h3>
-            <p className="text-sm text-stone-500 max-w-md mx-auto">
+            <p className="text-xs sm:text-sm text-stone-500 max-w-md mx-auto">
               בודק ריכוז פרוקטנים, לקטוז, עודף פרוקטוז, סורביטול, מניטול וגלקטנים לפי הנחיות ד״ר סיבקר ומונאש
             </p>
           </div>
 
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 max-w-md mx-auto text-xs text-emerald-900 font-medium">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 max-w-md mx-auto text-xs text-emerald-900 font-medium leading-relaxed">
             💡 <strong>ידעת?</strong> בסיבו, חיידקים שנמצאים במעי הדק מתסיסים סוכרים תוך פחות מ-30 דקות.
             אור ירוק מבטיח שהחיידקים יורעבו ולא יוכלו לתסוס!
           </div>

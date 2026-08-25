@@ -79,108 +79,121 @@ async function startServer() {
 
       parts.push({ text: promptText });
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: { parts },
-        config: {
-          systemInstruction,
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              status: {
-                type: Type.STRING,
-                description: 'Traffic light status: GREEN, YELLOW, or RED',
-              },
-              foodName: {
-                type: Type.STRING,
-                description: 'Hebrew name of the identified food or dish',
-              },
-              englishName: {
-                type: Type.STRING,
-                description: 'English name of the identified food',
-              },
-              shortVerdict: {
-                type: Type.STRING,
-                description: 'Short impactful 1-sentence verdict in Hebrew (e.g. אור ירוק! מותר ובטוח לניר)',
-              },
-              detailedExplanation: {
-                type: Type.STRING,
-                description: 'Detailed medical & biochemical explanation in Hebrew why it is allowed, limited or forbidden for SIBO',
-              },
-              fodmapTriggers: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: 'List of specific FODMAP / fermentation triggers identified (e.g. Fructans, GOS, Lactose, Excess Fructose, Sorbitol, Mannitol, Polyols, High Starch)',
-              },
-              phase1Compatibility: {
-                type: Type.BOOLEAN,
-                description: 'Is this food compatible with Phase 1 Strict SIBO diet?',
-              },
-              phase2Compatibility: {
-                type: Type.BOOLEAN,
-                description: 'Is this food compatible with Phase 2 Semi-Restricted diet?',
-              },
-              maxSafePortion: {
-                type: Type.STRING,
-                description: 'Exact recommended safe portion size in Hebrew (e.g. עד 65 גרם, ללא הגבלה, 0 גרם - אסור לחלוטין)',
-              },
-              safeSubstitutions: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: 'List of tasty, SIBO-safe alternative foods or replacement ingredients in Hebrew',
-              },
-              cookingTips: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: 'Actionable culinary & preparation tips to lower fermentation or soothe digestion for Nir',
-              },
-              medicalReferences: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: 'Relevant medical protocols and scientific references in Hebrew/English (e.g. Monash University Low FODMAP, Dr. Siebecker SIBO Food Guide)',
-              },
-              riskScore: {
-                type: Type.INTEGER,
-                description: 'Risk score from 1 (Safe) to 5 (Severe trigger)',
-              },
-              ingredientsBreakdown: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    status: { type: Type.STRING, description: 'GREEN, YELLOW, or RED' },
-                    notes: { type: Type.STRING },
+      // Helper to generate content with model fallback
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+      let response: any = null;
+      let lastError: any = null;
+
+      for (const model of modelsToTry) {
+        try {
+          response = await ai.models.generateContent({
+            model,
+            contents: { parts },
+            config: {
+              systemInstruction,
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  status: {
+                    type: Type.STRING,
+                    description: 'Traffic light status: GREEN, YELLOW, or RED',
                   },
-                  required: ['name', 'status'],
+                  foodName: {
+                    type: Type.STRING,
+                    description: 'Hebrew name of the identified food or dish',
+                  },
+                  englishName: {
+                    type: Type.STRING,
+                    description: 'English name of the identified food',
+                  },
+                  shortVerdict: {
+                    type: Type.STRING,
+                    description: 'Short impactful 1-sentence verdict in Hebrew (e.g. אור ירוק! מותר ובטוח לניר)',
+                  },
+                  detailedExplanation: {
+                    type: Type.STRING,
+                    description: 'Detailed medical & biochemical explanation in Hebrew why it is allowed, limited or forbidden for SIBO',
+                  },
+                  fodmapTriggers: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: 'List of specific FODMAP / fermentation triggers identified (e.g. Fructans, GOS, Lactose, Excess Fructose, Sorbitol, Mannitol, Polyols, High Starch)',
+                  },
+                  phase1Compatibility: {
+                    type: Type.BOOLEAN,
+                    description: 'Is this food compatible with Phase 1 Strict SIBO diet?',
+                  },
+                  phase2Compatibility: {
+                    type: Type.BOOLEAN,
+                    description: 'Is this food compatible with Phase 2 Semi-Restricted diet?',
+                  },
+                  maxSafePortion: {
+                    type: Type.STRING,
+                    description: 'Exact recommended safe portion size in Hebrew (e.g. עד 65 גרם, ללא הגבלה, 0 גרם - אסור לחלוטין)',
+                  },
+                  safeSubstitutions: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: 'List of tasty, SIBO-safe alternative foods or replacement ingredients in Hebrew',
+                  },
+                  cookingTips: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: 'Actionable culinary & preparation tips to lower fermentation or soothe digestion for Nir',
+                  },
+                  medicalReferences: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: 'Relevant medical protocols and scientific references in Hebrew/English (e.g. Monash University Low FODMAP, Dr. Siebecker SIBO Food Guide)',
+                  },
+                  riskScore: {
+                    type: Type.INTEGER,
+                    description: 'Risk score from 1 (Safe) to 5 (Severe trigger)',
+                  },
+                  ingredientsBreakdown: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        name: { type: Type.STRING },
+                        status: { type: Type.STRING, description: 'GREEN, YELLOW, or RED' },
+                        notes: { type: Type.STRING },
+                      },
+                      required: ['name', 'status'],
+                    },
+                    description: 'Breakdown of individual ingredients if this is a composite dish or meal',
+                  },
                 },
-                description: 'Breakdown of individual ingredients if this is a composite dish or meal',
+                required: [
+                  'status',
+                  'foodName',
+                  'shortVerdict',
+                  'detailedExplanation',
+                  'fodmapTriggers',
+                  'phase1Compatibility',
+                  'phase2Compatibility',
+                  'maxSafePortion',
+                  'safeSubstitutions',
+                  'cookingTips',
+                  'medicalReferences',
+                  'riskScore',
+                ],
               },
             },
-            required: [
-              'status',
-              'foodName',
-              'shortVerdict',
-              'detailedExplanation',
-              'fodmapTriggers',
-              'phase1Compatibility',
-              'phase2Compatibility',
-              'maxSafePortion',
-              'safeSubstitutions',
-              'cookingTips',
-              'medicalReferences',
-              'riskScore',
-            ],
-          },
-        },
-      });
-
-      const responseText = response.text;
-      if (!responseText) {
-        throw new Error('לא התקבלה תשובה מניתוח התמונה');
+          });
+          if (response?.text) break;
+        } catch (modelErr) {
+          lastError = modelErr;
+          console.warn(`[API] Model ${model} failed, trying next...`, modelErr);
+        }
       }
 
+      if (!response || !response.text) {
+        throw lastError || new Error('לא התקבלה תשובה מניתוח התמונה');
+      }
+
+      const responseText = response.text;
       const result = JSON.parse(responseText);
 
       // Validate & normalize status
@@ -230,16 +243,32 @@ async function startServer() {
 4. אם רלוונטי, ציין טיפ פרקטי למטבח או לאכילה מחוץ לבית.
 `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: question,
-        config: {
-          systemInstruction,
-        },
-      });
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+      let response: any = null;
+      let lastError: any = null;
+
+      for (const model of modelsToTry) {
+        try {
+          response = await ai.models.generateContent({
+            model,
+            contents: question,
+            config: {
+              systemInstruction,
+            },
+          });
+          if (response?.text) break;
+        } catch (modelErr) {
+          lastError = modelErr;
+          console.warn(`[Consult] Model ${model} failed, trying next...`, modelErr);
+        }
+      }
+
+      if (!response || !response.text) {
+        throw lastError || new Error('לא הצלחנו לקבל תשובה');
+      }
 
       res.json({
-        answer: response.text || 'לא הצלחתי לעבד את השאלה, אנא נסה שוב.',
+        answer: response.text,
         timestamp: Date.now(),
       });
     } catch (error: any) {
