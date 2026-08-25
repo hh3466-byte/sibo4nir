@@ -250,8 +250,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   // Capture snapshot from live video stream
   const captureSnapshot = () => {
-    if (!videoRef.current) return;
     const video = videoRef.current;
+
+    // Safety check: If video is not actually streaming frames, open native device camera
+    if (!video || !video.videoWidth || video.videoWidth === 0 || video.readyState < 2) {
+      console.warn('[CameraScanner] Live video not streaming frames, opening device camera directly...');
+      nativeCameraInputRef.current?.click();
+      return;
+    }
 
     // Trigger visual shutter flash
     setIsFlashActive(true);
@@ -259,8 +265,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       if (isMountedRef.current) setIsFlashActive(false);
     }, 250);
 
-    const videoWidth = video.videoWidth || 1280;
-    const videoHeight = video.videoHeight || 720;
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
 
     // Scale to max dimension 1280px for optimal speed and Gemini clarity
     const MAX_DIM = 1280;
@@ -281,7 +287,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     canvas.width = targetWidth;
     canvas.height = targetHeight;
     const ctx = canvas.getContext('2d', { willReadFrequently: false });
-    if (!ctx) return;
+    if (!ctx) {
+      nativeCameraInputRef.current?.click();
+      return;
+    }
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -305,6 +314,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     processImageFile(file);
+    e.target.value = ''; // allow re-triggering with new photos
   };
 
   // Process file to base64
@@ -604,20 +614,20 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                     id="capture-photo-btn"
                     type="button"
                     onClick={() => {
-                      if (cameraActive) {
+                      if (cameraActive && videoRef.current && videoRef.current.videoWidth > 0 && videoRef.current.readyState >= 2) {
                         captureSnapshot();
                       } else {
-                        startCamera(facingMode);
+                        nativeCameraInputRef.current?.click();
                       }
                     }}
                     disabled={isLoading}
                     className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
                   >
                     <Camera className="w-6 h-6" />
-                    <span>{cameraActive ? 'צלם ובדוק ברמזור 🚦' : 'הפעל מצלמה וסרוק 📷'}</span>
+                    <span>{cameraActive && videoRef.current?.videoWidth ? 'צלם ובדוק ברמזור 🚦' : 'צלם מאכל במצלמה 📷'}</span>
                   </button>
 
-                  {/* Direct smartphone camera fallback trigger */}
+                  {/* Direct smartphone camera / gallery trigger */}
                   <button
                     type="button"
                     onClick={() => nativeCameraInputRef.current?.click()}
