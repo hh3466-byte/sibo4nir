@@ -91,7 +91,11 @@ async function startServer() {
 
       for (const model of modelsToTry) {
         try {
-          response = await ai.models.generateContent({
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout for ${model}`)), 4500)
+          );
+
+          const aiCall = ai.models.generateContent({
             model,
             contents: { parts },
             config: {
@@ -187,9 +191,11 @@ async function startServer() {
               },
             },
           });
+
+          response = await Promise.race([aiCall, timeoutPromise]);
           if (response?.text) break;
-        } catch (modelErr) {
-          console.warn(`[API] Model ${model} failed, trying next...`, modelErr);
+        } catch (modelErr: any) {
+          console.warn(`[API] Model ${model} failed (${modelErr?.message}), trying next...`);
         }
       }
 
