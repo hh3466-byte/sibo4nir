@@ -212,17 +212,28 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   useEffect(() => {
     isMountedRef.current = true;
 
-    if (mode === 'camera' && !isLoading) {
+    if (mode === 'camera' && !isLoading && !document.hidden) {
       startCamera(facingMode);
     } else {
       stopCamera();
     }
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopCamera();
+      } else if (mode === 'camera' && !isLoading) {
+        startCamera(facingMode);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       isMountedRef.current = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       stopCamera();
     };
-  }, [mode, isLoading]); // Do not re-run on every function reference change
+  }, [mode, isLoading, facingMode, startCamera, stopCamera]);
 
   // Flip camera between front and back
   const handleToggleFacingMode = () => {
