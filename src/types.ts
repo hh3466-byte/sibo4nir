@@ -21,9 +21,10 @@ export interface FoodAnalysisResult {
   safeSubstitutions: string[];
   cookingTips: string[];
   medicalReferences: string[];
-  riskScore: number; // 1 (safest) to 5 (highest fermentation risk)
   ingredientsBreakdown?: IngredientItem[];
   imageUrl?: string;
+  isPackagedProduct?: boolean;
+  barcode?: string;
   timestamp: number;
 }
 

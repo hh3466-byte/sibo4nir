@@ -10,15 +10,19 @@ import {
   Loader2,
   CameraOff,
   SwitchCamera,
+  Barcode,
   CheckCircle2,
 } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
+import { fetchProductByBarcode } from '../services/barcodeService';
 
 interface CameraScannerProps {
   currentPhase: SiboPhase;
-  onAnalyze: (payload: { imageBase64?: string; textPrompt?: string; mimeType?: string }) => Promise<void>;
+  onAnalyze: (payload: { imageBase64?: string; textPrompt?: string; mimeType?: string; barcode?: string }) => Promise<void>;
   onCancelAnalyze?: () => void;
   isLoading: boolean;
   onOpenAllowedForbidden?: () => void;
+  initialMode?: 'camera' | 'barcode' | 'upload' | 'text';
 }
 
 export const CameraScanner: React.FC<CameraScannerProps> = ({
@@ -27,13 +31,17 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   onCancelAnalyze,
   isLoading,
   onOpenAllowedForbidden,
+  initialMode = 'camera',
 }) => {
-  const [mode, setMode] = useState<'camera' | 'upload' | 'text'>('camera');
+  const [mode, setMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>(initialMode);
   const [cameraActive, setCameraActive] = useState(false);
   const [isInitializingCamera, setIsInitializingCamera] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [textInput, setTextInput] = useState('');
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [isFetchingBarcode, setIsFetchingBarcode] = useState(false);
+  const [barcodeError, setBarcodeError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [isFlashActive, setIsFlashActive] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
@@ -45,6 +53,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const nativeCameraInputRef = useRef<HTMLInputElement | null>(null);
   const isMountedRef = useRef(true);
   const requestCounterRef = useRef(0);
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
   // Stop camera tracks safely and release hardware locks
   const stopCamera = useCallback(() => {
@@ -120,48 +129,33 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     if (!activeStream && isMountedRef.current && currentRequestId === requestCounterRef.current) {
       try {
         activeStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: targetFacing },
+          video: {
+            facingMode: targetFacing,
+          },
           audio: false,
         });
       } catch (e2) {
-        console.warn('[CameraScanner] Strategy 2 failed, trying Strategy 3 (fallback facingMode)...', e2);
+        console.warn('[CameraScanner] Strategy 2 failed, trying Strategy 3...', e2);
       }
     }
 
-    // Constraint Strategy 3: Inverted facingMode (user or environment fallback)
-    if (!activeStream && isMountedRef.current && currentRequestId === requestCounterRef.current) {
-      try {
-        const fallbackFacing = targetFacing === 'environment' ? 'user' : 'environment';
-        activeStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: fallbackFacing } },
-          audio: false,
-        });
-      } catch (e3) {
-        console.warn('[CameraScanner] Strategy 3 failed, trying Strategy 4 (any video device)...', e3);
-      }
-    }
-
-    // Constraint Strategy 4: Any available video device
+    // Constraint Strategy 3: Any video track available
     if (!activeStream && isMountedRef.current && currentRequestId === requestCounterRef.current) {
       try {
         activeStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false,
         });
-      } catch (e4: any) {
-        console.error('[CameraScanner] All camera initialization strategies failed:', e4);
+      } catch (e3: any) {
+        console.error('[CameraScanner] All camera strategies failed:', e3);
         if (isMountedRef.current && currentRequestId === requestCounterRef.current) {
-          let errorMsg = 'לא ניתן להפעיל את המצלמה. אנא ודאי שאישרת גישה למצלמה בדפדפן, או השתמשי בצילום מהטלפון.';
-          if (e4?.name === 'NotAllowedError' || e4?.name === 'PermissionDeniedError') {
-            errorMsg = 'הרשאת המצלמה נדחתה. יש לאשר שימוש במצלמה בהגדרות הדפדפן כדי לצפות במצלמה החיה.';
-          } else if (e4?.name === 'NotFoundError' || e4?.name === 'DevicesNotFoundError') {
-            errorMsg = 'לא נמצאה מצלמה מחוברת במכשיר זה. ניתן להעלות תמונה או להקליד מאכל.';
-          } else if (e4?.name === 'NotReadableError' || e4?.name === 'TrackStartError') {
-            errorMsg = 'המצלמה בשימוש ע"י אפליקציה אחרת. אנא סגרי חלונות/אפליקציות מצלמה אחרות ונסי שוב.';
-          }
-          setCameraError(errorMsg);
+          const isDenied = e3.name === 'NotAllowedError' || e3.name === 'PermissionDeniedError';
+          setCameraError(
+            isDenied
+              ? 'גישה למצלמה נחסמה בדפדפן. יש לאשר הרשאת מצלמה בהגדרות הדפדפן, או ללחוץ על "צלם במצלמת הטלפון".'
+              : 'לא הצלחנו לפתוח את שידור המצלמה. באפשרותך לצלם ישירות במצלמת המכשיר או להעלות תמונה.'
+          );
           setIsInitializingCamera(false);
-          setCameraActive(false);
         }
         return;
       }
@@ -194,7 +188,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           })
           .catch((playErr) => {
             console.warn('[CameraScanner] Play interrupted, waiting for user gesture or metadata:', playErr);
-            // On mobile iOS/Android, if autoplay is blocked, mark as ready so user can tap
             if (isMountedRef.current) {
               setCameraActive(true);
             }
@@ -227,6 +220,101 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     };
   }, [stopCamera]);
 
+  // Barcode Scanner Lifecycle using Html5Qrcode
+  useEffect(() => {
+    let isScannerRunning = false;
+
+    if (mode === 'barcode' && !isLoading) {
+      setBarcodeError(null);
+      const elementId = 'barcode-reader-viewfinder';
+
+      const timer = setTimeout(() => {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        try {
+          const qrScanner = new Html5Qrcode(elementId);
+          html5QrCodeRef.current = qrScanner;
+
+          qrScanner
+            .start(
+              { facingMode: 'environment' },
+              {
+                fps: 10,
+                qrbox: { width: 280, height: 160 },
+                aspectRatio: 1.777778,
+              },
+              (decodedText) => {
+                if (isMountedRef.current && isScannerRunning) {
+                  isScannerRunning = false;
+                  qrScanner.stop().catch(() => {});
+                  handleBarcodeLookup(decodedText);
+                }
+              },
+              () => {
+                // Ignore scanning frames without barcodes
+              }
+            )
+            .then(() => {
+              isScannerRunning = true;
+            })
+            .catch((err) => {
+              console.warn('[BarcodeScanner] start error:', err);
+            });
+        } catch (initErr) {
+          console.warn('[BarcodeScanner] init error:', initErr);
+        }
+      }, 200);
+
+      return () => {
+        clearTimeout(timer);
+        if (html5QrCodeRef.current && isScannerRunning) {
+          html5QrCodeRef.current.stop().catch(() => {});
+          html5QrCodeRef.current = null;
+        }
+      };
+    } else {
+      if (html5QrCodeRef.current) {
+        html5QrCodeRef.current.stop().catch(() => {});
+        html5QrCodeRef.current = null;
+      }
+    }
+  }, [mode, isLoading]);
+
+  // Lookup product by barcode from Open Food Facts & send to SIBO analysis
+  const handleBarcodeLookup = async (barcode: string) => {
+    const cleanCode = barcode.trim();
+    if (!cleanCode) return;
+
+    setIsFetchingBarcode(true);
+    setBarcodeError(null);
+
+    try {
+      const prod = await fetchProductByBarcode(cleanCode);
+      if (prod.found) {
+        const textPrompt = `מוצר ארוז מסחרי (זוהה מברקוד ${prod.barcode}):
+שם המוצר: ${prod.productName} ${prod.brand ? `(מותג: ${prod.brand})` : ''}
+רשימת רכיבים רשמית: ${prod.ingredientsText || 'ללא פירוט רכיבים במאגר'}
+אלרגנים/הערות: ${prod.allergens || 'לא צוינו אלרגנים'}
+קטגוריות: ${prod.categories || 'מזון'}`;
+
+        await onAnalyze({
+          textPrompt,
+          barcode: prod.barcode,
+          imageBase64: prod.imageUrl || undefined,
+        });
+      } else {
+        setBarcodeError(
+          `הברקוד (${cleanCode}) טרם נרשם במאגר הברקודים. צלמי ישירות את רשימת הרכיבים בגב האריזה לקבלת ניתוח SIBO מיידי!`
+        );
+      }
+    } catch (e: any) {
+      setBarcodeError('שגיאה בסריקת הברקוד. אנא נסי שוב או צלמי את רשימת הרכיבים בגב האריזה.');
+    } finally {
+      setIsFetchingBarcode(false);
+    }
+  };
+
   // Flip camera between front and back
   const handleToggleFacingMode = () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
@@ -236,47 +324,27 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   // Video metadata & canplay handlers
   const handleVideoCanPlay = () => {
-    if (videoRef.current && isMountedRef.current) {
-      videoRef.current
-        .play()
-        .then(() => {
-          setCameraActive(true);
-          setIsInitializingCamera(false);
-        })
-        .catch((err) => {
-          console.warn('[CameraScanner] CanPlay video.play catch:', err);
-          if (isMountedRef.current) {
-            setCameraActive(true);
-            setIsInitializingCamera(false);
-          }
-        });
+    if (isMountedRef.current) {
+      setCameraActive(true);
+      setIsInitializingCamera(false);
     }
   };
 
-  // Capture snapshot from live video stream
+  // Capture Snapshot from active video stream
   const captureSnapshot = () => {
-    const video = videoRef.current;
+    if (!videoRef.current || !cameraActive) return;
 
-    // Safety check: If video is not actually streaming frames, open native device camera
-    if (!video || !video.videoWidth || video.videoWidth === 0 || video.readyState < 2) {
-      console.warn('[CameraScanner] Live video not streaming frames, opening device camera directly...');
-      nativeCameraInputRef.current?.click();
-      return;
-    }
+    const video = videoRef.current;
+    if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
     // Trigger visual shutter flash
     setIsFlashActive(true);
-    setTimeout(() => {
-      if (isMountedRef.current) setIsFlashActive(false);
-    }, 250);
+    setTimeout(() => setIsFlashActive(false), 200);
 
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
-
-    // Scale to max dimension 1280px for optimal speed and Gemini clarity
-    const MAX_DIM = 1280;
-    let targetWidth = videoWidth;
-    let targetHeight = videoHeight;
+    const canvas = document.createElement('canvas');
+    const MAX_DIM = 960;
+    let targetWidth = video.videoWidth;
+    let targetHeight = video.videoHeight;
 
     if (targetWidth > MAX_DIM || targetHeight > MAX_DIM) {
       if (targetWidth > targetHeight) {
@@ -288,19 +356,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    const canvas = document.createElement('canvas');
     canvas.width = targetWidth;
     canvas.height = targetHeight;
-    const ctx = canvas.getContext('2d', { willReadFrequently: false });
-    if (!ctx) {
-      nativeCameraInputRef.current?.click();
-      return;
-    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // If front camera (user mode), optionally mirror canvas
     if (facingMode === 'user') {
       ctx.translate(targetWidth, 0);
       ctx.scale(-1, 1);
@@ -319,7 +382,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     processImageFile(file);
-    e.target.value = ''; // allow re-triggering with new photos
+    e.target.value = '';
   };
 
   // Process file to compressed base64 for instant upload (<100KB)
@@ -395,6 +458,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     onAnalyze({ textPrompt: textInput.trim() });
   };
 
+  const handleBarcodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!barcodeInput.trim()) return;
+    handleBarcodeLookup(barcodeInput.trim());
+  };
+
   return (
     <div id="camera-scanner-container" className="w-full max-w-4xl mx-auto space-y-6">
       {/* Intro Header Card - Mobile Optimized */}
@@ -403,9 +472,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
           <span>פרוטוקול תזונה קליני ל-SIBO</span>
         </div>
-        
+
         <p className="text-xs sm:text-sm text-stone-600 max-w-xl mx-auto leading-relaxed">
-          צלמי כל מאכל, מוצר או תפריט — המערכת תנתח את רמת התסיסה וה-FODMAP:
+          צלמי כל מאכל, מוצר בסופר, ברקוד או תפריט — המערכת תנתח את רמת התסיסה וה-FODMAP:
         </p>
 
         {/* Beautiful Centered Traffic Light Badge Bar */}
@@ -432,8 +501,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         className="hidden"
       />
 
-      {/* Symmetrical, Sleek 4-Button Toolbar (Perfect on Mobile & Desktop) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full max-w-2xl mx-auto">
+      {/* Symmetrical, Sleek 5-Button Toolbar (Perfect on Mobile & Desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 w-full max-w-3xl mx-auto">
         <button
           id="scanner-mode-camera"
           type="button"
@@ -441,14 +510,31 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             setPreviewImage(null);
             setMode('camera');
           }}
-          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+          className={`py-3 px-2.5 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
             mode === 'camera'
               ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white border-sky-400 shadow-md ring-2 ring-sky-300/40'
               : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
           }`}
         >
           <Camera className={`w-4 h-4 ${mode === 'camera' ? 'text-white' : 'text-sky-500'}`} />
-          <span>מצלמה חיה</span>
+          <span>מצלמה</span>
+        </button>
+
+        <button
+          id="scanner-mode-barcode"
+          type="button"
+          onClick={() => {
+            setMode('barcode');
+            stopCamera();
+          }}
+          className={`py-3 px-2.5 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+            mode === 'barcode'
+              ? 'bg-gradient-to-r from-indigo-500 to-blue-700 text-white border-indigo-400 shadow-md ring-2 ring-indigo-300/40'
+              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+          }`}
+        >
+          <Barcode className={`w-4 h-4 ${mode === 'barcode' ? 'text-white' : 'text-indigo-600'}`} />
+          <span>סורק ברקוד 🏷️</span>
         </button>
 
         <button
@@ -458,7 +544,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             setMode('upload');
             stopCamera();
           }}
-          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+          className={`py-3 px-2.5 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
             mode === 'upload'
               ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-purple-400 shadow-md ring-2 ring-purple-300/40'
               : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
@@ -475,7 +561,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             setMode('text');
             stopCamera();
           }}
-          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+          className={`py-3 px-2.5 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
             mode === 'text'
               ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white border-amber-400 shadow-md ring-2 ring-amber-300/40'
               : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
@@ -490,7 +576,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             id="btn-allowed-forbidden-top-row"
             type="button"
             onClick={onOpenAllowedForbidden}
-            className="py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-extrabold text-xs sm:text-sm border shadow-md active:scale-95 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-300/30"
+            className="col-span-2 sm:col-span-1 py-3 px-2.5 rounded-2xl transition-all flex items-center justify-center gap-1 cursor-pointer font-extrabold text-xs sm:text-sm border shadow-md active:scale-95 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-300/30"
           >
             <span>🚦 מותר / אסור</span>
           </button>
@@ -498,7 +584,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       </div>
 
       {/* Loading Overlay State */}
-      {isLoading ? (
+      {isLoading || isFetchingBarcode ? (
         <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-emerald-500/40 shadow-lg text-center space-y-5">
           {previewImage && (
             <div className="w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-emerald-400 relative">
@@ -520,7 +606,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
           <div className="space-y-1.5">
             <h3 className="text-lg sm:text-xl font-extrabold text-stone-900">
-              מנתח את המאכל על פי פרוטוקול SIBO קליני...
+              {isFetchingBarcode ? 'שולף רכיבי מוצר ממאגר הברקודים ומנתח...' : 'מנתח את המאכל על פי פרוטוקול SIBO קליני...'}
             </h3>
             <p className="text-xs sm:text-sm text-stone-500 max-w-md mx-auto">
               בודק ריכוז פרוקטנים, לקטוז, עודף פרוקטוז, סורביטול, מניטול וגלקטנים לפי הנחיות ד״ר סיבקר ומונאש
@@ -547,6 +633,70 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       ) : (
         /* Main Viewfinder / Scanner Area */
         <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden p-4 sm:p-6">
+          {/* BARCODE SCANNER MODE */}
+          {mode === 'barcode' && (
+            <div className="space-y-4">
+              <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-center space-y-1">
+                <h3 className="text-sm font-extrabold text-stone-900 flex items-center justify-center gap-1.5">
+                  <Barcode className="w-4 h-4 text-indigo-600" />
+                  <span>סורק ברקודים למוצרי מזון ארוזים 🏷️</span>
+                </h3>
+                <p className="text-xs text-stone-500 max-w-md mx-auto">
+                  כווני את המצלמה לקו הברקוד על גבי אריזת המוצר בסופר או בבית — המערכת תשלוף את כל רשימת הרכיבים מהיצרן ותנתח את התאמתם ל-SIBO!
+                </p>
+              </div>
+
+              {/* Barcode Camera Viewport */}
+              <div className="relative bg-stone-950 rounded-2xl overflow-hidden min-h-[260px] sm:min-h-[320px] flex items-center justify-center shadow-inner">
+                <div id="barcode-reader-viewfinder" className="w-full h-full min-h-[260px]" />
+                
+                {/* Laser animation overlay */}
+                <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_12px_#f43f5e] animate-pulse pointer-events-none z-10" />
+              </div>
+
+              {barcodeError && (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-medium space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>{barcodeError}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('camera');
+                      nativeCameraInputRef.current?.click();
+                    }}
+                    className="w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>צלמי את רשימת הרכיבים בגב האריזה 📸</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Manual Barcode Input Form */}
+              <form onSubmit={handleBarcodeSubmit} className="pt-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={barcodeInput}
+                    onChange={(e) => setBarcodeInput(e.target.value)}
+                    placeholder="או הקלידי מספר ברקוד ידנית (לדוגמה: 729000000000)..."
+                    className="flex-1 px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden text-right"
+                    dir="ltr"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!barcodeInput.trim()}
+                    className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-sm cursor-pointer"
+                  >
+                    בדיקת ברקוד
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
           {/* CAMERA MODE */}
           {mode === 'camera' && (
             <div className="space-y-4">
@@ -596,7 +746,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                       className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                     />
 
-                    {/* Tap to start camera overlay (for mobile browsers requiring user gesture) */}
+                    {/* Tap to start camera overlay */}
                     {!cameraActive && !isInitializingCamera && (
                       <div
                         onClick={() => startCamera(facingMode)}
@@ -610,7 +760,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                             לחצי כאן לפתיחת המצלמה 📷
                           </span>
                           <span className="text-xs text-stone-300 block">
-                            במידה והמצלמה לא נפתחה אוטומטית, לחצי להפעלה מיידית
+                            או צלמי ישירות באמצעות הכפתור הירוק למטה
                           </span>
                         </div>
                       </div>
@@ -629,7 +779,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                       <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-8 z-10">
                         <div className="w-64 h-64 border-2 border-dashed border-white/70 rounded-3xl flex items-center justify-center shadow-lg">
                           <span className="bg-stone-900/75 text-white/95 text-xs px-3.5 py-1.5 rounded-full font-bold backdrop-blur-xs shadow-sm">
-                            כווני את המצלמה למאכל
+                            כווני למאכל או לרכיבים בגב האריזה
                           </span>
                         </div>
                       </div>
@@ -644,7 +794,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                         </div>
                       )}
 
-                      {/* Camera Flip / Switcher Button (Available if multiple cameras or on mobile) */}
                       {cameraActive && (
                         <button
                           type="button"
@@ -660,7 +809,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 )}
               </div>
 
-              {/* Camera Action Buttons (Clear, reliable action buttons) */}
+              {/* Camera Action Buttons */}
               {!cameraError && (
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                   <button
@@ -677,10 +826,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                     className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
                   >
                     <Camera className="w-6 h-6" />
-                    <span>{cameraActive && videoRef.current?.videoWidth ? 'צלם ובדוק ברמזור 🚦' : 'צלם מאכל במצלמה 📷'}</span>
+                    <span>{cameraActive && videoRef.current?.videoWidth ? 'צלם ובדוק ברמזור 🚦' : 'צלם מאכל / רכיבים 📷'}</span>
                   </button>
 
-                  {/* Direct smartphone camera / gallery trigger */}
                   <button
                     type="button"
                     onClick={() => nativeCameraInputRef.current?.click()}
@@ -697,18 +845,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
           {/* UPLOAD MODE */}
           {mode === 'upload' && (
-            <div
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all ${
-                dragActive
-                  ? 'border-emerald-500 bg-emerald-50/50'
-                  : 'border-stone-300 hover:border-emerald-400 bg-stone-50/60'
-              }`}
-            >
+            <div className="space-y-4">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -717,57 +854,83 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 className="hidden"
               />
 
-              <div className="space-y-4 max-w-sm mx-auto">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
-                  <ImageIcon className="w-8 h-8" />
+              <div
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer ${
+                  dragActive
+                    ? 'border-purple-500 bg-purple-50/50 scale-[0.99]'
+                    : 'border-stone-300 hover:border-purple-400 hover:bg-stone-50/50'
+                }`}
+              >
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center shadow-inner">
+                  <Upload className="w-8 h-8" />
                 </div>
-                <div>
-                  <p className="text-base font-bold text-stone-800">
-                    לחצי כאן להעלאת תמונה של המאכל
-                  </p>
-                  <p className="text-xs text-stone-500 mt-1">
-                    תומך בכל סוגי התמונות מהטלפון או המחשב (JPEG, PNG, WEBP)
-                  </p>
-                </div>
-                <span className="inline-block px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-700 shadow-2xs">
-                  בחירת קובץ מהגלריה
-                </span>
+                <h3 className="text-base font-bold text-stone-900 mb-1">
+                  לחצי לבחירת תמונה או גררי לכאן
+                </h3>
+                <p className="text-xs text-stone-500 max-w-sm mx-auto mb-4 leading-relaxed">
+                  ניתן להעלות תמונה של צלחת, מוצר בסופר, תפריט במסעדה או צילום מסך (JPG, PNG, WebP)
+                </p>
+                <button
+                  type="button"
+                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-md transition-all pointer-events-none"
+                >
+                  עיון בקבצים
+                </button>
               </div>
             </div>
           )}
 
-          {/* TEXT SEARCH MODE */}
+          {/* TEXT MODE */}
           {mode === 'text' && (
             <form onSubmit={handleTextSubmit} className="space-y-4">
-              <div className="relative">
-                <input
-                  id="food-text-input"
-                  type="text"
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  placeholder="הקלידי שם מאכל, מנה או מצרך (למשל: סושי סלמון, חביתה עם שמן זית, חומוס...)"
-                  className="w-full pl-4 pr-12 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-sm sm:text-base focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
-                />
-                <Search className="w-5 h-5 text-stone-400 absolute right-4 top-1/2 -translate-y-1/2" />
+              <div className="space-y-1.5">
+                <label htmlFor="food-text-input" className="block text-xs font-bold text-stone-700">
+                  שם המאכל, המנה או רשימת הרכיבים:
+                </label>
+                <div className="relative">
+                  <input
+                    id="food-text-input"
+                    type="text"
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    placeholder="למשל: סלט יווני, לחם מחמצת, חלב שקדים, חזה עוף בשום ודבש, שוקולד מריר..."
+                    className="w-full pl-4 pr-11 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400"
+                  />
+                  <Search className="w-5 h-5 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                {onOpenAllowedForbidden ? (
+              {/* Quick suggestions chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[11px] font-semibold text-stone-400">חיפושים נפוצים:</span>
+                {['שום ובצל', 'חלב שיבולת שועל', 'תפוח עץ', 'לחם כוסמין', 'חומוס', 'אורז לבן', 'קפה'].map((item) => (
                   <button
+                    key={item}
                     type="button"
-                    onClick={onOpenAllowedForbidden}
-                    className="text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-1.5"
+                    onClick={() => {
+                      setTextInput(item);
+                      onAnalyze({ textPrompt: item });
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 text-xs font-medium transition-colors border border-stone-200"
                   >
-                    <span>רשימת מותר / אסור המלאה 🚦</span>
+                    {item}
                   </button>
-                ) : <div />}
+                ))}
+              </div>
 
+              <div className="pt-2 flex justify-end">
                 <button
                   type="submit"
-                  disabled={!textInput.trim()}
-                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-300 text-white font-bold text-sm rounded-xl transition-all shadow-xs cursor-pointer"
+                  disabled={!textInput.trim() || isLoading}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  בדוק ברמזור SIBO 🚦
+                  <Search className="w-4 h-4" />
+                  <span>בדוק ברמזור SIBO 🚦</span>
                 </button>
               </div>
             </form>

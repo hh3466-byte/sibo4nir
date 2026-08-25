@@ -194,7 +194,11 @@ async function startServer() {
                       },
                       required: ['name', 'status'],
                     },
-                    description: 'Breakdown of individual ingredients if this is a composite dish or meal',
+                    description: 'Breakdown of identified individual ingredients',
+                  },
+                  isPackagedProduct: {
+                    type: Type.BOOLEAN,
+                    description: 'True if this is a commercial/packaged product (bottle, jar, snack, box, can) where barcode scanning or ingredient table review is recommended',
                   },
                 },
                 required: [

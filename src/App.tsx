@@ -65,6 +65,7 @@ export default function App() {
     localStorage.setItem('sibo_nir_diary_v1', JSON.stringify(diaryEntries));
   }, [diaryEntries]);
 
+  const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   // Cancel ongoing analysis
@@ -280,9 +281,15 @@ export default function App() {
                 onReset={() => {
                   setAnalysisResult(null);
                   setErrorMsg(null);
+                  setScannerMode('camera');
                 }}
                 onSaveToDiary={handleSaveToDiary}
                 onExploreAlternative={handleExploreAlternative}
+                onScanBarcode={() => {
+                  setAnalysisResult(null);
+                  setErrorMsg(null);
+                  setScannerMode('barcode');
+                }}
                 isSaved={isSavedInDiary}
               />
             ) : (
@@ -292,6 +299,7 @@ export default function App() {
                 onCancelAnalyze={handleCancelAnalyze}
                 isLoading={isLoading}
                 onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
+                initialMode={scannerMode}
               />
             )}
           </div>

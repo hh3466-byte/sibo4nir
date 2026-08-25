@@ -11,6 +11,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Camera,
+  Barcode,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -18,6 +19,7 @@ interface TrafficLightResultProps {
   onReset: () => void;
   onSaveToDiary: (result: FoodAnalysisResult) => void;
   onExploreAlternative: (query: string) => void;
+  onScanBarcode?: () => void;
   isSaved?: boolean;
 }
 
@@ -26,6 +28,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   onReset,
   onSaveToDiary,
   onExploreAlternative,
+  onScanBarcode,
   isSaved = false,
 }) => {
   const statusConfig: Record<
@@ -204,7 +207,37 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
             </div>
           </div>
 
-          {/* Multi-Ingredient breakdown if composite meal */}
+          {/* Packaged Product Barcode Recommendation Banner */}
+          {result.isPackagedProduct && (
+            <div className="pt-5">
+              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-xs">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                    <Barcode className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
+                      <span>💡 זיהינו שמדובר במוצר ארוז / מסחרי</span>
+                    </h4>
+                    <p className="text-xs text-indigo-800/90 mt-0.5 leading-relaxed">
+                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
+                    </p>
+                  </div>
+                </div>
+                {onScanBarcode && (
+                  <button
+                    id="btn-scan-barcode-from-result"
+                    type="button"
+                    onClick={onScanBarcode}
+                    className="w-full sm:w-auto shrink-0 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Barcode className="w-4 h-4" />
+                    <span>סרוק ברקוד של המוצר 🏷️</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
           {result.ingredientsBreakdown && result.ingredientsBreakdown.length > 0 && (
             <div className="pt-5 space-y-3">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
