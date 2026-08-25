@@ -528,6 +528,46 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
     cookingTips: ['שמן זית מושרה בשום מעניק טעם שום אמיתי ללא שום נזק ל-SIBO!'],
     riskScore: 1,
   },
+  // --- תה קר, פיוז תה ומשקאות מסחריים (Iced Tea & Soft Drinks) ---
+  {
+    keywords: ['פיוז תה', 'פיוזתה', 'fuze', 'fuzetea', 'fuce tea', 'fuce', 'תה קר', 'נסטי', 'nestea', 'iced tea', 'תה קר אפרסק', 'תה קר לימון', 'thé', 'thés', 'thé glacé'],
+    statusPhase1: 'YELLOW',
+    statusPhase2: 'YELLOW',
+    foodNameHe: 'תה קר / פיוז תה (Fuze Tea)',
+    foodNameEn: 'Iced Tea / Fuze Tea',
+    verdictHe: 'אור צהוב — מוגבל / זהירות בגלל סוכר ורכז פרי',
+    explanationHe: 'תה קר מסחרי (כמו פיוז תה או נסטי) מבוסס על מים ותמצית תה, אך מוסיפים לו כמויות משמעותיות של סוכר, סירופ תירס עתיר פרוקטוז (HFCS) או רכזי פירות (כגון רכז אפרסק/לימון). ב-SIBO, עודף פרוקטוז נספג באיטיות ומתסיס את חיידקי המעי הדק. מותר בכמות מדודה וקטנה (עד חצי כוס), או עדיף להחליף בתה קר ירוק/צמחים ביתי ללא סוכר.',
+    fodmapTriggers: ['עודף פרוקטוז (Excess Fructose)', 'סוכר מוסף / רכז פרי'],
+    maxSafePortionHe: 'חצי כוס עד כוס קטנה (100-150 מ"ל)',
+    safeSubstitutions: [
+      '🍵 תה ירוק קר ביתי עם נענע ולימון (ללא סוכר)',
+      '🫚 חליטת ג׳ינג׳ר קרה מרעננת',
+      '🍋 מים צוננים עם פלחי לימון וקרח',
+      '🌿 תה צמחים / קמומיל קר'
+    ],
+    cookingTips: ['להכין תה קר בבית מחליטת תה ירוק או נענע ולהגיש עם קרח ופלח לימון ללא סוכר'],
+    riskScore: 3,
+  },
+  // --- תה ירוק וחליטות צמחים ללא סוכר (Natural Teas & Infusions) ---
+  {
+    keywords: ['תה ירוק', 'תה נענע', 'תה מנטה', 'חליטת נענע', 'חליטת מנטה', 'חליטת ג׳ינג׳ר', 'חליטת ג\'ינג\'ר', 'חליטת קמומיל', 'תה שחור', 'תה ללא סוכר'],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'תה ירוק / שחור / חליטת נענע וג׳ינג׳ר (ללא סוכר)',
+    foodNameEn: 'Green Tea / Peppermint / Ginger Infusion',
+    verdictHe: 'אור ירוק! מותר, בטוח ומרגיע את מערכת העיכול.',
+    explanationHe: 'תה ירוק, תה שחור רגיל, עלי נענע/מנטה וג׳ינג׳ר טרי נקיים מ-FODMAPs. מנטה וג׳ינג׳ר אף מרגיעים את שרירי מערכת העיכול ומפחיתים גזים ועוויתות.',
+    fodmapTriggers: ['ללא FODMAP'],
+    maxSafePortionHe: 'חופשי (2-4 כוסות ביום)',
+    safeSubstitutions: [
+      '🍵 תה ירוק טהור עשיר בנוגדי חמצון',
+      '🌿 חליטת עלי נענע טריים',
+      '🫚 חליטת שורש ג׳ינג׳ר טרי פרוס',
+      '🌼 תה קמומיל מרגיע'
+    ],
+    cookingTips: ['לחלוט עלי נענע או שורש ג׳ינג׳ר במים רותחים 5-10 דקות'],
+    riskScore: 1,
+  },
   // --- פחמימות מותרות שלב 2 (Phase 2 Starches) ---
   {
     keywords: ['אורז', 'אורז לבן', 'אורז בסמטי', 'אורז יסמין', 'תפוח אדמה', 'פירה ללא חלב', 'קינואה'],
@@ -553,12 +593,22 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
  * Find clinical SIBO analysis for any given query or food item
  */
 export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_strict'): FoodAnalysisResult {
-  const normalizedQuery = query.toLowerCase().trim();
   const isPhase1 = phase === 'phase1_strict';
+
+  // Clean raw prompt string if coming from barcode
+  let cleanName = query.trim();
+  if (cleanName.includes('שם המוצר:')) {
+    const match = cleanName.match(/שם המוצר:\s*([^:\n\r()]+)/);
+    if (match && match[1].trim()) {
+      cleanName = match[1].trim();
+    }
+  }
 
   // 1. Direct search in SIBO_FOOD_DATABASE with Hebrew fuzzy normalization
   const dbMatch = SIBO_FOOD_DATABASE.find((item) => {
     return (
+      fuzzyHebrewMatch(item.nameHe, cleanName) ||
+      fuzzyHebrewMatch(item.nameEn, cleanName) ||
       fuzzyHebrewMatch(item.nameHe, query) ||
       fuzzyHebrewMatch(item.nameEn, query)
     );
@@ -606,12 +656,18 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
 
   // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES
   for (const rule of CLINICAL_SIBO_RULES) {
-    const matchedKeyword = rule.keywords.find((kw) => fuzzyHebrewMatch(query, kw) || fuzzyHebrewMatch(kw, query));
+    const matchedKeyword = rule.keywords.find(
+      (kw) =>
+        fuzzyHebrewMatch(cleanName, kw) ||
+        fuzzyHebrewMatch(kw, cleanName) ||
+        fuzzyHebrewMatch(query, kw) ||
+        fuzzyHebrewMatch(kw, query)
+    );
     if (matchedKeyword) {
       const status = isPhase1 ? rule.statusPhase1 : rule.statusPhase2;
       return {
         status,
-        foodName: `${query} (${rule.foodNameHe})`,
+        foodName: cleanName.length > 0 && cleanName !== rule.foodNameHe ? `${cleanName} (${rule.foodNameHe})` : rule.foodNameHe,
         englishName: rule.foodNameEn,
         shortVerdict: rule.verdictHe,
         detailedExplanation: rule.explanationHe,
@@ -633,23 +689,28 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
   }
 
   // 3. Fallback for Unknown / Generic Queries
-  const smartSubs = getSmartCategoricalSubstitutions(query);
-  const isGeneric = !query || query.includes('מאכל שצולם') || query.includes('מאכל');
+  const smartSubs = getSmartCategoricalSubstitutions(cleanName);
+  const isGeneric = !cleanName || cleanName.includes('מאכל שצולם') || cleanName.includes('מאכל') || cleanName.includes('מוצר ארוז');
+  const isDrink = /תה|משקה|מיץ|קולה|סודה|ספרייט|פאנטה|משקאות|drink|tea|beverage|fuzetea|fuze/i.test(cleanName + query);
 
   return {
     status: isPhase1 ? 'YELLOW' : 'GREEN',
-    foodName: isGeneric ? 'מאכל ארוז / לא מזוהה' : query,
-    englishName: 'Food Item',
+    foodName: isGeneric ? (isDrink ? 'משקה ארוז / לא מזוהה' : 'מאכל ארוז / לא מזוהה') : cleanName,
+    englishName: isDrink ? 'Packaged Beverage' : 'Food Item',
     shortVerdict: `נבדק לפי פרוטוקול SIBO (${isPhase1 ? 'שלב 1 קפדני' : 'שלב 2'})`,
-    detailedExplanation: isGeneric
+    detailedExplanation: isDrink
+      ? `המשקה "${cleanName}" נבדק על פי כללי SIBO. מומלץ לצרוך בכמות מתונה ולוודא שאינו מכיל תוספת סירופ פרוקטוז (HFCS), סוכר מרוכז או ממתיקים אלכוהוליים מתסיסים (סורביטול/מניטול).`
+      : isGeneric
       ? 'זיהינו צילום של מוצר. כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), מומלץ ביותר לסרוק את הברקוד 🏷️ או לצלם ישירות את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!'
-      : `המאכל "${query}" נבדק על פי כללי התסיסה של פרוטוקול SIBO. בשלב 1 הקפדני מומלץ לצרוך במנה מתונה בלבד ולוודא שאין תוספת שום, בצל, קמח חיטה או ממתיקים אלכוהוליים.`,
-    fodmapTriggers: ['דרושה בדיקת רכיבים מדויקת'],
+      : `המאכל "${cleanName}" נבדק על פי כללי התסיסה של פרוטוקול SIBO. בשלב 1 הקפדני מומלץ לצרוך במנה מתונה בלבד ולוודא שאין תוספת שום, בצל, קמח חיטה או ממתיקים אלכוהוליים.`,
+    fodmapTriggers: isDrink ? ['סוכרים מוספים / פרוקטוז'] : ['דרושה בדיקת רכיבים מדויקת'],
     phase1Compatibility: false,
     phase2Compatibility: true,
-    maxSafePortion: 'מנה קטנה ומדודה (עד 50-75 גרם)',
-    safeSubstitutions: smartSubs, // WILL BE [] IF NO KNOWN CATEGORY!
-    cookingTips: ['לוודא שאין תבלינים מתסיסים כמו אבקת שום או בצל'],
+    maxSafePortion: isDrink ? 'עד 1 כוס (150-200 מ"ל)' : 'מנה קטנה ומדודה (עד 50-75 גרם)',
+    safeSubstitutions: smartSubs,
+    cookingTips: isDrink
+      ? ['להעדיף מים, סודה טבעית או חליטות צמחים ותה ירוק ללא סוכר']
+      : ['לוודא שאין תבלינים מתסיסים כמו אבקת שום או בצל'],
     medicalReferences: [
       'Dr. Allison Siebecker - SIBO Food Guide',
       'Monash University FODMAP'

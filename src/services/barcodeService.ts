@@ -17,7 +17,33 @@ export interface BarcodeProductInfo {
  * Known common Israeli barcodes dictionary for instant offline zero-latency lookup
  */
 const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
-  // Yotvata / Tnuva / Tara Lactose Free milks
+  // Fuze Tea & Iced Teas
+  '7290110115623': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110115616': {
+    productName: 'תה קר בטעם מנגו-אננס (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, סוכר, פרוקטוז, תמצית תה שחור, רכז מיץ מנגו ואננס',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110115609': {
+    productName: 'תה קר בטעם לימון (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, סוכר, פרוקטוז, תמצית תה שחור, רכז מיץ לימון',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110115630': {
+    productName: 'תה קר ZERO ללא סוכר בטעם אפרסק (Fuze Tea Zero)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, תמצית תה שחור, מווסתי חומציות, ממתיקים (אספרטיים, אססולפאם K, סוכרלוז)',
+    categories: 'תה קר ללא סוכר / משקאות דיאט',
+  },
+
+  // Milks & Lactose Free Dairy
   '7290000045053': {
     productName: 'חלב יטבתה דל לקטוז (0% לקטוז)',
     brand: 'יטבתה',
@@ -31,14 +57,14 @@ const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
     categories: 'מוצרי חלב ללא לקטוז',
   },
   '7290000045077': {
-    productName: 'קוטג׳ תנובה 5% (רגיל)',
+    productName: 'גבינת קוטג׳ תנובה 5% (רגיל)',
     brand: 'תנובה',
     ingredientsText: 'חלב מפוסטר, שמנת, מלח, חומרי טעם',
     allergens: 'מכיל לקטוז וחלב',
     categories: 'גבינות רכות',
   },
   '7290000045084': {
-    productName: 'קוטג׳ שטראוס ללא לקטוז (0% לקטוז)',
+    productName: 'גבינת קוטג׳ שטראוס ללא לקטוז (0% לקטוז)',
     brand: 'שטראוס',
     ingredientsText: 'חלב מפוסטר ללא לקטוז, שמנת, אנזים לקטאז, מלח',
     categories: 'מוצרי חלב ללא לקטוז',
@@ -50,6 +76,23 @@ const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
     categories: 'גבינות קשות',
   },
 };
+
+/**
+ * Clean and normalize product names from messy international barcode DBs
+ */
+function cleanRawProductName(rawName: string, brand?: string): string {
+  let name = rawName.trim();
+  if (/fuce\s*tea/i.test(name) || /fuze\s*tea/i.test(name) || /fuzetea/i.test(name)) {
+    return 'תה קר פיוז תה (Fuze Tea)';
+  }
+  if (/nestea/i.test(name)) {
+    return 'תה קר נסטי (Nestea)';
+  }
+  if (/coca\s*cola/i.test(name) || /coke/i.test(name)) {
+    return 'קוקה קולה (Coca Cola)';
+  }
+  return name;
+}
 
 /**
  * Fetch product information and full ingredient list with resilient timeout
@@ -99,13 +142,16 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
 
       if (data.status === 1 && data.product) {
         const p = data.product;
-        const productName =
+        const brand = p.brands || p.brand_owner || '';
+        const rawName =
           p.product_name_he ||
           p.product_name ||
           p.generic_name_he ||
           p.generic_name ||
-          p.brands ||
+          brand ||
           `מוצר ארוז (${cleanBarcode})`;
+
+        const productName = cleanRawProductName(rawName, brand);
 
         const ingredientsText =
           p.ingredients_text_he ||
@@ -114,7 +160,6 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
           p.ingredients_text_with_allergens_he ||
           '';
 
-        const brand = p.brands || p.brand_owner || '';
         const allergens = p.allergens || p.allergens_tags?.join(', ') || '';
         const categories = p.categories || '';
         const imageUrl = p.image_front_url || p.image_url || '';

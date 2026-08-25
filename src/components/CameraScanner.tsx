@@ -376,11 +376,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     try {
       const prod = await fetchProductByBarcode(cleanCode);
       if (prod.found) {
-        const textPrompt = `מוצר ארוז מסחרי (זוהה מברקוד ${prod.barcode}):
-שם המוצר: ${prod.productName} ${prod.brand ? `(מותג: ${prod.brand})` : ''}
-רשימת רכיבים רשמית: ${prod.ingredientsText || 'ללא פירוט רכיבים במאגר'}
-אלרגנים/הערות: ${prod.allergens || 'לא צוינו אלרגנים'}
-קטגוריות: ${prod.categories || 'מזון'}`;
+        const cleanName = prod.productName || 'מוצר ארוז';
+        const textPrompt = prod.ingredientsText
+          ? `${cleanName} (רכיבים: ${prod.ingredientsText})`
+          : cleanName;
 
         await onAnalyze({
           textPrompt,
