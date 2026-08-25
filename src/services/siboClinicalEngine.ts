@@ -18,45 +18,136 @@ interface ClinicalRule {
 
 /**
  * Smart contextual substitution resolver based on food category
+ * RULES:
+ * 1. Must strictly belong to the same culinary category (drinks -> drinks, dairy -> dairy, bread -> starches).
+ * 2. If the query is generic or unknown (e.g. 'מאכל שצולם', 'מוצר'), RETURN AN EMPTY ARRAY []!
+ *    NEVER output random chicken/cucumber/oil.
  */
 export function getSmartCategoricalSubstitutions(query: string): string[] {
-  const q = query.toLowerCase();
+  if (!query || !query.trim()) return [];
+  const q = query.toLowerCase().trim();
 
-  // 1. Coffee, Tea & Hot/Cold Drinks
-  if (q.includes('קפה') || q.includes('אספרסו') || q.includes('לאטה') || q.includes('שוקו') || q.includes('נס קפה') || q.includes('קפוצ') || q.includes('תה') || q.includes('משקאות') || q.includes('מיץ') || q.includes('קולה') || q.includes('סודה') || q.includes('שייק') || q.includes('משקה')) {
+  // If generic placeholder query, return NO substitutions
+  if (
+    q === 'מאכל שצולם' ||
+    q === 'מאכל' ||
+    q === 'תמונה' ||
+    q === 'אוכל' ||
+    q === 'מנה' ||
+    q === 'מוצר' ||
+    q === 'food item' ||
+    q === 'food'
+  ) {
+    return [];
+  }
+
+  // 1. Dairy Products, Milk & Soft Cheeses (חלב, יוגורט, דל לקטוז, יטבתה, תנובה, טרה, שטראוס)
+  if (
+    q.includes('חלב') ||
+    q.includes('לקטוז') ||
+    q.includes('יוגורט') ||
+    q.includes('גבינ') ||
+    q.includes('קוטג') ||
+    q.includes('שמנת') ||
+    q.includes('מוצרלה') ||
+    q.includes('גלידה') ||
+    q.includes('שוקו') ||
+    q.includes('ריקוטה') ||
+    q.includes('חמאה') ||
+    q.includes('יטבתה') ||
+    q.includes('תנובה') ||
+    q.includes('טרה') ||
+    q.includes('שטראוס') ||
+    q.includes('מחלבות') ||
+    q.includes('קזאין') ||
+    q.includes('מעדן')
+  ) {
     return [
-      '☕ קפה אספרסו שחור נקי (ללא חלב רגיל)',
+      '🥛 חלב שקדים טהור ללא סוכר וללא תוספי גומי (Almond Milk)',
+      '🥛 חלב / יוגורט 0% לקטוז (Lactose-Free)',
+      '🧀 גבינת פרמזן מיושנת (Aged Parmesan) — כמעט 0% לקטוז ומותרת!',
+      '🧈 חמאה מזוקקת (גהי / Ghee) נקייה ממוצקי חלב ולקטוז',
+      '🥥 יוגורט קוקוס טבעי ללא סוכר וללא חומרי עיבוי'
+    ];
+  }
+
+  // 2. Coffee, Tea & Hot/Cold Drinks (קפה, אספרסו, לאטה, תה, מיצים, משקאות)
+  if (
+    q.includes('קפה') ||
+    q.includes('אספרסו') ||
+    q.includes('לאטה') ||
+    q.includes('נס קפה') ||
+    q.includes('קפוצ') ||
+    q.includes('הפוך') ||
+    q.includes('תה') ||
+    q.includes('משקאות') ||
+    q.includes('מיץ') ||
+    q.includes('קולה') ||
+    q.includes('סודה') ||
+    q.includes('שייק') ||
+    q.includes('משקה') ||
+    q.includes('תרכיז')
+  ) {
+    return [
+      '☕ קפה אספרסו שחור נקי (ללא חלב פרה רגיל)',
       '🥛 קפה עם חלב שקדים טהור ללא סוכר וללא תוספי גומי',
-      '🫚 תה ג׳ינג׳ר טרי מחומם (מאיץ מעולה לתנועתיות מעיים MMC)',
+      '🫚 תה ג׳ינג׳ר טרי מחומם (מאיץ מעולה לתנוعתיות מעיים MMC)',
       '🍵 תה ירוק עדין או תה נענע/מנטה טבעי ללא סוכר',
       '🍋 סודה טבעית מרעננת עם פלחי לימון ונענע'
     ];
   }
 
-  // 2. Breads, Baked Goods, Wheat, Pastas & Grains
-  if (q.includes('לחם') || q.includes('פיתה') || q.includes('חלה') || q.includes('בגט') || q.includes('לחמני') || q.includes('פסטה') || q.includes('בצק') || q.includes('פיצה') || q.includes('קרקר') || q.includes('ביסקוויט') || q.includes('עוגה') || q.includes('עוגיו') || q.includes('טוסט') || q.includes('קוסקוס') || q.includes('בורגול') || q.includes('דגנים') || q.includes('גלוטן') || q.includes('סנדוויץ') || q.includes('כריך')) {
+  // 3. Breads, Baked Goods, Wheat, Pastas & Grains (לחם, פסטה, פיתה, עוגיות, קרקרים)
+  if (
+    q.includes('לחם') ||
+    q.includes('פיתה') ||
+    q.includes('חלה') ||
+    q.includes('בגט') ||
+    q.includes('לחמני') ||
+    q.includes('פסטה') ||
+    q.includes('בצק') ||
+    q.includes('פיצה') ||
+    q.includes('קרקר') ||
+    q.includes('ביסקוויט') ||
+    q.includes('עוגה') ||
+    q.includes('עוגיו') ||
+    q.includes('טוסט') ||
+    q.includes('קוסקוס') ||
+    q.includes('בורגול') ||
+    q.includes('דגנים') ||
+    q.includes('גלוטן') ||
+    q.includes('סנדוויץ') ||
+    q.includes('כריך') ||
+    q.includes('מאפה') ||
+    q.includes('רוגלך') ||
+    q.includes('קרואסון') ||
+    q.includes('אנג׳ל') ||
+    q.includes('ברמן')
+  ) {
     return [
       '🌾 פריכיות אורז מלא או אורז לבן במתינות (1-2 יחידות)',
-      '🍞 לחם מחמצת כוסמין 100% אמיתי בהתססה איטית ממושכת (בדיקה אישית)',
-      '🥖 קרקרים ביתיים מבוססי קמח שקדים וזרעי צ׳יה',
+      '🍞 לחם מחמצת כוסמין 100% אמיתי בהתססה איטית ממושכת (בדיקה אישית בלבד)',
+      '🥖 קרקרים מבוססי קמח שקדים וזרעי צ׳יה',
       '🥬 עטיפות עלי חסה פריכים כבסיס לכריך ללא גלוטן וללא פחמימות',
       '🍜 נודלס מקישואים מגוררים (Zoodles) כחלופה מעולה לפסטה'
     ];
   }
 
-  // 3. Dairy Products, Milk & Soft Cheeses
-  if (q.includes('חלב') || q.includes('יוגורט') || q.includes('גבינ') || q.includes('קוטג') || q.includes('שמנת') || q.includes('מוצרלה') || q.includes('גלידה') || q.includes('שוקו') || q.includes('ריקוטה') || q.includes('חמאה')) {
-    return [
-      '🥛 חלב שקדים טהור ללא תוספת סוכר, קרגינן או גומי (Almond Milk)',
-      '🧀 גבינת פרמזן מיושנת (Aged Parmesan) — כמעט 0% לקטוז ומותרת!',
-      '🧈 חמאה מזוקקת (גהי / Ghee) נקייה ממוצקי חלב ולקטוז',
-      '🥥 יוגורט קוקוס טבעי ללא סוכר וללא תוספי עיבוי',
-      '🥛 חלב / יוגורט מועשר ללא לקטוז (Lactose-Free)'
-    ];
-  }
-
-  // 4. Sweets, Sugar, Desserts & Chocolate
-  if (q.includes('שוקולד') || q.includes('סוכר') || q.includes('ממתק') || q.includes('דבש') || q.includes('סילאן') || q.includes('ריבה') || q.includes('חלבה') || q.includes('גלידה') || q.includes('קינוח') || q.includes('קרמל') || q.includes('ופל')) {
+  // 4. Sweets, Sugar, Desserts & Chocolate (שוקולד, ממתקים, עוגות, סוכר, דבש)
+  if (
+    q.includes('שוקולד') ||
+    q.includes('סוכר') ||
+    q.includes('ממתק') ||
+    q.includes('דבש') ||
+    q.includes('סילאן') ||
+    q.includes('ריבה') ||
+    q.includes('חלבה') ||
+    q.includes('קינוח') ||
+    q.includes('קרמל') ||
+    q.includes('ופל') ||
+    q.includes('עלית') ||
+    q.includes('ממתקים')
+  ) {
     return [
       '🍓 תותים טריים עם מעט סירופ מייפל טהור 100%',
       '🍫 שוקולד מריר 85%+ איכותי דל סוכר (קובייה אחת מדודה)',
@@ -66,8 +157,16 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // 5. Onion, Garlic & Intense Seasonings
-  if (q.includes('שום') || q.includes('בצל') || q.includes('כרישה') || q.includes('שאלוט') || q.includes('אבקת שום') || q.includes('אבקת בצל') || q.includes('רוטב')) {
+  // 5. Onion, Garlic & Intense Seasonings (שום, בצל, כרישה, אבקת שום)
+  if (
+    q.includes('שום') ||
+    q.includes('בצל') ||
+    q.includes('כרישה') ||
+    q.includes('שאלוט') ||
+    q.includes('אבקת שום') ||
+    q.includes('אבקת בצל') ||
+    q.includes('רוטב שום')
+  ) {
     return [
       '🧄 שמן זית מושרה בשום (Garlic-Infused Oil) — הפרוקטן אינו מסיס בשמן ומותר לחלוטין!',
       '🌱 עלי בצל ירוק (החלק הירוק העליון בלבד — 0 פרוקטנים)',
@@ -77,8 +176,19 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // 6. Legumes, Hummus & Beans
-  if (q.includes('חומוס') || q.includes('עדשים') || q.includes('שעועית') || q.includes('פול') || q.includes('פלאפל') || q.includes('אפונה') || q.includes('טחינה') || q.includes('מסבחה')) {
+  // 6. Legumes, Hummus & Beans (חומוס, עדשים, שעועית, פול, פלאפל)
+  if (
+    q.includes('חומוס') ||
+    q.includes('עדשים') ||
+    q.includes('שעועית') ||
+    q.includes('פול') ||
+    q.includes('פלאפל') ||
+    q.includes('אפונה') ||
+    q.includes('טחינה') ||
+    q.includes('מסבחה') ||
+    q.includes('צבר') ||
+    q.includes('אחלה')
+  ) {
     return [
       '🥒 ממרח קישואים קלויים בשמן זית ושמן שום (במרקם וטעם חומוס מדהים ללא קטניות!)',
       '🥕 ממרח גזר אפוי וטחון עם שמן זית וכמון',
@@ -88,8 +198,20 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // 7. High FODMAP Fruits (Apple, Pear, Watermelon, Mango, Dates)
-  if (q.includes('תפוח') || q.includes('אגס') || q.includes('אבטיח') || q.includes('מנגו') || q.includes('תמר') || q.includes('צימוק') || q.includes('משמש') || q.includes('אפרסק') || q.includes('דובדבן') || q.includes('שזיף') || q.includes('פרי יבש')) {
+  // 7. High FODMAP Fruits (תפוח, אגס, מנגו, אבטיח, תמרים, פירות יבשים)
+  if (
+    q.includes('תפוח') ||
+    q.includes('אגס') ||
+    q.includes('אבטיח') ||
+    q.includes('מנגו') ||
+    q.includes('תמר') ||
+    q.includes('צימוק') ||
+    q.includes('משמש') ||
+    q.includes('אפרסק') ||
+    q.includes('דובדבן') ||
+    q.includes('שזיף') ||
+    q.includes('פרי יבש')
+  ) {
     return [
       '🍓 תות שדה טרי (עד 5-6 תותים בינוניים)',
       '🍊 תפוז או קלמנטינה טרייה (יחס גלוקוז-פרוקטוז מאוזן 1:1)',
@@ -99,8 +221,15 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // 8. High FODMAP Vegetables (Cauliflower, Mushrooms, Asparagus)
-  if (q.includes('כרובית') || q.includes('פטריות') || q.includes('אספרגוס') || q.includes('ארטישוק') || q.includes('סלק') || q.includes('ברוקולי')) {
+  // 8. High FODMAP Vegetables (כרובית, פטריות, אספרגוס, ארטישוק)
+  if (
+    q.includes('כרובית') ||
+    q.includes('פטריות') ||
+    q.includes('אספרגוס') ||
+    q.includes('ארטישוק') ||
+    q.includes('סלק') ||
+    q.includes('ברוקולי')
+  ) {
     return [
       '🥕 גזר מבושל ורך (0 FODMAP וקל מאוד לעיכול)',
       '🥒 קישוא / זוקיני מאודה בשמן זית (עד 65 גרם)',
@@ -110,8 +239,16 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // 9. Alcohol & Cocktails
-  if (q.includes('בירה') || q.includes('אלכוהול') || q.includes('יין') || q.includes('וודקה') || q.includes('ג׳ין') || q.includes('קוקטייל') || q.includes('וויסקי')) {
+  // 9. Alcohol & Cocktails (בירה, יין, אלכוהול)
+  if (
+    q.includes('בירה') ||
+    q.includes('אלכוהול') ||
+    q.includes('יין') ||
+    q.includes('וודקה') ||
+    q.includes('ג׳ין') ||
+    q.includes('קוקטייל') ||
+    q.includes('וויסקי')
+  ) {
     return [
       '🍷 כוס יין אדום או לבן יבש בלבד (Dry Wine — דל בסוכרים מתסיסים)',
       '🍸 ג׳ין או וודקה איכותית נקייה עם מי סודה ולימון (ללא משקאות מוגזים ממותקים)',
@@ -119,17 +256,41 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
-  // Default General Clean SIBO Alternatives
-  return [
-    '🍗 חלבון טהור: חזה עוף טרי צלוי, סלמון אפוי או ביצים',
-    '🥒 ירקות מותרים: מלפפון קלוף, גזר מבושל, קישוא מאודה',
-    '🫒 שומנים בריאים: שמן זית כתית מעולה או גהי (Ghee)',
-    '🍓 פירות דלי תסיסה: תותים טריים או אוכמניות בכמות מדודה'
-  ];
+  // If no category match, DO NOT invent substitutions — return empty array!
+  return [];
 }
 
 // Extensive dictionary of clinical SIBO dietary rules
 const CLINICAL_SIBO_RULES: ClinicalRule[] = [
+  // --- חלב דל לקטוז / ללא לקטוז (Lactose-Free & Low Lactose Milk) ---
+  {
+    keywords: [
+      'דל לקטוז',
+      'ללא לקטוז',
+      'חלב דל לקטוז',
+      'חלב ללא לקטוז',
+      'יטבתה דל לקטוז',
+      'תנובה דל לקטוז',
+      'טרה דל לקטוז',
+      'משקה דל לקטוז',
+      '0% לקטוז'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'חלב פרה דל לקטוז / ללא לקטוז (Lactose-Free Milk)',
+    foodNameEn: 'Lactose-Free Milk',
+    verdictHe: 'אור ירוק! מותר ובטוח לניר (הלקטוז פורק מראש לאנזימים פשוטים).',
+    explanationHe: 'בחלב דל לקטוז / ללא לקטוז, אנזים הלקטאז מפרק מראש את הלקטוז לגלוקוז וגלקטוז, שנספגים ישירות במעי הדק ללא תסיסה חיידקית. בטוח לחלוטין לניר לשתייה עם קפה, להכנת שייקים מותרים או לדייסות דלות FODMAP.',
+    fodmapTriggers: ['0 לקטוז (הלקטוז מפורק לחלוטין)'],
+    maxSafePortionHe: 'עד כוס אחת (200-250 מ״ל) לארוחה',
+    safeSubstitutions: [
+      '🥛 חלב שקדים טהור ללא סוכר וללא תוספי גומי',
+      '🥥 יוגורט קוקוס טבעי ללא סוכר',
+      '🧀 גבינת פרמזן מיושנת (Aged Parmesan — 0% לקטוז)'
+    ],
+    cookingTips: ['לוודא שאין תוספת סוכרים או חומרי עיבוי כמו אינולין ברשימת הרכיבים'],
+    riskScore: 1,
+  },
   // --- קפה ומשקאות (Coffee, Tea & Beverages) ---
   {
     keywords: ['קפה', 'אספרסו', 'לאטה', 'נס קפה', 'קפוצינו', 'הפוך', 'קפה עם חלב', 'שוקו', 'תה שחור', 'משקה', 'קולה', 'מיץ'],
@@ -220,22 +381,22 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
     cookingTips: ['אם מכינים ממרח: להכין ממרח קישואים או גזר קלוי בשמן זית ללא קטניות'],
     riskScore: 5,
   },
-  // --- מוצרי חלב ולקטוז (Dairy & Lactose) ---
+  // --- מוצרי חלב פרה רגיל ולקטוז (Dairy & Lactose) ---
   {
-    keywords: ['חלב', 'יוגורט', 'קוטג׳', 'גבינה לבנה', 'גבינה צהובה רגילה', 'שמנת', 'גלידה', 'מוצרלה רכה', 'ריזוטו שמנת'],
+    keywords: ['חלב פרה', 'חלב רגיל', 'חלב תנובה', 'יוגורט', 'קוטג׳', 'גבינה לבנה', 'גבינה צהובה רגילה', 'שמנת', 'גלידה', 'מוצרלה רכה', 'ריזוטו שמנת'],
     statusPhase1: 'RED',
     statusPhase2: 'RED',
     foodNameHe: 'מוצרי חלב פרה ניגר וגבינות רכות',
     foodNameEn: 'Dairy & Lactose Products',
     verdictHe: 'אור אדום! מכיל לקטוז שמתסיס את חיידקי ה-SIBO.',
-    explanationHe: 'לקטוז הוא דו-סוכר הדורש את אנזים הלקטאז. במצב של SIBO רירית המעי הדק מודלקת, ספיגת הלקטוז ירודה והחיידקים מתסיסים אותו במהירות. גבינות קשות מיושנות בלבד (פרמזן, צ׳דר) מותרות כי הלקטוז פורק ביישון.',
+    explanationHe: 'חלב פרה רגיל עשיר בלקטוז. במצב של SIBO רירית המעי הדק מודלקת, ספיגת הלקטוז ירודה והחיידקים מתסיסים אותו במהירות. מומלץ לעבור לחלב דל לקטוז או חלב שקדים טהור.',
     fodmapTriggers: ['לקטוז (Lactose)'],
     maxSafePortionHe: '0 מ״ל חלב רגיל / גבינות קשות עד 40 גרם',
     safeSubstitutions: [
+      '🥛 חלב דל לקטוז / ללא לקטוז (0% לקטוז)',
       '🥛 חלב שקדים טהור ללא סוכר וללא תוספי גומי (Almond Milk)',
       '🧀 גבינת פרמזן מיושנת (Aged Parmesan) — כמעט 0% לקטוז!',
       '🧈 חמאה מזוקקת (גהי / Ghee) נקייה ממוצקי חלב ולקטוז',
-      '🥛 חלב או יוגורט ללא לקטוז (Lactose-Free)',
       '🥥 יוגורט קוקוס טבעי ללא סוכר'
     ],
     cookingTips: ['לוודא שתווית חלב השקדים נקייה מקרגינן (Carrageenan) וגומי גלאן (Gellan Gum)'],
@@ -412,9 +573,10 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     const isYellow = status === 'YELLOW';
 
     // Get smart contextual substitutions tailored to this exact food category
-    const smartSubs = (dbMatch.alternativesHe && dbMatch.alternativesHe.length > 0)
-      ? dbMatch.alternativesHe
-      : getSmartCategoricalSubstitutions(dbMatch.nameHe);
+    const smartSubs =
+      dbMatch.alternativesHe && dbMatch.alternativesHe.length > 0
+        ? dbMatch.alternativesHe
+        : getSmartCategoricalSubstitutions(dbMatch.nameHe);
 
     return {
       status,
@@ -473,23 +635,29 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     }
   }
 
-  // 3. Smart Category-Aware Fallback
+  // 3. Fallback for Unknown / Generic Queries
+  const smartSubs = getSmartCategoricalSubstitutions(query);
+  const isGeneric = !query || query.includes('מאכל שצולם') || query.includes('מאכל');
+
   return {
     status: isPhase1 ? 'YELLOW' : 'GREEN',
-    foodName: query,
+    foodName: isGeneric ? 'מאכל ארוז / לא מזוהה' : query,
     englishName: 'Food Item',
     shortVerdict: `נבדק לפי פרוטוקול SIBO (${isPhase1 ? 'שלב 1 קפדני' : 'שלב 2'})`,
-    detailedExplanation: `המאכל "${query}" נבדק על פי כללי התסיסה של פרוטוקול SIBO. בשלב 1 הקפדני מומלץ לצרוך במנה מתונה בלבד ולוודא שאין תוספת שום, בצל, קמח חיטה או ממתיקים אלכוהוליים.`,
+    detailedExplanation: isGeneric
+      ? 'זיהינו צילום של מוצר. כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), מומלץ ביותר לסרוק את הברקוד 🏷️ או לצלם ישירות את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!'
+      : `המאכל "${query}" נבדק על פי כללי התסיסה של פרוטוקול SIBO. בשלב 1 הקפדני מומלץ לצרוך במנה מתונה בלבד ולוודא שאין תוספת שום, בצל, קמח חיטה או ממתיקים אלכוהוליים.`,
     fodmapTriggers: ['דרושה בדיקת רכיבים מדויקת'],
     phase1Compatibility: false,
     phase2Compatibility: true,
     maxSafePortion: 'מנה קטנה ומדודה (עד 50-75 גרם)',
-    safeSubstitutions: getSmartCategoricalSubstitutions(query),
+    safeSubstitutions: smartSubs, // WILL BE [] IF NO KNOWN CATEGORY!
     cookingTips: ['לוודא שאין תבלינים מתסיסים כמו אבקת שום או בצל'],
     medicalReferences: [
       'Dr. Allison Siebecker - SIBO Food Guide',
       'Monash University FODMAP'
     ],
+    isPackagedProduct: isGeneric,
     riskScore: 3,
     timestamp: Date.now(),
   };

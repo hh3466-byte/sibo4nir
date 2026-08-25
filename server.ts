@@ -109,13 +109,13 @@ async function startServer() {
       parts.push({ text: promptText });
 
       // Helper to generate content with model fallback
-      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
       let response: any = null;
 
       for (const model of modelsToTry) {
         try {
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error(`Timeout for ${model}`)), 4500)
+            setTimeout(() => reject(new Error(`Timeout for ${model}`)), 12000)
           );
 
           const aiCall = ai.models.generateContent({
@@ -283,7 +283,7 @@ async function startServer() {
 4. אם רלוונטי, ציין טיפ פרקטי למטבח או לאכילה מחוץ לבית.
 `;
 
-      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
       let response: any = null;
       let lastError: any = null;
 
