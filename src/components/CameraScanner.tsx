@@ -397,28 +397,29 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   return (
     <div id="camera-scanner-container" className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Intro Header Card */}
-      <div className="text-center space-y-2">
+      {/* Intro Header Card - Mobile Optimized */}
+      <div className="text-center space-y-2.5">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 text-xs font-extrabold shadow-2xs border border-emerald-300">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
           <span>פרוטוקול תזונה קליני ל-SIBO</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">
-          סורק רמזור מזון לסיבו (SIBO) לגורגורילה
-        </h2>
-        <p className="text-sm text-stone-600 max-w-2xl mx-auto leading-relaxed">
-          צלמי כל מאכל, צלחת, מוצר בסופר או תפריט — המערכת תנתח את רמת התסיסה וה-FODMAP ותסמן מיד{' '}
-          <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-lg shadow-2xs">
-            🟢 אור ירוק (מותר)
-          </span>{' '}
-          <span className="inline-flex items-center gap-1 font-bold text-yellow-900 bg-yellow-300 border border-yellow-400 px-2 py-0.5 rounded-lg shadow-2xs">
-            🟡 אור צהוב (מוגבל)
-          </span>{' '}
-          או{' '}
-          <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-lg shadow-2xs">
-            🔴 אור אדום (אסור)
-          </span>.
+        
+        <p className="text-xs sm:text-sm text-stone-600 max-w-xl mx-auto leading-relaxed">
+          צלמי כל מאכל, מוצר או תפריט — המערכת תנתח את רמת התסיסה וה-FODMAP:
         </p>
+
+        {/* Beautiful Centered Traffic Light Badge Bar */}
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap text-xs">
+          <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-xl shadow-2xs">
+            🟢 אור ירוק (מותר)
+          </span>
+          <span className="inline-flex items-center gap-1 font-bold text-yellow-950 bg-yellow-300 border border-yellow-400 px-2.5 py-1 rounded-xl shadow-2xs">
+            🟡 אור צהוב (מוגבל)
+          </span>
+          <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2.5 py-1 rounded-xl shadow-2xs">
+            🔴 אור אדום (אסור)
+          </span>
+        </div>
       </div>
 
       {/* Hidden Native Mobile Camera Input (Direct Smartphone Camera Trigger) */}
@@ -431,74 +432,67 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         className="hidden"
       />
 
-      {/* Input Mode Selector Tabs & Allowed/Forbidden Quick Button */}
-      <div className="flex flex-wrap items-center justify-center gap-2.5">
-        <div className="inline-flex p-1 rounded-2xl bg-gradient-to-r from-sky-100/80 via-purple-100/80 to-amber-100/80 border border-stone-300/80 text-xs font-semibold shadow-xs">
-          <button
-            id="scanner-mode-camera"
-            type="button"
-            onClick={() => {
-              setPreviewImage(null);
-              setMode('camera');
-            }}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-              mode === 'camera'
-                ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm font-bold'
-                : 'text-sky-900 hover:text-sky-950 hover:bg-white/60'
-            }`}
-          >
-            <Camera className="w-4 h-4" />
-            <span>מצלמה חיה</span>
-          </button>
+      {/* Symmetrical, Sleek 4-Button Toolbar (Perfect on Mobile & Desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full max-w-2xl mx-auto">
+        <button
+          id="scanner-mode-camera"
+          type="button"
+          onClick={() => {
+            setPreviewImage(null);
+            setMode('camera');
+          }}
+          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+            mode === 'camera'
+              ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white border-sky-400 shadow-md ring-2 ring-sky-300/40'
+              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+          }`}
+        >
+          <Camera className={`w-4 h-4 ${mode === 'camera' ? 'text-white' : 'text-sky-500'}`} />
+          <span>מצלמה חיה</span>
+        </button>
 
-          <button
-            id="scanner-mode-upload"
-            type="button"
-            onClick={() => {
-              setMode('upload');
-              stopCamera();
-            }}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-              mode === 'upload'
-                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-sm font-bold'
-                : 'text-purple-900 hover:text-purple-950 hover:bg-white/60'
-            }`}
-          >
-            <Upload className="w-4 h-4" />
-            <span>העלאת תמונה</span>
-          </button>
+        <button
+          id="scanner-mode-upload"
+          type="button"
+          onClick={() => {
+            setMode('upload');
+            stopCamera();
+          }}
+          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+            mode === 'upload'
+              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-purple-400 shadow-md ring-2 ring-purple-300/40'
+              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+          }`}
+        >
+          <Upload className={`w-4 h-4 ${mode === 'upload' ? 'text-white' : 'text-purple-500'}`} />
+          <span>העלאת תמונה</span>
+        </button>
 
-          <button
-            id="scanner-mode-text"
-            type="button"
-            onClick={() => {
-              setMode('text');
-              stopCamera();
-            }}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-              mode === 'text'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm font-bold'
-                : 'text-amber-900 hover:text-amber-950 hover:bg-white/60'
-            }`}
-          >
-            <Search className="w-4 h-4" />
-            <span>הקלדת מאכל / מנה</span>
-          </button>
-        </div>
+        <button
+          id="scanner-mode-text"
+          type="button"
+          onClick={() => {
+            setMode('text');
+            stopCamera();
+          }}
+          className={`py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border shadow-xs active:scale-95 ${
+            mode === 'text'
+              ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white border-amber-400 shadow-md ring-2 ring-amber-300/40'
+              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+          }`}
+        >
+          <Search className={`w-4 h-4 ${mode === 'text' ? 'text-white' : 'text-amber-500'}`} />
+          <span>הקלדת מאכל</span>
+        </button>
 
-        {/* מותר / אסור Button positioned in top line */}
         {onOpenAllowedForbidden && (
           <button
             id="btn-allowed-forbidden-top-row"
             type="button"
             onClick={onOpenAllowedForbidden}
-            className="px-4 py-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-2xl text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center gap-2 border border-emerald-400/50 cursor-pointer ring-2 ring-emerald-400/20"
+            className="py-3 px-3 rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-extrabold text-xs sm:text-sm border shadow-md active:scale-95 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-300/30"
           >
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-              <span className="w-2 h-2 rounded-full bg-rose-400" />
-            </span>
-            <span>מותר / אסור 🚦</span>
+            <span>🚦 מותר / אסור</span>
           </button>
         )}
       </div>
