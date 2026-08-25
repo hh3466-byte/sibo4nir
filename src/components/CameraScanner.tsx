@@ -11,10 +11,10 @@ import {
   CameraOff,
   SwitchCamera,
   Barcode,
-  CheckCircle2,
   RotateCcw,
   Zap,
   ZapOff,
+  Crosshair,
 } from 'lucide-react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { fetchProductByBarcode } from '../services/barcodeService';
@@ -50,6 +50,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
 
+  // Barcode Scanning Mode: 'manual' (Nir aims & clicks) vs 'auto' (continuous auto-detect)
+  const [barcodeScanMode, setBarcodeScanMode] = useState<'manual' | 'auto'>('manual');
+  const [isDecodingManualBarcode, setIsDecodingManualBarcode] = useState(false);
+
   // Barcode Zoom & Torch Controls
   const [barcodeZoom, setBarcodeZoom] = useState<number>(1.5);
   const [isTorchOn, setIsTorchOn] = useState<boolean>(false);
@@ -63,6 +67,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const isMountedRef = useRef(true);
   const requestCounterRef = useRef(0);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+
+  // Synchronize initialMode changes from parent (e.g. when user clicks "סרוק ברקוד" from result modal)
+  useEffect(() => {
+    if (initialMode && initialMode !== mode) {
+      setMode(initialMode);
+      if (initialMode !== 'camera') {
+        stopCamera();
+      }
+    }
+  }, [initialMode]);
 
   // Stop camera tracks safely and release hardware locks
   const stopCamera = useCallback(() => {
@@ -120,7 +134,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     let activeStream: MediaStream | null = null;
 
-    // Constraint Strategy 1: High Resolution with continuous autofocus
+    // Strategy 1: High-res video with environment camera
     try {
       activeStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -134,7 +148,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       console.warn('[CameraScanner] Strategy 1 failed, trying Strategy 2...', e1);
     }
 
-    // Constraint Strategy 2: Simple target facingMode
+    // Strategy 2: Simple target facingMode
     if (!activeStream && isMountedRef.current && currentRequestId === requestCounterRef.current) {
       try {
         activeStream = await navigator.mediaDevices.getUserMedia({
@@ -148,7 +162,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    // Constraint Strategy 3: Any video track available
+    // Strategy 3: Any video track available
     if (!activeStream && isMountedRef.current && currentRequestId === requestCounterRef.current) {
       try {
         activeStream = await navigator.mediaDevices.getUserMedia({
@@ -161,7 +175,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           const isDenied = e3.name === 'NotAllowedError' || e3.name === 'PermissionDeniedError';
           setCameraError(
             isDenied
-              ? 'גישה למצלמה נחסמה בדפדפן. יש לאשר הרשאת מצלמה בהגדרות הדפדפן, או ללחוץ על "צלם במצלמת הטלפון".'
+              ? 'גישה למצלמה נחסמה בדפדפן. יש לאשר הרשאת מצלמה בהגדרות הדפדפן, או ללחוץ על "צלמי במצלמת הטלפון".'
               : 'לא הצלחנו לפתוח את שידור המצלמה. באפשרותך לצלם ישירות במצלמת המכשיר.'
           );
           setIsInitializingCamera(false);
@@ -320,11 +334,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 facingMode: 'environment',
               },
               {
-                fps: 20,
+                fps: 15,
                 qrbox: (viewfinderWidth, viewfinderHeight) => {
                   return {
-                    width: Math.min(viewfinderWidth - 40, 320),
-                    height: Math.min(viewfinderHeight - 40, 200),
+                    width: Math.min(viewfinderWidth - 30, 340),
+                    height: Math.min(viewfinderHeight - 30, 220),
                   };
                 },
                 aspectRatio: 1.777778,
@@ -335,12 +349,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 },
               },
               (decodedText) => {
+                // If in manual mode, ignore automatic triggers so Nir can aim in peace!
+                if (barcodeScanMode === 'manual') return;
+
                 if (isMountedRef.current && isScannerRunning) {
                   isScannerRunning = false;
                   handleBarcodeLookup(decodedText);
                   setTimeout(() => {
                     if (isMountedRef.current) isScannerRunning = true;
-                  }, 2500);
+                  }, 3000);
                 }
               },
               () => {
@@ -386,7 +403,54 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         html5QrCodeRef.current = null;
       }
     }
-  }, [mode, isLoading]);
+  }, [mode, isLoading, barcodeScanMode]);
+
+  // Manual Trigger: Nir aims calmly, clicks the button, and we decode the current frame!
+  const handleManualBarcodeScan = async () => {
+    setIsDecodingManualBarcode(true);
+    setBarcodeError(null);
+
+    try {
+      const videoEl = document.querySelector('#barcode-reader-viewfinder video') as HTMLVideoElement;
+      if (!videoEl || videoEl.videoWidth === 0) {
+        barcodeFileInputRef.current?.click();
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = videoEl.videoWidth;
+      canvas.height = videoEl.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setIsDecodingManualBarcode(false);
+          return;
+        }
+
+        const file = new File([blob], 'barcode_snap.jpg', { type: 'image/jpeg' });
+        const qrScanner = html5QrCodeRef.current || new Html5Qrcode('barcode-reader-viewfinder');
+
+        try {
+          const decodedText = await qrScanner.scanFile(file, true);
+          if (decodedText) {
+            await handleBarcodeLookup(decodedText);
+            return;
+          }
+        } catch (err) {
+          setBarcodeError('לא זוהה ברקוד בפריים הנוכחי. הקרבי מעט את המצלמה לברקוד ולחצי שוב.');
+        } finally {
+          setIsDecodingManualBarcode(false);
+        }
+      }, 'image/jpeg', 0.95);
+    } catch (e) {
+      console.warn('[BarcodeScanner] Manual scan error:', e);
+      setIsDecodingManualBarcode(false);
+    }
+  };
 
   // Lookup product by barcode from Open Food Facts & send to SIBO analysis
   const handleBarcodeLookup = async (barcode: string) => {
@@ -603,6 +667,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setCameraError(null);
     setBarcodeError(null);
     setIsFetchingBarcode(false);
+    setIsDecodingManualBarcode(false);
     setTextInput('');
     setBarcodeInput('');
     stopCamera();
@@ -763,7 +828,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             <div className="space-y-3 sm:space-y-4">
               {/* Aiming Guide Banner */}
               <div className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-center text-xs font-bold text-stone-600">
-                🎯 כווני את המצלמה למאכל או לאריזה, וכשאת מוכנה לחצי על כפתור הצילום הירוק:
+                🎯 כווני את המצלמה למאכל או לאריזה בנחת, וכשאת מוכנה לחצי על כפתור הצילום הירוק:
               </div>
 
               <div className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] flex items-center justify-center shadow-inner">
@@ -890,6 +955,39 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           {/* BARCODE SCANNER MODE */}
           {mode === 'barcode' && (
             <div className="space-y-3 sm:space-y-4">
+              {/* Aiming Guide & Trigger Mode Switch */}
+              <div className="flex items-center justify-between gap-2 bg-indigo-50 border border-indigo-200 rounded-2xl p-2.5 text-xs">
+                <span className="font-bold text-indigo-950 flex items-center gap-1.5">
+                  <Crosshair className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <span>כווני את הפס האדום למרכז הברקוד:</span>
+                </span>
+
+                <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-indigo-200 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setBarcodeScanMode('manual')}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                      barcodeScanMode === 'manual'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    🎯 בלחיצה
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBarcodeScanMode('auto')}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                      barcodeScanMode === 'auto'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    ⚡ אוטומטי
+                  </button>
+                </div>
+              </div>
+
               <div className="relative bg-stone-950 rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[340px] flex items-center justify-center shadow-inner">
                 <div
                   id="barcode-reader-viewfinder"
@@ -946,21 +1044,41 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 </div>
               </div>
 
-              {/* High-Resolution Macro Camera Barcode Scan */}
-              <div className="flex flex-col sm:flex-row items-center gap-2">
+              {/* Big Dedicated Manual Barcode Scan Button */}
+              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleManualBarcodeScan}
+                  disabled={isDecodingManualBarcode || isFetchingBarcode}
+                  className="flex-1 w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 active:scale-95 text-white rounded-2xl text-sm sm:text-base font-black transition-all flex items-center justify-center gap-2.5 shadow-lg cursor-pointer ring-2 ring-indigo-400/30"
+                >
+                  {isDecodingManualBarcode ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>מפענח ברקוד...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Barcode className="w-5 h-5 text-indigo-200" />
+                      <span>🎯 סרוק את הברקוד עכשיו (בדיקת מוצר)</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => barcodeFileInputRef.current?.click()}
-                  className="flex-1 w-full py-4 px-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 active:scale-95 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                  className="w-full sm:w-auto py-4 px-5 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
+                  title="צילום תמונת מקרו חדה"
                 >
-                  <Camera className="w-5 h-5 text-indigo-200" />
-                  <span>צלמי תמונת ברקוד ברורה (פוקוס מקרו) 📸</span>
+                  <Camera className="w-4 h-4 text-indigo-400" />
+                  <span>צילום מקרו 📸</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleResetScanner}
-                  className="w-full sm:w-auto py-4 px-5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
+                  className="w-full sm:w-auto py-4 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
                 >
                   <RotateCcw className="w-4 h-4 text-emerald-600" />
                   <span>איפוס 🔄</span>
@@ -968,7 +1086,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               </div>
 
               {barcodeError && (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-medium space-y-2.5">
+                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-medium space-y-2.5 animate-fadeIn">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
                     <span className="font-bold">{barcodeError}</span>
