@@ -74,9 +74,11 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Logo & Big Title */}
           <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white shadow-md ring-2 ring-emerald-600/20 shrink-0">
-                <Heart className="w-6 h-6 fill-white/20" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="SIBO Safe for Nir"
+                className="w-12 h-12 rounded-2xl object-cover shadow-md ring-2 ring-emerald-600/20 shrink-0 border border-emerald-100"
+              />
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-lg sm:text-xl font-extrabold text-stone-900 tracking-tight">

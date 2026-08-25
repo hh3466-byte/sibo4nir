@@ -1,0 +1,26 @@
+{
+  "short_name": "SIBO Safe",
+  "name": "SIBO Safe for Nir - סורק מזון לסיבו",
+  "description": "סורק מזון רפואי ומדריך תזונה קליני ל-SIBO עבור ניר",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#064e3b",
+  "theme_color": "#064e3b",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "he"
+}
