@@ -12,8 +12,6 @@ import {
   SwitchCamera,
   Barcode,
   RotateCcw,
-  Zap,
-  ZapOff,
   CheckCircle2,
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -75,7 +73,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     if (streamRef.current) {
       try {
         const tracks = streamRef.current.getTracks();
-        tracks.forEach((track) => track.stop());
+        tracks.forEach((track) => {
+          try {
+            track.stop();
+          } catch (e) {}
+        });
       } catch (err) {
         console.warn('[CameraScanner] Error stopping tracks:', err);
       }
@@ -95,7 +97,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     // Stop existing stream first
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current.getTracks().forEach((t) => {
+        try {
+          t.stop();
+        } catch (e) {}
+      });
       streamRef.current = null;
     }
 
@@ -116,16 +122,20 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       streamRef.current = stream;
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().then(() => {
-            setCameraActive(true);
-            setIsInitializingCamera(false);
-          }).catch(() => {
-            setCameraActive(true);
-            setIsInitializingCamera(false);
-          });
-        };
+        const video = videoRef.current;
+        video.srcObject = stream;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.muted = true;
+        
+        try {
+          await video.play();
+        } catch (playErr) {
+          console.warn('[CameraScanner] Video play caught:', playErr);
+        }
+
+        setCameraActive(true);
+        setIsInitializingCamera(false);
       } else {
         setCameraActive(true);
         setIsInitializingCamera(false);
@@ -144,7 +154,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   // Manage Camera Mode Lifecycle
   useEffect(() => {
-    if (mode === 'camera' && !isLoading && !stagedImage) {
+    if (mode === 'camera' && !stagedImage) {
       startCamera(facingMode);
     } else {
       stopCamera();
@@ -153,11 +163,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     return () => {
       stopCamera();
     };
-  }, [mode, facingMode, stagedImage, isLoading]);
+  }, [mode, facingMode, stagedImage]);
 
-  // Manage Barcode Scanner Mode Lifecycle (Reads barcodes continuously with debounce guard)
+  // Manage Barcode Scanner Mode Lifecycle
   useEffect(() => {
-    if (mode !== 'barcode' || isLoading) {
+    if (mode !== 'barcode') {
       if (html5QrCodeRef.current) {
         html5QrCodeRef.current.stop().catch(() => {});
         html5QrCodeRef.current = null;
@@ -213,7 +223,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         html5QrCodeRef.current = null;
       }
     };
-  }, [mode, isLoading]);
+  }, [mode]);
 
   // Lookup product by barcode from Open Food Facts & send to SIBO analysis
   const handleBarcodeLookup = async (barcode: string) => {
