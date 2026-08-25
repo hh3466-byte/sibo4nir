@@ -183,14 +183,20 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         video.setAttribute('webkit-playsinline', 'true');
         video.muted = true;
 
-        try {
-          await video.play();
-          if (isMountedRef.current) {
-            setCameraActive(true);
-          }
-        } catch (playErr) {
-          console.warn('[CameraScanner] Play interrupted, waiting for loadedmetadata event...', playErr);
-        }
+        video
+          .play()
+          .then(() => {
+            if (isMountedRef.current) {
+              setCameraActive(true);
+            }
+          })
+          .catch((playErr) => {
+            console.warn('[CameraScanner] Play interrupted, waiting for user gesture or metadata:', playErr);
+            // On mobile iOS/Android, if autoplay is blocked, mark as ready so user can tap
+            if (isMountedRef.current) {
+              setCameraActive(true);
+            }
+          });
       }
 
       if (isMountedRef.current) {
@@ -214,7 +220,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       isMountedRef.current = false;
       stopCamera();
     };
-  }, [mode, isLoading, facingMode, startCamera, stopCamera]);
+  }, [mode, isLoading]); // Do not re-run on every function reference change
 
   // Flip camera between front and back
   const handleToggleFacingMode = () => {
@@ -226,12 +232,19 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   // Video metadata & canplay handlers
   const handleVideoCanPlay = () => {
     if (videoRef.current && isMountedRef.current) {
-      videoRef.current.play().then(() => {
-        setCameraActive(true);
-        setIsInitializingCamera(false);
-      }).catch((err) => {
-        console.warn('[CameraScanner] CanPlay video.play catch:', err);
-      });
+      videoRef.current
+        .play()
+        .then(() => {
+          setCameraActive(true);
+          setIsInitializingCamera(false);
+        })
+        .catch((err) => {
+          console.warn('[CameraScanner] CanPlay video.play catch:', err);
+          if (isMountedRef.current) {
+            setCameraActive(true);
+            setIsInitializingCamera(false);
+          }
+        });
     }
   };
 
@@ -517,10 +530,28 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                       muted
                       onLoadedMetadata={handleVideoCanPlay}
                       onCanPlay={handleVideoCanPlay}
-                      className={`w-full h-full object-cover transition-opacity duration-300 ${
-                        cameraActive ? 'opacity-100' : 'opacity-0'
-                      } ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                      className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                     />
+
+                    {/* Tap to start camera overlay (for mobile browsers requiring user gesture) */}
+                    {!cameraActive && !isInitializingCamera && (
+                      <div
+                        onClick={() => startCamera(facingMode)}
+                        className="absolute inset-0 bg-stone-950/85 backdrop-blur-xs flex flex-col items-center justify-center gap-3 p-6 text-center cursor-pointer z-15 hover:bg-stone-950/75 transition-all"
+                      >
+                        <div className="w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg animate-pulse ring-4 ring-emerald-400/40">
+                          <Camera className="w-8 h-8" />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-sm font-extrabold text-white block">
+                            לחצי כאן לפתיחת המצלמה 📷
+                          </span>
+                          <span className="text-xs text-stone-300 block">
+                            במידה והמצלמה לא נפתחה אוטומטית, לחצי להפעלה מיידית
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Camera Loading Spinner Overlay */}
                     {isInitializingCamera && (
@@ -566,29 +597,35 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 )}
               </div>
 
-              {/* Camera Action Buttons (Clean hero capture button - Absolutely No Refresh button) */}
+              {/* Camera Action Buttons (Clear, reliable action buttons) */}
               {!cameraError && (
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                   <button
                     id="capture-photo-btn"
                     type="button"
-                    onClick={captureSnapshot}
-                    disabled={!cameraActive || isInitializingCamera}
-                    className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
+                    onClick={() => {
+                      if (cameraActive) {
+                        captureSnapshot();
+                      } else {
+                        startCamera(facingMode);
+                      }
+                    }}
+                    disabled={isLoading}
+                    className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
                   >
                     <Camera className="w-6 h-6" />
-                    <span>צלם ובדוק ברמזור 🚦</span>
+                    <span>{cameraActive ? 'צלם ובדוק ברמזור 🚦' : 'הפעל מצלמה וסרוק 📷'}</span>
                   </button>
 
                   {/* Direct smartphone camera fallback trigger */}
                   <button
                     type="button"
                     onClick={() => nativeCameraInputRef.current?.click()}
-                    className="text-xs text-stone-600 hover:text-emerald-700 py-2.5 px-4 rounded-xl hover:bg-stone-100 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
+                    className="w-full sm:w-auto px-5 py-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 border border-stone-300 shadow-xs cursor-pointer"
                     title="פתיחת מצלמת הטלפון המלאה"
                   >
                     <ImageIcon className="w-4 h-4 text-emerald-600" />
-                    <span>או צלמי ישירות מהטלפון / גלריה</span>
+                    <span>צלמי ישירות מהטלפון / גלריה 📸</span>
                   </button>
                 </div>
               )}
