@@ -96,6 +96,16 @@ export default function App() {
       controller.abort();
     }, 35000);
 
+    // ⚡ Instant 0ms Client-Side SIBO Analysis for Text/Food Queries!
+    if (payload.textPrompt && !payload.imageBase64) {
+      const instantResult = analyzeFoodClinically(payload.textPrompt, currentPhase);
+      setAnalysisResult(instantResult);
+      setActiveTab('scanner');
+      playFeedbackTone(instantResult.status);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/analyze-food', {
         method: 'POST',

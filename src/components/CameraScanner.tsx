@@ -319,14 +319,49 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     e.target.value = ''; // allow re-triggering with new photos
   };
 
-  // Process file to base64
+  // Process file to compressed base64 for instant upload (<100KB)
   const processImageFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setPreviewImage(dataUrl);
-      stopCamera();
-      onAnalyze({ imageBase64: dataUrl, mimeType: file.type || 'image/jpeg' });
+      const rawDataUrl = event.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 960;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setPreviewImage(compressedDataUrl);
+          stopCamera();
+          onAnalyze({ imageBase64: compressedDataUrl, mimeType: 'image/jpeg' });
+        } else {
+          setPreviewImage(rawDataUrl);
+          stopCamera();
+          onAnalyze({ imageBase64: rawDataUrl, mimeType: file.type || 'image/jpeg' });
+        }
+      };
+      img.onerror = () => {
+        setPreviewImage(rawDataUrl);
+        stopCamera();
+        onAnalyze({ imageBase64: rawDataUrl, mimeType: file.type || 'image/jpeg' });
+      };
+      img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   };
