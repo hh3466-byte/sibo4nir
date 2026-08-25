@@ -14,7 +14,7 @@ import {
   RotateCcw,
   CheckCircle2,
 } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { BrowserMultiFormatReader } from '@zxing/browser';
 import { fetchProductByBarcode } from '../services/barcodeService';
 
 interface CameraScannerProps {
@@ -56,7 +56,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const nativeCameraInputRef = useRef<HTMLInputElement | null>(null);
   const barcodeFileInputRef = useRef<HTMLInputElement | null>(null);
-  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+
+  const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const barcodeScanLoopRef = useRef<number | null>(null);
+  const isBarcodeScanningActiveRef = useRef<boolean>(false);
 
   // Sync initialMode changes from parent (e.g. when user clicks "סרוק ברקוד" from result modal)
   useEffect(() => {
@@ -68,8 +71,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   }, [initialMode]);
 
-  // Stop camera tracks safely and release hardware locks
-  const stopFoodCamera = useCallback(() => {
+  // Stop camera tracks safely
+  const stopCameraStream = useCallback(() => {
+    if (barcodeScanLoopRef.current) {
+      cancelAnimationFrame(barcodeScanLoopRef.current);
+      barcodeScanLoopRef.current = null;
+    }
+    isBarcodeScanningActiveRef.current = false;
+
     if (streamRef.current) {
       try {
         const tracks = streamRef.current.getTracks();
@@ -90,12 +99,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsInitializingCamera(false);
   }, []);
 
-  // Simple, rock-solid camera starter that never freezes on mobile
-  const startFoodCamera = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
+  // Universal Single Video Stream Starter (Supports both Food photo & Barcode)
+  const startCameraStream = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
     setCameraError(null);
     setIsInitializingCamera(true);
 
-    // Stop existing stream first
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => {
         try {
@@ -115,6 +123,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: targetFacing },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
         },
         audio: false,
       });
@@ -127,18 +137,26 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
         video.muted = true;
-        
-        try {
-          await video.play();
-        } catch (playErr) {
-          console.warn('[CameraScanner] Video play caught:', playErr);
-        }
 
-        setCameraActive(true);
-        setIsInitializingCamera(false);
-      } else {
-        setCameraActive(true);
-        setIsInitializingCamera(false);
+        const onPlay = async () => {
+          try {
+            await video.play();
+            setCameraActive(true);
+            setIsInitializingCamera(false);
+          } catch (playErr) {
+            console.warn('[CameraScanner] Video play caught:', playErr);
+            setCameraActive(true);
+            setIsInitializingCamera(false);
+          }
+        };
+
+        if (video.readyState >= 2) {
+          onPlay();
+        } else {
+          video.onloadedmetadata = () => {
+            onPlay();
+          };
+        }
       }
     } catch (err: any) {
       console.warn('[CameraScanner] getUserMedia error:', err);
@@ -146,92 +164,34 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       const isDenied = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError';
       setCameraError(
         isDenied
-          ? 'גישה למצלמה נחסמה בדפדפן. יש לאשר הרשאת מצלמה, או ללחוץ על "צלמי במצלמת המכשיר".'
+          ? 'גישה למצלמה נחסמה בדפדפן. יש לאשר הרשאת מצלמה בהגדרות, או ללחוץ על "צלמי במצלמת המכשיר".'
           : 'לא הצלחנו לפתוח את שידור המצלמה. באפשרותך לצלם ישירות במצלמת המכשיר.'
       );
     }
   }, [facingMode]);
 
-  // Manage Camera Mode Lifecycle
+  // Manage Camera Mode Lifecycle (Food and Barcode modes use the same rock-solid stream)
   useEffect(() => {
-    if (mode === 'camera' && !stagedImage) {
-      startFoodCamera(facingMode);
-    } else {
-      stopFoodCamera();
-    }
+    const isCameraNeeded = (mode === 'camera' || mode === 'barcode') && !stagedImage;
 
-    return () => {
-      stopFoodCamera();
-    };
+    if (isCameraNeeded) {
+      if (!streamRef.current || !cameraActive) {
+        startCameraStream(facingMode);
+      }
+    } else {
+      stopCameraStream();
+    }
   }, [mode, facingMode, stagedImage]);
 
-  // Manage Barcode Scanner Mode Lifecycle
+  // Stop camera only when unmounting the entire component
   useEffect(() => {
-    if (mode !== 'barcode') {
-      if (html5QrCodeRef.current) {
-        try {
-          html5QrCodeRef.current.stop().catch(() => {});
-        } catch (e) {}
-        html5QrCodeRef.current = null;
-      }
-      return;
-    }
-
-    // Stop food camera completely before barcode starts so there is zero camera lock conflict!
-    stopFoodCamera();
-
-    let isMounted = true;
-    let isScanning = true;
-    setBarcodeError(null);
-    setScannedBarcodeSuccess(null);
-
-    const elementId = 'barcode-reader-viewfinder';
-
-    const timer = setTimeout(async () => {
-      const el = document.getElementById(elementId);
-      if (!el || !isMounted) return;
-
-      try {
-        const qrScanner = new Html5Qrcode(elementId);
-        html5QrCodeRef.current = qrScanner;
-
-        // Scans full camera frame with standard safe qrbox for immediate 360-degree barcode decoding
-        await qrScanner.start(
-          { facingMode: 'environment' },
-          {
-            fps: 15,
-            qrbox: { width: 260, height: 160 },
-          },
-          (decodedText) => {
-            if (!isMounted || !isScanning) return;
-            isScanning = false;
-            setScannedBarcodeSuccess(decodedText);
-            handleBarcodeLookup(decodedText);
-            setTimeout(() => {
-              if (isMounted) isScanning = true;
-            }, 3000);
-          },
-          () => {}
-        );
-      } catch (err: any) {
-        console.warn('[BarcodeScanner] start error:', err);
-      }
-    }, 250);
-
     return () => {
-      isMounted = false;
-      clearTimeout(timer);
-      if (html5QrCodeRef.current) {
-        try {
-          html5QrCodeRef.current.stop().catch(() => {});
-        } catch (e) {}
-        html5QrCodeRef.current = null;
-      }
+      stopCameraStream();
     };
-  }, [mode]);
+  }, [stopCameraStream]);
 
   // Lookup product by barcode from Open Food Facts & send to SIBO analysis
-  const handleBarcodeLookup = async (barcode: string) => {
+  const handleBarcodeLookup = useCallback(async (barcode: string) => {
     const cleanCode = barcode.trim();
     if (!cleanCode) return;
 
@@ -261,7 +221,108 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     } finally {
       setIsFetchingBarcode(false);
     }
-  };
+  }, [onAnalyze]);
+
+  // Real-Time Barcode Scanner Worker on the Unified Live Video Stream
+  useEffect(() => {
+    if (mode !== 'barcode' || stagedImage || isLoading) {
+      isBarcodeScanningActiveRef.current = false;
+      if (barcodeScanLoopRef.current) {
+        cancelAnimationFrame(barcodeScanLoopRef.current);
+        barcodeScanLoopRef.current = null;
+      }
+      return;
+    }
+
+    isBarcodeScanningActiveRef.current = true;
+    setBarcodeError(null);
+    setScannedBarcodeSuccess(null);
+
+    if (!zxingReaderRef.current) {
+      zxingReaderRef.current = new BrowserMultiFormatReader();
+    }
+
+    let lastScanTime = 0;
+    const scanIntervalMs = 250; // scan every 250ms for low CPU usage & high responsiveness
+
+    // Modern Native BarcodeDetector (Hardware Accelerated if available)
+    const hasNativeBarcodeDetector = 'BarcodeDetector' in window;
+    let nativeDetector: any = null;
+    if (hasNativeBarcodeDetector) {
+      try {
+        nativeDetector = new (window as any).BarcodeDetector({
+          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'],
+        });
+      } catch (e) {
+        nativeDetector = null;
+      }
+    }
+
+    // Temporary canvas for fast frame processing
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const scanFrame = async (now: number) => {
+      if (!isBarcodeScanningActiveRef.current || mode !== 'barcode') return;
+
+      const video = videoRef.current;
+      if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
+        lastScanTime = now;
+
+        // Try Native Hardware Barcode Detector first
+        if (nativeDetector) {
+          try {
+            const detected = await nativeDetector.detect(video);
+            if (detected && detected.length > 0 && detected[0].rawValue) {
+              const code = detected[0].rawValue;
+              isBarcodeScanningActiveRef.current = false;
+              setScannedBarcodeSuccess(code);
+              handleBarcodeLookup(code);
+              return;
+            }
+          } catch (detErr) {
+            // fallback to zxing
+          }
+        }
+
+        // Fast ZXing Reader on Canvas Frame
+        if (zxingReaderRef.current && ctx) {
+          try {
+            const width = Math.min(video.videoWidth, 640);
+            const height = Math.round((video.videoHeight * width) / video.videoWidth);
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(video, 0, 0, width, height);
+
+            const result = zxingReaderRef.current.decodeFromCanvas(canvas);
+            if (result && result.getText()) {
+              const code = result.getText();
+              isBarcodeScanningActiveRef.current = false;
+              setScannedBarcodeSuccess(code);
+              handleBarcodeLookup(code);
+              return;
+            }
+          } catch (e) {
+            // normal frame without barcode
+          }
+        }
+      }
+
+      if (isBarcodeScanningActiveRef.current) {
+        barcodeScanLoopRef.current = requestAnimationFrame(scanFrame);
+      }
+    };
+
+    barcodeScanLoopRef.current = requestAnimationFrame(scanFrame);
+
+    return () => {
+      isBarcodeScanningActiveRef.current = false;
+      if (barcodeScanLoopRef.current) {
+        cancelAnimationFrame(barcodeScanLoopRef.current);
+        barcodeScanLoopRef.current = null;
+      }
+    };
+  }, [mode, stagedImage, isLoading, handleBarcodeLookup]);
 
   // High-Resolution Native Mobile Photo Scan for Barcode
   const handleBarcodeFileCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -273,21 +334,31 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setBarcodeError(null);
 
     try {
-      const qrScanner = html5QrCodeRef.current || new Html5Qrcode('barcode-reader-viewfinder');
-      try {
-        const decodedText = await qrScanner.scanFile(file, true);
-        if (decodedText) {
-          await handleBarcodeLookup(decodedText);
-          return;
+      const reader = new BrowserMultiFormatReader();
+      const img = document.createElement('img');
+      const objectUrl = URL.createObjectURL(file);
+      img.src = objectUrl;
+
+      img.onload = async () => {
+        try {
+          const result = reader.decodeFromImageElement(img);
+          if (result && result.getText()) {
+            URL.revokeObjectURL(objectUrl);
+            await handleBarcodeLookup(result.getText());
+            return;
+          }
+        } catch (zxErr) {
+          // fallback to SIBO image analyzer
         }
-      } catch (scanErr) {
-        console.log('[BarcodeScanner] Falling back to image analysis...', scanErr);
-      }
-      processImageFile(file);
+        URL.revokeObjectURL(objectUrl);
+        processImageFile(file);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        processImageFile(file);
+      };
     } catch (err: any) {
       processImageFile(file);
-    } finally {
-      setIsFetchingBarcode(false);
     }
   };
 
@@ -295,7 +366,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const handleToggleFacingMode = () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
     setFacingMode(nextFacing);
-    startFoodCamera(nextFacing);
+    startCameraStream(nextFacing);
   };
 
   // Take Snapshot from video stream and stage it for Nir to review!
@@ -344,7 +415,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     // Stage photo for review
     setStagedImage(dataUrl);
-    stopFoodCamera();
+    stopCameraStream();
   };
 
   // User confirmed the photo -> send for SIBO analysis!
@@ -357,7 +428,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const handleRetakePhoto = () => {
     setStagedImage(null);
     setCameraError(null);
-    setTimeout(() => startFoodCamera(facingMode), 100);
+    setTimeout(() => startCameraStream(facingMode), 100);
   };
 
   // Handle file select (Gallery or Native Mobile Camera)
@@ -397,15 +468,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           ctx.drawImage(img, 0, 0, width, height);
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
           setStagedImage(compressedDataUrl);
-          stopFoodCamera();
+          stopCameraStream();
         } else {
           setStagedImage(rawDataUrl);
-          stopFoodCamera();
+          stopCameraStream();
         }
       };
       img.onerror = () => {
         setStagedImage(rawDataUrl);
-        stopFoodCamera();
+        stopCameraStream();
       };
       img.src = rawDataUrl;
     };
@@ -451,9 +522,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsFetchingBarcode(false);
     setTextInput('');
     setBarcodeInput('');
-    stopFoodCamera();
-    if (mode === 'camera') {
-      setTimeout(() => startFoodCamera(facingMode), 100);
+    stopCameraStream();
+    if (mode === 'camera' || mode === 'barcode') {
+      setTimeout(() => startCameraStream(facingMode), 100);
     }
   };
 
@@ -502,7 +573,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('barcode');
-            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'barcode'
@@ -520,7 +590,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('text');
-            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'text'
@@ -538,7 +607,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('upload');
-            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'upload'
@@ -607,8 +675,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       ) : (
         /* MAIN VIEWFINDER BOX - Elevated at Top of Viewport */
         <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden p-3 sm:p-5 space-y-3">
-          {/* CAMERA MODE */}
-          {mode === 'camera' && (
+          {/* CAMERA & BARCODE SHARED FLUID LIVE VIDEO STREAM */}
+          {(mode === 'camera' || mode === 'barcode') && (
             <div className="space-y-3 sm:space-y-4">
               {/* STAGED PHOTO REVIEW STATE (Nir inspects the photo and confirms!) */}
               {stagedImage ? (
@@ -649,13 +717,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                   </div>
                 </div>
               ) : (
-                /* LIVE VIDEO STREAM (Nir aims in total calm!) */
+                /* CONTINUOUS LIVE VIDEO STREAM (Fluid 60fps for both Food & Barcode!) */
                 <>
-                  <div className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-center text-xs font-bold text-stone-600">
-                    📸 המצלמה פועלת בשידור חי. כווני את הטלפון למוצר, וכשתרצי לצלם לחצי על כפתור הצילום למטה:
+                  <div className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-center text-xs font-bold text-stone-700">
+                    {mode === 'barcode'
+                      ? '🏷️ סורק ברקודים חי: כווני את הפס האדום למרכז הברקוד לזיהוי מיידי'
+                      : '📸 המצלמה פועלת בשידור חי: כווני למוצר בנחת ולחצי על כפתור הצילום למטה'}
                   </div>
 
-                  <div className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] flex items-center justify-center shadow-inner">
+                  <div className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex items-center justify-center shadow-inner">
                     {isFlashActive && (
                       <div className="absolute inset-0 bg-white z-30 animate-fade-out pointer-events-none" />
                     )}
@@ -697,14 +767,35 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                           </div>
                         )}
 
-                        {/* Viewfinder Target Guide */}
-                        {cameraActive && (
+                        {/* Barcode Laser Overlay (When in Barcode Mode) */}
+                        {mode === 'barcode' && cameraActive && (
+                          <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
+                            <div className="w-64 h-36 sm:w-80 sm:h-44 border-2 border-dashed border-indigo-400/90 rounded-2xl flex items-center justify-center relative shadow-lg">
+                              {/* Laser Line */}
+                              <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_14px_#f43f5e] animate-pulse" />
+                              <span className="absolute -top-3 bg-indigo-600 text-white text-[11px] px-3 py-0.5 rounded-full font-bold shadow-xs">
+                                מקמי ברקוד כאן
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Food Frame Target Guide (When in Camera Mode) */}
+                        {mode === 'camera' && cameraActive && (
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
                             <div className="w-56 h-56 sm:w-72 sm:h-72 border-2 border-dashed border-white/80 rounded-3xl flex items-center justify-center shadow-lg">
                               <span className="bg-stone-900/80 text-white text-xs px-3.5 py-1 rounded-full font-bold backdrop-blur-xs shadow-sm">
                                 הציבי את המאכל במרכז
                               </span>
                             </div>
+                          </div>
+                        )}
+
+                        {/* Success Badge for Barcode */}
+                        {scannedBarcodeSuccess && (
+                          <div className="absolute top-4 inset-x-4 p-3 rounded-2xl bg-emerald-600 text-white text-xs font-black text-center shadow-lg animate-bounce z-30 flex items-center justify-center gap-2">
+                            <CheckCircle2 className="w-5 h-5" />
+                            <span>ברקוד זוהה בהצלחה ({scannedBarcodeSuccess})! שולף נתונים...</span>
                           </div>
                         )}
 
@@ -732,149 +823,113 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                     )}
                   </div>
 
-                  {/* Action Buttons: Big Green Shutter + High-Res Camera + Refresh */}
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
-                    <button
-                      id="capture-photo-btn"
-                      type="button"
-                      onClick={() => {
-                        if (cameraActive && videoRef.current && videoRef.current.videoWidth > 0) {
-                          captureSnapshot();
-                        } else {
-                          nativeCameraInputRef.current?.click();
-                        }
-                      }}
-                      disabled={isLoading}
-                      className="w-full sm:w-auto flex-1 py-4 px-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-black text-base sm:text-lg rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
-                    >
-                      <Camera className="w-6 h-6" />
-                      <span>📸 צלמי עכשיו (בדיקת רמזור) 🚦</span>
-                    </button>
+                  {/* Mode-Specific Action Buttons */}
+                  {mode === 'camera' ? (
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
+                      <button
+                        id="capture-photo-btn"
+                        type="button"
+                        onClick={() => {
+                          if (cameraActive && videoRef.current && videoRef.current.videoWidth > 0) {
+                            captureSnapshot();
+                          } else {
+                            nativeCameraInputRef.current?.click();
+                          }
+                        }}
+                        disabled={isLoading}
+                        className="w-full sm:w-auto flex-1 py-4 px-8 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-black text-base sm:text-lg rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-emerald-400/30"
+                      >
+                        <Camera className="w-6 h-6" />
+                        <span>📸 צלמי עכשיו (בדיקת רמזור) 🚦</span>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => nativeCameraInputRef.current?.click()}
-                      className="w-full sm:w-auto px-5 py-4 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
-                      title="צילום חד במיוחד במצלמת הטלפון"
-                    >
-                      <ImageIcon className="w-4 h-4 text-emerald-400" />
-                      <span>צילום חד במצלמת המכשיר 📷</span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => nativeCameraInputRef.current?.click()}
+                        className="w-full sm:w-auto px-5 py-4 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
+                        title="צילום חד במיוחד במצלמת הטלפון"
+                      >
+                        <ImageIcon className="w-4 h-4 text-emerald-400" />
+                        <span>צילום חד במצלמת המכשיר 📷</span>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={handleResetScanner}
-                      className="w-full sm:w-auto px-4 py-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
-                      title="איפוס וריענון מצלמה"
-                    >
-                      <RotateCcw className="w-4 h-4 text-emerald-600" />
-                      <span>איפוס 🔄</span>
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={handleResetScanner}
+                        className="w-full sm:w-auto px-4 py-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
+                        title="איפוס וריענון מצלמה"
+                      >
+                        <RotateCcw className="w-4 h-4 text-emerald-600" />
+                        <span>איפוס 🔄</span>
+                      </button>
+                    </div>
+                  ) : (
+                    /* BARCODE ACTION BUTTONS */
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => barcodeFileInputRef.current?.click()}
+                          className="flex-1 w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 active:scale-95 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                        >
+                          <Camera className="w-5 h-5 text-indigo-200" />
+                          <span>צלמי תמונת ברקוד במצלמת הטלפון (פוקוס מקרו) 📸</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleResetScanner}
+                          className="w-full sm:w-auto py-4 px-5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
+                        >
+                          <RotateCcw className="w-4 h-4 text-emerald-600" />
+                          <span>איפוס 🔄</span>
+                        </button>
+                      </div>
+
+                      {barcodeError && (
+                        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-medium space-y-2.5 animate-fadeIn">
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+                            <span className="font-bold">{barcodeError}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMode('camera');
+                              nativeCameraInputRef.current?.click();
+                            }}
+                            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                          >
+                            <Camera className="w-4 h-4" />
+                            <span>צלמי את רשימת הרכיבים בגב האריזה 📸</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Manual Barcode Input Form */}
+                      <form onSubmit={handleBarcodeSubmit} className="pt-1">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={barcodeInput}
+                            onChange={(e) => setBarcodeInput(e.target.value)}
+                            placeholder="או הקלידי מספר ברקוד (לדוגמה: 7290110115623)..."
+                            className="flex-1 px-4 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden text-right font-medium"
+                            dir="ltr"
+                          />
+                          <button
+                            type="submit"
+                            disabled={!barcodeInput.trim()}
+                            className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-2xl font-black text-xs sm:text-sm transition-all shadow-sm cursor-pointer active:scale-95"
+                          >
+                            בדיקה
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </>
               )}
-            </div>
-          )}
-
-          {/* BARCODE SCANNER MODE */}
-          {mode === 'barcode' && (
-            <div className="space-y-3 sm:space-y-4">
-              {/* Aiming Guide */}
-              <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-center text-xs font-bold text-indigo-950 flex items-center justify-center gap-2">
-                <span>כווני את הפס האדום למרכז הברקוד — הזיהוי יתבצע באופן מיידי:</span>
-              </div>
-
-              <div className="relative bg-stone-950 rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[340px] flex items-center justify-center shadow-inner">
-                <div
-                  id="barcode-reader-viewfinder"
-                  className="w-full h-full min-h-[280px] transition-transform duration-200 origin-center"
-                />
-
-                {/* Laser animation line */}
-                <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_14px_#f43f5e] animate-pulse pointer-events-none z-10" />
-
-                {/* Success Indicator Badge */}
-                {scannedBarcodeSuccess && (
-                  <div className="absolute top-4 inset-x-4 p-3 rounded-2xl bg-emerald-600 text-white text-xs font-black text-center shadow-lg animate-bounce z-30 flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>ברקוד זוהה בהצלחה ({scannedBarcodeSuccess})! שולף נתונים...</span>
-                  </div>
-                )}
-
-                {/* Top Controls */}
-                <div className="absolute top-3 left-3 z-20 pointer-events-auto">
-                  <button
-                    type="button"
-                    onClick={handleResetScanner}
-                    className="p-2 rounded-full bg-stone-900/80 text-white hover:bg-stone-800 backdrop-blur-md border border-white/20 shadow-md transition-all cursor-pointer"
-                    title="ריענון סורק ברקוד"
-                  >
-                    <RotateCcw className="w-4 h-4 text-emerald-400" />
-                  </button>
-                </div>
-              </div>
-
-              {/* High-Resolution Macro Camera Scan Button */}
-              <div className="flex flex-col sm:flex-row items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => barcodeFileInputRef.current?.click()}
-                  className="flex-1 w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 active:scale-95 text-white rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                >
-                  <Camera className="w-5 h-5 text-indigo-200" />
-                  <span>צלמי תמונת ברקוד במצלמת הטלפון (פוקוס מקרו) 📸</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleResetScanner}
-                  className="w-full sm:w-auto py-4 px-5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 border border-stone-300 shadow-xs cursor-pointer active:scale-95"
-                >
-                  <RotateCcw className="w-4 h-4 text-emerald-600" />
-                  <span>איפוס 🔄</span>
-                </button>
-              </div>
-
-              {barcodeError && (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-medium space-y-2.5 animate-fadeIn">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
-                    <span className="font-bold">{barcodeError}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('camera');
-                      nativeCameraInputRef.current?.click();
-                    }}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                  >
-                    <Camera className="w-4 h-4" />
-                    <span>צלמי את רשימת הרכיבים בגב האריזה 📸</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Manual Barcode Form */}
-              <form onSubmit={handleBarcodeSubmit} className="pt-1">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={barcodeInput}
-                    onChange={(e) => setBarcodeInput(e.target.value)}
-                    placeholder="או הקלידי מספר ברקוד (לדוגמה: 7290110115623)..."
-                    className="flex-1 px-4 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden text-right font-medium"
-                    dir="ltr"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!barcodeInput.trim()}
-                    className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-2xl font-black text-xs sm:text-sm transition-all shadow-sm cursor-pointer active:scale-95"
-                  >
-                    בדיקה
-                  </button>
-                </div>
-              </form>
             </div>
           )}
 
