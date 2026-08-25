@@ -208,21 +208,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   }, [facingMode, stopCamera, checkAvailableCameras]);
 
-  // Track mount state and trigger camera
+  // Track mount state and handle visibility change
   useEffect(() => {
     isMountedRef.current = true;
-
-    if (mode === 'camera' && !isLoading && !document.hidden) {
-      startCamera(facingMode);
-    } else {
-      stopCamera();
-    }
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         stopCamera();
-      } else if (mode === 'camera' && !isLoading) {
-        startCamera(facingMode);
       }
     };
 
@@ -233,7 +225,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       stopCamera();
     };
-  }, [mode, isLoading, facingMode, startCamera, stopCamera]);
+  }, [stopCamera]);
 
   // Flip camera between front and back
   const handleToggleFacingMode = () => {
