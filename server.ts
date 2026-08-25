@@ -29,6 +29,18 @@ async function startServer() {
     },
   });
 
+  // Direct favicon route with cache-busting
+  app.get('/favicon.ico', (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Content-Type', 'image/x-icon');
+    const distPath = path.join(process.cwd(), 'dist', 'favicon.ico');
+    const pubPath = path.join(process.cwd(), 'public', 'favicon.ico');
+    const fs = require('fs');
+    if (fs.existsSync(distPath)) return res.sendFile(distPath);
+    if (fs.existsSync(pubPath)) return res.sendFile(pubPath);
+    res.status(404).end();
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
