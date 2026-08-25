@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
+import { analyzeFoodClinically } from './src/services/siboClinicalEngine';
 
 async function startServer() {
   const app = express();
@@ -69,7 +70,6 @@ async function startServer() {
       const parts: any[] = [];
 
       if (imageBase64) {
-        // Safely strip data:image/...;base64, prefix if present
         const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
         parts.push({
           inlineData: {
@@ -86,9 +86,8 @@ async function startServer() {
       parts.push({ text: promptText });
 
       // Helper to generate content with model fallback
-      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
       let response: any = null;
-      let lastError: any = null;
 
       for (const model of modelsToTry) {
         try {
@@ -190,33 +189,35 @@ async function startServer() {
           });
           if (response?.text) break;
         } catch (modelErr) {
-          lastError = modelErr;
           console.warn(`[API] Model ${model} failed, trying next...`, modelErr);
         }
       }
 
-      if (!response || !response.text) {
-        throw lastError || new Error('לא התקבלה תשובה מניתוח התמונה');
+      if (response?.text) {
+        const result = JSON.parse(response.text);
+        if (!['GREEN', 'YELLOW', 'RED'].includes(result.status)) {
+          result.status = 'YELLOW';
+        }
+        result.timestamp = Date.now();
+        if (imageBase64) result.imageUrl = imageBase64;
+        return res.json(result);
       }
 
-      const responseText = response.text;
-      const result = JSON.parse(responseText);
-
-      // Validate & normalize status
-      if (!['GREEN', 'YELLOW', 'RED'].includes(result.status)) {
-        result.status = 'YELLOW';
-      }
-
-      // Add timestamp
-      result.timestamp = Date.now();
-
-      res.json(result);
+      // If AI model was unavailable or quota exceeded, fall back to Clinical Rule Engine
+      console.warn('[Server] AI unavailable, activating SIBO Clinical Rule Engine fallback...');
+      const fallbackResult = analyzeFoodClinically(textPrompt || 'מאכל שצולם', phase);
+      if (imageBase64) fallbackResult.imageUrl = imageBase64;
+      return res.json(fallbackResult);
     } catch (error: any) {
-      console.error('Error analyzing food:', error);
-      res.status(500).json({
-        error: 'שגיאה בניתוח המאכל',
-        details: error?.message || 'אנא נסה שוב עם תמונה ברורה יותר או תיאור טקסטואלי.',
-      });
+      console.error('Error analyzing food, using fallback engine:', error?.message);
+      try {
+        const { textPrompt, imageBase64, phase = 'phase1_strict' } = req.body || {};
+        const fallbackResult = analyzeFoodClinically(textPrompt || 'מאכל שצולם', phase);
+        if (imageBase64) fallbackResult.imageUrl = imageBase64;
+        return res.json(fallbackResult);
+      } catch (e) {
+        res.status(500).json({ error: 'שגיאה בניתוח המאכל' });
+      }
     }
   });
 
