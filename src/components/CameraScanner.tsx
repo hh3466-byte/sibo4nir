@@ -69,7 +69,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   }, [initialMode]);
 
   // Stop camera tracks safely and release hardware locks
-  const stopCamera = useCallback(() => {
+  const stopFoodCamera = useCallback(() => {
     if (streamRef.current) {
       try {
         const tracks = streamRef.current.getTracks();
@@ -91,7 +91,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   }, []);
 
   // Simple, rock-solid camera starter that never freezes on mobile
-  const startCamera = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
+  const startFoodCamera = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
     setCameraError(null);
     setIsInitializingCamera(true);
 
@@ -155,13 +155,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   // Manage Camera Mode Lifecycle
   useEffect(() => {
     if (mode === 'camera' && !stagedImage) {
-      startCamera(facingMode);
+      startFoodCamera(facingMode);
     } else {
-      stopCamera();
+      stopFoodCamera();
     }
 
     return () => {
-      stopCamera();
+      stopFoodCamera();
     };
   }, [mode, facingMode, stagedImage]);
 
@@ -169,11 +169,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   useEffect(() => {
     if (mode !== 'barcode') {
       if (html5QrCodeRef.current) {
-        html5QrCodeRef.current.stop().catch(() => {});
+        try {
+          html5QrCodeRef.current.stop().catch(() => {});
+        } catch (e) {}
         html5QrCodeRef.current = null;
       }
       return;
     }
+
+    // Stop food camera completely before barcode starts so there is zero camera lock conflict!
+    stopFoodCamera();
 
     let isMounted = true;
     let isScanning = true;
@@ -190,14 +195,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         const qrScanner = new Html5Qrcode(elementId);
         html5QrCodeRef.current = qrScanner;
 
+        // Scans full camera frame with standard safe qrbox for immediate 360-degree barcode decoding
         await qrScanner.start(
           { facingMode: 'environment' },
           {
             fps: 15,
-            qrbox: (viewfinderWidth, viewfinderHeight) => ({
-              width: Math.min(viewfinderWidth - 20, 320),
-              height: Math.min(viewfinderHeight - 20, 180),
-            }),
+            qrbox: { width: 260, height: 160 },
           },
           (decodedText) => {
             if (!isMounted || !isScanning) return;
@@ -213,13 +216,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       } catch (err: any) {
         console.warn('[BarcodeScanner] start error:', err);
       }
-    }, 150);
+    }, 250);
 
     return () => {
       isMounted = false;
       clearTimeout(timer);
       if (html5QrCodeRef.current) {
-        html5QrCodeRef.current.stop().catch(() => {});
+        try {
+          html5QrCodeRef.current.stop().catch(() => {});
+        } catch (e) {}
         html5QrCodeRef.current = null;
       }
     };
@@ -290,7 +295,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const handleToggleFacingMode = () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
     setFacingMode(nextFacing);
-    startCamera(nextFacing);
+    startFoodCamera(nextFacing);
   };
 
   // Take Snapshot from video stream and stage it for Nir to review!
@@ -339,7 +344,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     // Stage photo for review
     setStagedImage(dataUrl);
-    stopCamera();
+    stopFoodCamera();
   };
 
   // User confirmed the photo -> send for SIBO analysis!
@@ -352,7 +357,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const handleRetakePhoto = () => {
     setStagedImage(null);
     setCameraError(null);
-    setTimeout(() => startCamera(facingMode), 100);
+    setTimeout(() => startFoodCamera(facingMode), 100);
   };
 
   // Handle file select (Gallery or Native Mobile Camera)
@@ -392,15 +397,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           ctx.drawImage(img, 0, 0, width, height);
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
           setStagedImage(compressedDataUrl);
-          stopCamera();
+          stopFoodCamera();
         } else {
           setStagedImage(rawDataUrl);
-          stopCamera();
+          stopFoodCamera();
         }
       };
       img.onerror = () => {
         setStagedImage(rawDataUrl);
-        stopCamera();
+        stopFoodCamera();
       };
       img.src = rawDataUrl;
     };
@@ -446,9 +451,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsFetchingBarcode(false);
     setTextInput('');
     setBarcodeInput('');
-    stopCamera();
+    stopFoodCamera();
     if (mode === 'camera') {
-      setTimeout(() => startCamera(facingMode), 100);
+      setTimeout(() => startFoodCamera(facingMode), 100);
     }
   };
 
@@ -497,7 +502,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('barcode');
-            stopCamera();
+            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'barcode'
@@ -515,7 +520,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('text');
-            stopCamera();
+            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'text'
@@ -533,7 +538,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('upload');
-            stopCamera();
+            stopFoodCamera();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'upload'
