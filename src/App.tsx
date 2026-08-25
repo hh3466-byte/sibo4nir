@@ -149,10 +149,12 @@ export default function App() {
     }
   };
 
-  // Play audio tone (green / yellow / red)
+  // Play audio tone (green / yellow / red) with instant AudioContext release
   const playFeedbackTone = (status: string) => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtxClass) return;
+      const audioCtx = new AudioCtxClass();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
@@ -161,24 +163,29 @@ export default function App() {
       if (status === 'GREEN') {
         osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
         osc.frequency.setValueAtTime(880.0, audioCtx.currentTime + 0.1); // A5
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.35);
       } else if (status === 'RED') {
         osc.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
         osc.frequency.setValueAtTime(261.63, audioCtx.currentTime + 0.12); // C4
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.4);
       } else {
         osc.frequency.setValueAtTime(440.0, audioCtx.currentTime); // A4
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.25);
       }
+
+      // CRITICAL: Close AudioContext after playback to release Chrome media indicator
+      setTimeout(() => {
+        audioCtx.close().catch(() => {});
+      }, 500);
     } catch (e) {
       // Audio context might be restricted before interaction
     }
