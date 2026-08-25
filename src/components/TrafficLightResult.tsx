@@ -54,11 +54,11 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
     YELLOW: {
       title: 'אור צהוב — כמות מוגבלת / שלב 2 בלבד 🟡',
       subtitle: 'מותר אך ורק בכמות מדודה וקטנה, או מיועד לשלב שילוב מחדש.',
-      color: 'text-amber-700',
-      bgBadge: 'bg-amber-100 text-amber-900 border-amber-300',
-      borderCol: 'border-amber-500',
-      glowColor: 'shadow-[0_0_40px_rgba(245,158,11,0.35)] ring-4 ring-amber-500/30',
-      bannerBg: 'bg-gradient-to-l from-amber-500 via-amber-600 to-orange-700 text-white',
+      color: 'text-yellow-800',
+      bgBadge: 'bg-yellow-300 text-yellow-950 border-yellow-400 font-bold',
+      borderCol: 'border-yellow-400',
+      glowColor: 'shadow-[0_0_40px_rgba(250,204,21,0.5)] ring-4 ring-yellow-400/40',
+      bannerBg: 'bg-gradient-to-l from-yellow-500 via-amber-400 to-yellow-500 text-stone-950',
       icon: AlertTriangle,
     },
     RED: {
@@ -104,7 +104,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
               <div
                 className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
                   result.status === 'YELLOW'
-                    ? 'bg-amber-400 shadow-[0_0_24px_#fbbf24] ring-3 ring-amber-300 animate-pulse text-stone-900 font-black'
+                    ? 'bg-yellow-400 shadow-[0_0_24px_#facc15] ring-4 ring-yellow-300 animate-pulse text-stone-950 font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
                 title="צהוב - מוגבל"

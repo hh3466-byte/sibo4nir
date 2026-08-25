@@ -90,8 +90,8 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             <span className="w-2 h-2 rounded-full bg-emerald-600" />
             <span>{stats.green} מותרים (ירוק)</span>
           </span>
-          <span className="bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-amber-600" />
+          <span className="bg-yellow-300 text-yellow-950 border border-yellow-400 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-yellow-600" />
             <span>{stats.yellow} מוגבלים (צהוב)</span>
           </span>
           <span className="bg-rose-100 text-rose-900 border border-rose-300 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs">
@@ -142,8 +142,8 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
               onClick={() => setStatusFilter('YELLOW')}
               className={`px-3 py-2 rounded-xl transition-all flex items-center gap-1 ${
                 statusFilter === 'YELLOW'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-amber-700 hover:bg-amber-50'
+                  ? 'bg-yellow-400 text-stone-950 font-bold shadow-xs'
+                  : 'text-yellow-800 hover:bg-yellow-100'
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />

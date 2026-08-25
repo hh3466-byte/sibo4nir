@@ -406,11 +406,18 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight">
           סורק רמזור מזון לסיבו (SIBO) לגורגורילה
         </h2>
-        <p className="text-sm text-stone-600 max-w-2xl mx-auto">
+        <p className="text-sm text-stone-600 max-w-2xl mx-auto leading-relaxed">
           צלמי כל מאכל, צלחת, מוצר בסופר או תפריט — המערכת תנתח את רמת התסיסה וה-FODMAP ותסמן מיד{' '}
-          <span className="text-emerald-700 font-bold">באור ירוק (מותר)</span>,{' '}
-          <span className="text-amber-700 font-bold">אור צהוב (מוגבל)</span> או{' '}
-          <span className="text-rose-700 font-bold">אור אדום (אסור)</span>.
+          <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-lg shadow-2xs">
+            🟢 אור ירוק (מותר)
+          </span>{' '}
+          <span className="inline-flex items-center gap-1 font-bold text-yellow-900 bg-yellow-300 border border-yellow-400 px-2 py-0.5 rounded-lg shadow-2xs">
+            🟡 אור צהוב (מוגבל)
+          </span>{' '}
+          או{' '}
+          <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-lg shadow-2xs">
+            🔴 אור אדום (אסור)
+          </span>.
         </p>
       </div>
 
