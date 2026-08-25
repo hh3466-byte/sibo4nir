@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FoodAnalysisResult, TrafficLightStatus } from '../types';
 import {
   CheckCircle2,
@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Camera,
   Barcode,
+  RotateCcw,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -31,6 +32,10 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   onScanBarcode,
   isSaved = false,
 }) => {
+  const [showPackagedModal, setShowPackagedModal] = useState<boolean>(
+    Boolean(result.isPackagedProduct)
+  );
+
   const statusConfig: Record<
     TrafficLightStatus,
     {
@@ -68,28 +73,80 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
       title: 'אור אדום — אסור בתכלית לניר! 🔴',
       subtitle: 'מאכל עתיר תסיסה (FODMAP גבוה / עמילן מרוכז). מזין את חיידקי ה-SIBO!',
       color: 'text-rose-700',
-      bgBadge: 'bg-rose-100 text-rose-900 border-rose-300',
+      bgBadge: 'bg-rose-100 text-rose-800 border-rose-300',
       borderCol: 'border-rose-500',
-      glowColor: 'shadow-[0_0_40px_rgba(244,63,94,0.4)] ring-4 ring-rose-500/30',
-      bannerBg: 'bg-gradient-to-l from-rose-600 via-red-700 to-rose-900 text-white',
+      glowColor: 'shadow-[0_0_40px_rgba(244,63,94,0.35)] ring-4 ring-rose-500/30',
+      bannerBg: 'bg-gradient-to-l from-rose-600 via-rose-700 to-red-800 text-white',
       icon: XCircle,
     },
   };
 
   const currentCfg = statusConfig[result.status] || statusConfig.YELLOW;
-  const StatusIcon = currentCfg.icon;
 
   return (
     <div id="traffic-light-result-card" className="w-full max-w-4xl mx-auto space-y-6 animate-fadeIn">
+      {/* Packaged Product Barcode Recommendation Pop-up Modal */}
+      {showPackagedModal && (
+        <div className="fixed inset-0 z-50 bg-stone-950/75 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-2 border-indigo-400 space-y-5 text-center relative">
+            <button
+              type="button"
+              onClick={() => setShowPackagedModal(false)}
+              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-800 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
+              title="סגור חלון"
+            >
+              ✕
+            </button>
+
+            <div className="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto shadow-inner ring-4 ring-indigo-50">
+              <Barcode className="w-9 h-9" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-stone-900 leading-snug">
+                💡 זיהינו שמדובר במוצר ארוז / מסחרי!
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-xs mx-auto">
+                כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
+              </p>
+            </div>
+
+            <div className="space-y-2.5 pt-1">
+              {onScanBarcode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPackagedModal(false);
+                    onScanBarcode();
+                  }}
+                  className="w-full py-4 px-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-500 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer ring-2 ring-indigo-300"
+                >
+                  <Barcode className="w-5 h-5" />
+                  <span>סרוק ברקוד של המוצר עכשיו 🏷️</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowPackagedModal(false)}
+                className="w-full py-3 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-2xl transition-all cursor-pointer"
+              >
+                המשך לתוצאות הנוכחיות ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Visual Traffic Light Display Box */}
       <div className={`rounded-3xl overflow-hidden shadow-lg border-2 ${currentCfg.borderCol} bg-white`}>
-        {/* Top Banner with Big Traffic Light Bulb Graphic */}
+        {/* Top Banner with Big Traffic Light Graphic */}
         <div className={`${currentCfg.bannerBg} p-6 sm:p-8 text-center relative overflow-hidden`}>
-          {/* Background subtle radial glow */}
+          {/* Subtle glow */}
           <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
 
           <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
-            {/* Realistic Traffic Light Graphic Unit */}
+            {/* Realistic Traffic Light Unit */}
             <div className="flex items-center gap-3 bg-stone-950/80 p-2.5 sm:p-3 rounded-full border border-stone-800 shadow-inner">
               {/* Red Light */}
               <div
@@ -107,12 +164,12 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
               <div
                 className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
                   result.status === 'YELLOW'
-                    ? 'bg-yellow-400 shadow-[0_0_24px_#facc15] ring-4 ring-yellow-300 animate-pulse text-stone-950 font-black'
+                    ? 'bg-yellow-300 shadow-[0_0_24px_#fde047] ring-4 ring-yellow-400 animate-pulse text-yellow-950 font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
                 title="צהוב - מוגבל"
               >
-                {result.status === 'YELLOW' && <AlertTriangle className="w-6 h-6" />}
+                {result.status === 'YELLOW' && <AlertTriangle className="w-6 h-6 text-yellow-950" />}
               </div>
 
               {/* Green Light */}
@@ -142,6 +199,38 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
         {/* Content Details Body */}
         <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100">
+          {/* In-page Barcode Suggestion Banner if Packaged Product */}
+          {result.isPackagedProduct && (
+            <div className="pb-2">
+              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-xs">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                    <Barcode className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
+                      <span>💡 זוהה כמוצר ארוז / מסחרי</span>
+                    </h4>
+                    <p className="text-xs text-indigo-800/90 mt-0.5 leading-relaxed">
+                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
+                    </p>
+                  </div>
+                </div>
+                {onScanBarcode && (
+                  <button
+                    id="btn-scan-barcode-from-result"
+                    type="button"
+                    onClick={onScanBarcode}
+                    className="w-full sm:w-auto shrink-0 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Barcode className="w-4 h-4" />
+                    <span>סרוק ברקוד של המוצר 🏷️</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Main Info Row: Food Name, Safe Portion, Image */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
             <div>
@@ -181,7 +270,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                       result.status === 'GREEN'
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : result.status === 'YELLOW'
-                        ? 'bg-amber-50 text-amber-900 border-amber-200'
+                        ? 'bg-yellow-50 text-yellow-950 border-yellow-300'
                         : 'bg-rose-50 text-rose-900 border-rose-200'
                     }`}
                   >
@@ -207,37 +296,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
             </div>
           </div>
 
-          {/* Packaged Product Barcode Recommendation Banner */}
-          {result.isPackagedProduct && (
-            <div className="pt-5">
-              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-xs">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                    <Barcode className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
-                      <span>💡 זיהינו שמדובר במוצר ארוז / מסחרי</span>
-                    </h4>
-                    <p className="text-xs text-indigo-800/90 mt-0.5 leading-relaxed">
-                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
-                    </p>
-                  </div>
-                </div>
-                {onScanBarcode && (
-                  <button
-                    id="btn-scan-barcode-from-result"
-                    type="button"
-                    onClick={onScanBarcode}
-                    className="w-full sm:w-auto shrink-0 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Barcode className="w-4 h-4" />
-                    <span>סרוק ברקוד של המוצר 🏷️</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+          {/* Multi-Ingredient breakdown if composite meal */}
           {result.ingredientsBreakdown && result.ingredientsBreakdown.length > 0 && (
             <div className="pt-5 space-y-3">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
@@ -251,7 +310,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                       item.status === 'GREEN'
                         ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
                         : item.status === 'YELLOW'
-                        ? 'bg-amber-50/70 border-amber-200 text-amber-950'
+                        ? 'bg-yellow-50/70 border-yellow-300 text-yellow-950'
                         : 'bg-rose-50/70 border-rose-200 text-rose-950'
                     }`}
                   >
@@ -261,7 +320,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                         item.status === 'GREEN'
                           ? 'bg-emerald-200 text-emerald-900'
                           : item.status === 'YELLOW'
-                          ? 'bg-amber-200 text-amber-900'
+                          ? 'bg-yellow-300 text-yellow-950 font-bold'
                           : 'bg-rose-200 text-rose-900'
                       }`}
                     >
@@ -285,7 +344,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                   <button
                     key={idx}
                     onClick={() => onExploreAlternative(sub)}
-                    className="text-right p-3 rounded-xl bg-emerald-50/60 hover:bg-emerald-100/70 border border-emerald-200/80 text-emerald-900 text-xs font-medium transition-colors flex items-center justify-between group"
+                    className="text-right p-3 rounded-xl bg-emerald-50/60 hover:bg-emerald-100/70 border border-emerald-200/80 text-emerald-900 text-xs font-medium transition-colors flex items-center justify-between group cursor-pointer"
                   >
                     <span>{sub}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity rtl:rotate-180" />
@@ -321,30 +380,45 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           )}
         </div>
 
-        {/* Action Buttons Bar */}
-        <div className="bg-stone-50 p-4 sm:p-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* Action Buttons Footer */}
+        <div className="bg-stone-50 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <button
-            id="reset-scan-btn"
+            id="btn-scan-another-food"
+            type="button"
             onClick={onReset}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-2xs"
+            className="w-full sm:w-auto px-6 py-3 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95"
           >
-            <Camera className="w-4 h-4 text-emerald-700" />
-            <span>סריקת מאכל נוסף 📸</span>
+            <RotateCcw className="w-4 h-4" />
+            <span>סרוק / בדוק מאכל נוסף 📸</span>
           </button>
 
-          <button
-            id="save-to-diary-btn"
-            onClick={() => onSaveToDiary(result)}
-            disabled={isSaved}
-            className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${
-              isSaved
-                ? 'bg-stone-200 text-stone-500 cursor-not-allowed'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-            }`}
-          >
-            <BookmarkPlus className="w-4 h-4" />
-            <span>{isSaved ? 'נשמר ביומן של ניר ✓' : 'הוסף ליומן הארוחות של ניר'}</span>
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {onScanBarcode && (
+              <button
+                type="button"
+                onClick={onScanBarcode}
+                className="flex-1 sm:flex-initial px-4 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <Barcode className="w-4 h-4" />
+                <span>סרוק ברקוד 🏷️</span>
+              </button>
+            )}
+
+            <button
+              id="btn-save-to-sibo-diary"
+              type="button"
+              onClick={() => onSaveToDiary(result)}
+              disabled={isSaved}
+              className={`flex-1 sm:flex-initial px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 border shadow-xs cursor-pointer ${
+                isSaved
+                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300 cursor-default'
+                  : 'bg-white hover:bg-stone-100 text-stone-800 border-stone-300'
+              }`}
+            >
+              <BookmarkPlus className="w-4 h-4 text-emerald-600" />
+              <span>{isSaved ? 'נשמר ביומן! ✓' : 'שמור ביומן מעקב'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
