@@ -19,8 +19,12 @@ import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, Messa
 export default function App() {
   // State for Diet Phase (Default to Phase 1 Strict as requested for Nir)
   const [currentPhase, setCurrentPhase] = useState<SiboPhase>(() => {
-    const saved = localStorage.getItem('sibo_nir_phase');
-    return (saved as SiboPhase) || 'phase1_strict';
+    try {
+      const saved = localStorage.getItem('sibo_nir_phase');
+      return (saved as SiboPhase) || 'phase1_strict';
+    } catch {
+      return 'phase1_strict';
+    }
   });
 
   const [activeTab, setActiveTab] = useState<string>('scanner');
@@ -55,14 +59,22 @@ export default function App() {
     ];
   });
 
-  // Save phase to local storage
+  // Save phase to local storage safely
   useEffect(() => {
-    localStorage.setItem('sibo_nir_phase', currentPhase);
+    try {
+      localStorage.setItem('sibo_nir_phase', currentPhase);
+    } catch (e) {
+      console.warn('Could not write phase to localStorage', e);
+    }
   }, [currentPhase]);
 
-  // Save diary to local storage
+  // Save diary to local storage safely
   useEffect(() => {
-    localStorage.setItem('sibo_nir_diary_v1', JSON.stringify(diaryEntries));
+    try {
+      localStorage.setItem('sibo_nir_diary_v1', JSON.stringify(diaryEntries));
+    } catch (e) {
+      console.warn('Could not write diary to localStorage', e);
+    }
   }, [diaryEntries]);
 
   const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
