@@ -16,6 +16,7 @@ import {
 interface CameraScannerProps {
   currentPhase: SiboPhase;
   onAnalyze: (payload: { imageBase64?: string; textPrompt?: string; mimeType?: string }) => Promise<void>;
+  onCancelAnalyze?: () => void;
   isLoading: boolean;
   onOpenAllowedForbidden?: () => void;
 }
@@ -23,6 +24,7 @@ interface CameraScannerProps {
 export const CameraScanner: React.FC<CameraScannerProps> = ({
   currentPhase,
   onAnalyze,
+  onCancelAnalyze,
   isLoading,
   onOpenAllowedForbidden,
 }) => {
@@ -490,6 +492,18 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             💡 <strong>ידעת?</strong> בסיבו, חיידקים שנמצאים במעי הדק מתסיסים סוכרים תוך פחות מ-30 דקות.
             אור ירוק מבטיח שהחיידקים יורעבו ולא יוכלו לתסוס!
           </div>
+
+          {onCancelAnalyze && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onCancelAnalyze}
+                className="px-5 py-2.5 bg-stone-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 text-stone-600 rounded-xl text-xs font-bold transition-all border border-stone-200 cursor-pointer shadow-xs"
+              >
+                ✕ ביטול וחזרה למצלמה
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         /* Main Viewfinder / Scanner Area */

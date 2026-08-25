@@ -64,25 +64,49 @@ export default function App() {
     localStorage.setItem('sibo_nir_diary_v1', JSON.stringify(diaryEntries));
   }, [diaryEntries]);
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  // Cancel ongoing analysis
+  const handleCancelAnalyze = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
+  };
+
   // Handle Food & Image Analysis
   const handleAnalyze = async (payload: {
     imageBase64?: string;
     textPrompt?: string;
     mimeType?: string;
   }) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     setErrorMsg(null);
     setIsSavedInDiary(false);
+
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 35000);
 
     try {
       const response = await fetch('/api/analyze-food', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           ...payload,
           phase: currentPhase,
         }),
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
@@ -96,10 +120,16 @@ export default function App() {
       // Play soft audio tone for traffic light feedback
       playFeedbackTone(result.status);
     } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        setErrorMsg('הניתוח בוטל או שלקח זמן רב מדי (ייתכן שהשרת מתעורר). נסה שוב.');
+        return;
+      }
       console.error('Error analyzing food:', err);
       setErrorMsg(err.message || 'לא הצלחנו לנתח את המאכל. אנא נסה שוב עם תמונה ברורה יותר.');
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -236,6 +266,7 @@ export default function App() {
               <CameraScanner
                 currentPhase={currentPhase}
                 onAnalyze={handleAnalyze}
+                onCancelAnalyze={handleCancelAnalyze}
                 isLoading={isLoading}
                 onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
               />
