@@ -272,16 +272,25 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 1: SCANNER & TRAFFIC LIGHT RESULTS */}
+        {/* TAB 1: SCANNER */}
         {activeTab === 'scanner' && (
-          <div>
-            {analysisResult ? (
+          <div className="relative">
+            <CameraScanner
+              currentPhase={currentPhase}
+              onAnalyze={handleAnalyze}
+              onCancelAnalyze={handleCancelAnalyze}
+              isLoading={isLoading}
+              onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
+              initialMode={scannerMode}
+            />
+
+            {/* Analysis Result Pop-up Modal */}
+            {analysisResult && (
               <TrafficLightResult
                 result={analysisResult}
                 onReset={() => {
                   setAnalysisResult(null);
                   setErrorMsg(null);
-                  setScannerMode('camera');
                 }}
                 onSaveToDiary={handleSaveToDiary}
                 onExploreAlternative={handleExploreAlternative}
@@ -291,15 +300,7 @@ export default function App() {
                   setScannerMode('barcode');
                 }}
                 isSaved={isSavedInDiary}
-              />
-            ) : (
-              <CameraScanner
-                currentPhase={currentPhase}
-                onAnalyze={handleAnalyze}
-                onCancelAnalyze={handleCancelAnalyze}
-                isLoading={isLoading}
-                onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
-                initialMode={scannerMode}
+                isModal={true}
               />
             )}
           </div>

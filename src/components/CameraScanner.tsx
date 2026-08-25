@@ -310,8 +310,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               (decodedText) => {
                 if (isMountedRef.current && isScannerRunning) {
                   isScannerRunning = false;
-                  qrScanner.stop().catch(() => {});
                   handleBarcodeLookup(decodedText);
+                  // Allow resuming scanning automatically after 2.5 seconds
+                  setTimeout(() => {
+                    if (isMountedRef.current) isScannerRunning = true;
+                  }, 2500);
                 }
               },
               () => {
@@ -575,13 +578,38 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     handleBarcodeLookup(barcodeInput.trim());
   };
 
+  const handleResetScanner = () => {
+    setPreviewImage(null);
+    setCameraError(null);
+    setBarcodeError(null);
+    setIsFetchingBarcode(false);
+    setTextInput('');
+    setBarcodeInput('');
+    stopCamera();
+    if (mode === 'camera') {
+      setTimeout(() => startCamera(facingMode), 100);
+    }
+  };
+
   return (
     <div id="camera-scanner-container" className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Intro Header Card - Mobile Optimized */}
-      <div className="text-center space-y-2.5">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 text-xs font-extrabold shadow-2xs border border-emerald-300">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-          <span>פרוטוקול תזונה קליני ל-SIBO</span>
+      {/* Intro Header Card - Mobile Optimized with Instant Refresh Button */}
+      <div className="text-center space-y-2.5 relative">
+        <div className="flex items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 text-xs font-extrabold shadow-2xs border border-emerald-300">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <span>פרוטוקול תזונה קליני ל-SIBO</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleResetScanner}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all border border-stone-300 shadow-2xs cursor-pointer active:scale-95"
+            title="איפוס וריענון סורק"
+          >
+            <RotateCcw className="w-3 h-3 text-emerald-600" />
+            <span>🔄 ריענון סורק</span>
+          </button>
         </div>
 
         <p className="text-xs sm:text-sm text-stone-600 max-w-xl mx-auto leading-relaxed">

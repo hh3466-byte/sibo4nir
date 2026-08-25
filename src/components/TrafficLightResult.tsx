@@ -13,6 +13,7 @@ import {
   Camera,
   Barcode,
   RotateCcw,
+  X,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -22,6 +23,7 @@ interface TrafficLightResultProps {
   onExploreAlternative: (query: string) => void;
   onScanBarcode?: () => void;
   isSaved?: boolean;
+  isModal?: boolean;
 }
 
 export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
@@ -31,8 +33,9 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   onExploreAlternative,
   onScanBarcode,
   isSaved = false,
+  isModal = true,
 }) => {
-  const [showPackagedModal, setShowPackagedModal] = useState<boolean>(
+  const [showPackagedPrompt, setShowPackagedPrompt] = useState<boolean>(
     Boolean(result.isPackagedProduct)
   );
 
@@ -83,114 +86,86 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
   const currentCfg = statusConfig[result.status] || statusConfig.YELLOW;
 
-  return (
-    <div id="traffic-light-result-card" className="w-full max-w-4xl mx-auto space-y-6 animate-fadeIn">
-      {/* Packaged Product Barcode Recommendation Pop-up Modal */}
-      {showPackagedModal && (
-        <div className="fixed inset-0 z-50 bg-stone-950/75 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-2 border-indigo-400 space-y-5 text-center relative">
-            <button
-              type="button"
-              onClick={() => setShowPackagedModal(false)}
-              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-800 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
-              title="סגור חלון"
-            >
-              ✕
-            </button>
-
-            <div className="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto shadow-inner ring-4 ring-indigo-50">
-              <Barcode className="w-9 h-9" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-stone-900 leading-snug">
-                💡 זיהינו שמדובר במוצר ארוז / מסחרי!
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-xs mx-auto">
-                כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
-              </p>
-            </div>
-
-            <div className="space-y-2.5 pt-1">
-              {onScanBarcode && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPackagedModal(false);
-                    onScanBarcode();
-                  }}
-                  className="w-full py-4 px-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-500 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer ring-2 ring-indigo-300"
-                >
-                  <Barcode className="w-5 h-5" />
-                  <span>סרוק ברקוד של המוצר עכשיו 🏷️</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setShowPackagedModal(false)}
-                className="w-full py-3 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-2xl transition-all cursor-pointer"
-              >
-                המשך לתוצאות הנוכחיות ✕
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+  const content = (
+    <div
+      id="traffic-light-result-card"
+      className="w-full max-w-3xl mx-auto space-y-4 animate-scaleIn relative"
+    >
       {/* Visual Traffic Light Display Box */}
-      <div className={`rounded-3xl overflow-hidden shadow-lg border-2 ${currentCfg.borderCol} bg-white`}>
+      <div className={`rounded-3xl overflow-hidden shadow-2xl border-2 ${currentCfg.borderCol} bg-white relative`}>
+        {/* Modal Top Control Bar (Close & Fast Refresh) */}
+        <div className="absolute top-4 inset-x-4 flex items-center justify-between z-30 pointer-events-auto">
+          <button
+            type="button"
+            onClick={onReset}
+            className="px-3.5 py-1.5 rounded-full bg-stone-900/75 hover:bg-stone-900 text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+            title="ריענון וסריקת מוצר נוסף"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>🔄 סרוק מוצר נוסף / ריענון</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onReset}
+            className="w-8 h-8 rounded-full bg-stone-900/75 hover:bg-stone-900 text-white flex items-center justify-center font-bold text-sm backdrop-blur-md border border-white/20 shadow-md transition-all cursor-pointer active:scale-95"
+            title="סגור חלון"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
         {/* Top Banner with Big Traffic Light Graphic */}
-        <div className={`${currentCfg.bannerBg} p-6 sm:p-8 text-center relative overflow-hidden`}>
-          {/* Subtle glow */}
+        <div className={`${currentCfg.bannerBg} pt-14 pb-6 px-6 sm:px-8 text-center relative overflow-hidden`}>
+          {/* Subtle radial glow */}
           <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
 
-          <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
-            {/* Realistic Traffic Light Unit */}
-            <div className="flex items-center gap-3 bg-stone-950/80 p-2.5 sm:p-3 rounded-full border border-stone-800 shadow-inner">
+          <div className="relative z-10 flex flex-col items-center justify-center space-y-3">
+            {/* Realistic Traffic Light Graphic Unit */}
+            <div className="flex items-center gap-3 bg-stone-950/85 p-2 sm:p-2.5 rounded-full border border-stone-700 shadow-inner">
               {/* Red Light */}
               <div
-                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                   result.status === 'RED'
                     ? 'bg-rose-500 shadow-[0_0_24px_#f43f5e] ring-3 ring-rose-400 animate-pulse text-white font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
                 title="אדום - אסור"
               >
-                {result.status === 'RED' && <XCircle className="w-6 h-6" />}
+                {result.status === 'RED' && <XCircle className="w-5 h-5 sm:w-6 sm:h-6" />}
               </div>
 
               {/* Yellow Light */}
               <div
-                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                   result.status === 'YELLOW'
-                    ? 'bg-yellow-300 shadow-[0_0_24px_#fde047] ring-4 ring-yellow-400 animate-pulse text-yellow-950 font-black'
+                    ? 'bg-yellow-300 shadow-[0_0_24px_#fde047] ring-3 ring-yellow-400 animate-pulse text-yellow-950 font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
                 title="צהוב - מוגבל"
               >
-                {result.status === 'YELLOW' && <AlertTriangle className="w-6 h-6 text-yellow-950" />}
+                {result.status === 'YELLOW' && <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-950" />}
               </div>
 
               {/* Green Light */}
               <div
-                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                   result.status === 'GREEN'
                     ? 'bg-emerald-400 shadow-[0_0_24px_#34d399] ring-3 ring-emerald-300 animate-pulse text-white font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
                 title="ירוק - מותר"
               >
-                {result.status === 'GREEN' && <CheckCircle2 className="w-6 h-6" />}
+                {result.status === 'GREEN' && <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />}
               </div>
             </div>
 
             {/* Verdict text */}
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight drop-shadow-xs">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight drop-shadow-xs">
                 {currentCfg.title}
               </h2>
-              <p className="text-sm sm:text-base font-medium text-white/90 max-w-xl mx-auto">
+              <p className="text-xs sm:text-sm font-medium text-white/90 max-w-xl mx-auto">
                 {result.shortVerdict}
               </p>
             </div>
@@ -198,21 +173,21 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
         </div>
 
         {/* Content Details Body */}
-        <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100">
-          {/* In-page Barcode Suggestion Banner if Packaged Product */}
-          {result.isPackagedProduct && (
+        <div className="p-5 sm:p-7 space-y-5 divide-y divide-stone-100 max-h-[60vh] overflow-y-auto">
+          {/* Packaged Product Barcode Recommendation Banner */}
+          {result.isPackagedProduct && showPackagedPrompt && (
             <div className="pb-2">
-              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-xs">
+              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
                     <Barcode className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
+                    <h4 className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-1.5">
                       <span>💡 זוהה כמוצר ארוז / מסחרי</span>
                     </h4>
                     <p className="text-xs text-indigo-800/90 mt-0.5 leading-relaxed">
-                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> או לצלם את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!
+                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> לקבלת דיוק של 100%!
                     </p>
                   </div>
                 </div>
@@ -224,27 +199,27 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                     className="w-full sm:w-auto shrink-0 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Barcode className="w-4 h-4" />
-                    <span>סרוק ברקוד של המוצר 🏷️</span>
+                    <span>סרוק ברקוד 🏷️</span>
                   </button>
                 )}
               </div>
             </div>
           )}
 
-          {/* Main Info Row: Food Name, Safe Portion, Image */}
+          {/* Main Info Row: Food Name, Safe Portion */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-2xl font-bold text-stone-900">{result.foodName}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-stone-900">{result.foodName}</h3>
                 {result.englishName && (
-                  <span className="text-sm text-stone-400 font-normal">({result.englishName})</span>
+                  <span className="text-xs text-stone-400 font-normal">({result.englishName})</span>
                 )}
               </div>
               <p className="text-xs text-stone-500 mt-0.5">זיהוי וניתוח מבוסס פרוטוקול SIBO קליני</p>
             </div>
 
             {/* Max Safe Portion Badge */}
-            <div className="bg-stone-50 border border-stone-200 px-4 py-2.5 rounded-2xl flex items-center gap-3">
+            <div className="bg-stone-50 border border-stone-200 px-4 py-2.5 rounded-2xl flex items-center gap-3 shrink-0">
               <div className="text-right">
                 <span className="text-[11px] font-semibold text-stone-400 block uppercase tracking-wider">
                   כמות בטוחה מומלצת
@@ -256,7 +231,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           </div>
 
           {/* FODMAP & Fermentation Triggers */}
-          <div className="pt-5 space-y-2">
+          <div className="pt-4 space-y-2">
             <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>רכיבי תסיסה ו-FODMAP שזוהו:</span>
@@ -286,19 +261,19 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           </div>
 
           {/* Detailed Medical / Biochemical Explanation */}
-          <div className="pt-5 space-y-2">
+          <div className="pt-4 space-y-2">
             <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-blue-600" />
               <span>הסבר רפואי וביוכימי:</span>
             </h4>
-            <div className="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 sm:p-5 text-stone-800 text-sm leading-relaxed whitespace-pre-line">
+            <div className="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 text-stone-800 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
               {result.detailedExplanation}
             </div>
           </div>
 
           {/* Multi-Ingredient breakdown if composite meal */}
           {result.ingredientsBreakdown && result.ingredientsBreakdown.length > 0 && (
-            <div className="pt-5 space-y-3">
+            <div className="pt-4 space-y-3">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
                 פירוק רכיבי המנה לפי בטיחות SIBO:
               </h4>
@@ -306,7 +281,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                 {result.ingredientsBreakdown.map((item, idx) => (
                   <div
                     key={idx}
-                    className={`p-3 rounded-xl border flex items-center justify-between text-xs font-medium ${
+                    className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-medium ${
                       item.status === 'GREEN'
                         ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
                         : item.status === 'YELLOW'
@@ -334,7 +309,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
           {/* Safe Substitutions for Nir (חלופות בטוחות ומותרות) */}
           {result.safeSubstitutions && result.safeSubstitutions.length > 0 && (
-            <div className="pt-5 space-y-3">
+            <div className="pt-4 space-y-3">
               <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
                 <ChefHat className="w-3.5 h-3.5 text-emerald-600" />
                 <span>חלופות טעימות ומותרות שמתאימות לניר:</span>
@@ -343,7 +318,9 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                 {result.safeSubstitutions.map((sub, idx) => (
                   <button
                     key={idx}
-                    onClick={() => onExploreAlternative(sub)}
+                    onClick={() => {
+                      onExploreAlternative(sub);
+                    }}
                     className="text-right p-3 rounded-xl bg-emerald-50/60 hover:bg-emerald-100/70 border border-emerald-200/80 text-emerald-900 text-xs font-medium transition-colors flex items-center justify-between group cursor-pointer"
                   >
                     <span>{sub}</span>
@@ -356,7 +333,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
           {/* Culinary & Cooking Tips */}
           {result.cookingTips && result.cookingTips.length > 0 && (
-            <div className="pt-5 space-y-2">
+            <div className="pt-4 space-y-2">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
                 טיפים להכנה והקלה על העיכול של ניר:
               </h4>
@@ -373,23 +350,23 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
           {/* Medical References Footnote */}
           {result.medicalReferences && result.medicalReferences.length > 0 && (
-            <div className="pt-5 text-[11px] text-stone-400 flex items-center gap-2">
+            <div className="pt-4 text-[11px] text-stone-400 flex items-center gap-2">
               <span className="font-semibold">מקורות רפואיים:</span>
               <span>{result.medicalReferences.join(' | ')}</span>
             </div>
           )}
         </div>
 
-        {/* Action Buttons Footer */}
-        <div className="bg-stone-50 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* Action Buttons Footer with Big Refresh / Rescan Button */}
+        <div className="bg-stone-50 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 border-t border-stone-200">
           <button
             id="btn-scan-another-food"
             type="button"
             onClick={onReset}
-            className="w-full sm:w-auto px-6 py-3 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 hover:from-stone-800 hover:to-stone-700 text-white rounded-2xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95 ring-2 ring-stone-400/20"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>סרוק / בדוק מאכל נוסף 📸</span>
+            <RotateCcw className="w-4 h-4 text-emerald-400" />
+            <span>🔄 סרוק מוצר נוסף (ריענון וסגירה) 📸</span>
           </button>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -423,4 +400,14 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
       </div>
     </div>
   );
+
+  if (isModal) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 };
