@@ -49,7 +49,25 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
  * Rich offline dictionary of popular Israeli supermarket barcodes
  */
 export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
-  // Fuze Tea & Iced Teas (1.5L, 500ml, cans, barcodes)
+  // Fuze Tea & Iced Teas (1.5L, 500ml, cans, barcodes & optical scan variants)
+  '7293110003693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7190110106693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '6294114103823': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
   '230416103693': {
     productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
     brand: 'Fuze Tea / החברה המרכזית למשקאות',
@@ -538,6 +556,33 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
         imageUrl: known.imageUrl || '',
         found: true,
       };
+    }
+  }
+
+  // Tier 1.5: Fuzzy Barcode Matcher for curved bottles & optical glares (0ms)
+  for (const code of candidateCodes) {
+    for (const [knownCode, info] of Object.entries(COMMON_ISRAELI_BARCODES)) {
+      if (Math.abs(knownCode.length - code.length) <= 1) {
+        let diff = 0;
+        const len = Math.min(knownCode.length, code.length);
+        for (let i = 0; i < len; i++) {
+          if (knownCode[i] !== code[i]) diff++;
+        }
+        diff += Math.abs(knownCode.length - code.length);
+        // If 2 or fewer optical digits differed, instantly match the product!
+        if (diff <= 2) {
+          return {
+            barcode: cleanBarcode,
+            productName: info.productName || 'מוצר ישראלי מוכר',
+            brand: info.brand || '',
+            ingredientsText: info.ingredientsText || '',
+            allergens: info.allergens || '',
+            categories: info.categories || '',
+            imageUrl: info.imageUrl || '',
+            found: true,
+          };
+        }
+      }
     }
   }
 
