@@ -46,6 +46,25 @@ async function startServer() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
+  // Real-time Mobile Diagnostics & Telemetry Buffer
+  const mobileTelemetryLogs: Array<{ time: string; event: string; data?: any }> = [];
+
+  app.post('/api/telemetry/log', (req, res) => {
+    const entry = {
+      time: new Date().toISOString(),
+      event: req.body?.event || 'mobile_event',
+      data: req.body?.data || {},
+    };
+    mobileTelemetryLogs.push(entry);
+    if (mobileTelemetryLogs.length > 200) mobileTelemetryLogs.shift();
+    console.log(`[📱 Phone Telemetry] ${entry.event}:`, JSON.stringify(entry.data || {}));
+    res.json({ ok: true });
+  });
+
+  app.get('/api/telemetry/recent', (req, res) => {
+    res.json({ count: mobileTelemetryLogs.length, logs: mobileTelemetryLogs });
+  });
+
   // API: Server-side Barcode Proxy (Eliminates CORS & Mobile Cellular latency)
   app.get('/api/barcode/:code', async (req, res) => {
     try {

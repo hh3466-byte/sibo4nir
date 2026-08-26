@@ -22,8 +22,10 @@ import {
   RGBLuminanceSource,
   BinaryBitmap,
   HybridBinarizer,
+  GlobalHistogramBinarizer,
 } from '@zxing/library';
 import { fetchProductByBarcode } from '../services/barcodeService';
+import { logMobileEvent } from '../services/telemetryService';
 
 interface CameraScannerProps {
   currentPhase: SiboPhase;
@@ -168,11 +170,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             setCameraActive(true);
             setIsInitializingCamera(false);
             setIsVideoPaused(false);
+            logMobileEvent('camera_ready', {
+              resolution: `${video.videoWidth}x${video.videoHeight}`,
+              facingMode: targetFacing,
+            });
           } catch (playErr) {
             console.warn('[CameraScanner] Video play caught:', playErr);
             setCameraActive(true);
             setIsInitializingCamera(false);
             setIsVideoPaused(true);
+            logMobileEvent('camera_play_blocked', { error: String(playErr) });
           }
         };
 
@@ -187,6 +194,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     } catch (err: any) {
       console.warn('[CameraScanner] getUserMedia error:', err);
       setIsInitializingCamera(false);
+      logMobileEvent('camera_get_user_media_error', { error: String(err) });
       const isDenied = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError';
       setCameraError(
         isDenied
@@ -206,6 +214,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       if (initialMode === 'barcode' || initialMode === 'camera') {
         startCameraStream(facingMode);
       }
+      logMobileEvent('mode_switched', { newMode: initialMode });
     }
   }, [initialMode, facingMode, startCameraStream]);
 
@@ -238,6 +247,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       try {
         await videoRef.current.play();
         setIsVideoPaused(false);
+        logMobileEvent('video_manual_resumed');
       } catch (e) {
         console.warn('Resume video caught:', e);
       }
@@ -251,6 +261,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     setIsFetchingBarcode(true);
     setBarcodeError(null);
+    logMobileEvent('barcode_lookup_started', { barcode: cleanCode });
 
     try {
       const prod = await fetchProductByBarcode(cleanCode);
@@ -258,6 +269,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       const textPrompt = prod.ingredientsText
         ? `${cleanName} (רכיבים: ${prod.ingredientsText})`
         : cleanName;
+
+      logMobileEvent('barcode_lookup_success', {
+        barcode: cleanCode,
+        productName: prod.productName,
+        found: prod.found,
+      });
 
       await onAnalyze({
         textPrompt,
@@ -267,6 +284,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       setScannedBarcodeSuccess(null);
     } catch (e: any) {
       console.warn('[BarcodeScanner] Lookup error, analyzing barcode name fallback:', e);
+      logMobileEvent('barcode_lookup_fallback_error', { barcode: cleanCode, error: String(e) });
       await onAnalyze({
         textPrompt: `מוצר ארוז (ברקוד ${cleanCode})`,
         barcode: cleanCode,
