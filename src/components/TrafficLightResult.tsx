@@ -190,8 +190,8 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
         {/* Content Details Body with Large Clear Typography */}
         <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100 max-h-[62vh] overflow-y-auto">
 
-          {/* Unidentified Packaged Product - High-Priority Clinical Warning Card for Nir */}
-          {(result.isPackagedProduct || result.foodName.includes('לא מזוהה') || result.foodName.includes('מוצר ארוז')) && (
+          {/* Unidentified Packaged Product - High-Priority Clinical Warning Card for Nir (ONLY when truly unrecognized and RED) */}
+          {(result.status === 'RED' && (result.foodName.includes('לא מזוהה') || result.foodName.includes('מוצר ארוז') || result.foodName.includes('מוצר מסחרי שטרם זוהה'))) && (
             <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-rose-600 via-rose-700 to-red-900 text-white shadow-2xl border-4 border-rose-300 space-y-5 animate-pulse-subtle">
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center shrink-0 text-3xl font-black shadow-md">
