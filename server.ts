@@ -46,8 +46,14 @@ async function startServer() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
-  // Real-time Mobile Diagnostics & Telemetry Buffer
-  const mobileTelemetryLogs: Array<{ time: string; event: string; data?: any }> = [];
+  // Real-time Mobile Diagnostics & Telemetry Buffer with Disk Persistence
+  const TELEMETRY_FILE = path.join(process.cwd(), 'mobile_telemetry.json');
+  let mobileTelemetryLogs: Array<{ time: string; event: string; data?: any }> = [];
+  try {
+    if (fs.existsSync(TELEMETRY_FILE)) {
+      mobileTelemetryLogs = JSON.parse(fs.readFileSync(TELEMETRY_FILE, 'utf-8'));
+    }
+  } catch (e) {}
 
   app.post('/api/telemetry/log', (req, res) => {
     const entry = {
@@ -56,7 +62,10 @@ async function startServer() {
       data: req.body?.data || {},
     };
     mobileTelemetryLogs.push(entry);
-    if (mobileTelemetryLogs.length > 200) mobileTelemetryLogs.shift();
+    if (mobileTelemetryLogs.length > 500) mobileTelemetryLogs.shift();
+    try {
+      fs.writeFileSync(TELEMETRY_FILE, JSON.stringify(mobileTelemetryLogs, null, 2));
+    } catch (e) {}
     console.log(`[📱 Phone Telemetry] ${entry.event}:`, JSON.stringify(entry.data || {}));
     res.json({ ok: true });
   });
