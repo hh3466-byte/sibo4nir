@@ -284,6 +284,38 @@ function getManufacturerFromBarcode(barcode: string): { brand: string; category:
 }
 
 /**
+ * Get user-saved learned barcodes from local storage
+ */
+export function getCustomBarcodes(): Record<string, Partial<BarcodeProductInfo>> {
+  try {
+    const saved = localStorage.getItem('sibo_user_barcodes_v1');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return {};
+}
+
+/**
+ * Save a newly discovered barcode to local storage
+ */
+export function saveCustomBarcode(barcode: string, info: Partial<BarcodeProductInfo>) {
+  try {
+    const current = getCustomBarcodes();
+    const clean = barcode.trim().replace(/[^0-9]/g, '');
+    if (clean) {
+      current[clean] = {
+        ...info,
+        barcode: clean,
+      };
+      // also save padded 13-digit variant
+      if (clean.length === 12) {
+        current['0' + clean] = { ...info, barcode: '0' + clean };
+      }
+      localStorage.setItem('sibo_user_barcodes_v1', JSON.stringify(current));
+    }
+  } catch (e) {}
+}
+
+/**
  * Fetch product information and full ingredient list with resilient multi-tier resolver
  */
 export async function fetchProductByBarcode(barcode: string): Promise<BarcodeProductInfo> {
@@ -297,22 +329,49 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     };
   }
 
-  // Tier 1: Check instant local offline dictionary (0ms)
-  if (COMMON_ISRAELI_BARCODES[cleanBarcode]) {
-    const known = COMMON_ISRAELI_BARCODES[cleanBarcode];
-    return {
-      barcode: cleanBarcode,
-      productName: known.productName || 'מוצר ישראלי מוכר',
-      brand: known.brand || '',
-      ingredientsText: known.ingredientsText || '',
-      allergens: known.allergens || '',
-      categories: known.categories || '',
-      imageUrl: known.imageUrl || '',
-      found: true,
-    };
+  // Generate candidate variants (raw, 13-digit zero-padded, trimmed zero)
+  const candidateCodes = Array.from(
+    new Set([
+      cleanBarcode,
+      cleanBarcode.padStart(13, '0'),
+      cleanBarcode.replace(/^0+/, ''),
+    ].filter(Boolean))
+  );
+
+  const customBarcodes = getCustomBarcodes();
+
+  // Tier 1: Check user-learned barcodes and rich offline dictionary for ALL variants (0ms)
+  for (const code of candidateCodes) {
+    if (customBarcodes[code]) {
+      const known = customBarcodes[code];
+      return {
+        barcode: cleanBarcode,
+        productName: known.productName || 'מוצר שמור',
+        brand: known.brand || '',
+        ingredientsText: known.ingredientsText || '',
+        allergens: known.allergens || '',
+        categories: known.categories || '',
+        imageUrl: known.imageUrl || '',
+        found: true,
+      };
+    }
+
+    if (COMMON_ISRAELI_BARCODES[code]) {
+      const known = COMMON_ISRAELI_BARCODES[code];
+      return {
+        barcode: cleanBarcode,
+        productName: known.productName || 'מוצר ישראלי מוכר',
+        brand: known.brand || '',
+        ingredientsText: known.ingredientsText || '',
+        allergens: known.allergens || '',
+        categories: known.categories || '',
+        imageUrl: known.imageUrl || '',
+        found: true,
+      };
+    }
   }
 
-  // Tier 2: Query our fast server-side proxy
+  // Tier 2: Query our fast server-side proxy (tests all variants)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 2500);
 
@@ -344,41 +403,45 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     clearTimeout(timeoutId);
   }
 
-  // Tier 3: Direct Open Food Facts query
-  try {
-    const directRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${cleanBarcode}.json`);
-    if (directRes.ok) {
-      const data = await directRes.json();
-      if (data.status === 1 && data.product) {
-        const p = data.product;
-        const brand = p.brands || p.brand_owner || '';
-        const rawName = p.product_name_he || p.product_name || p.generic_name_he || brand || `מוצר (${cleanBarcode})`;
-        return {
-          barcode: cleanBarcode,
-          productName: cleanRawProductName(rawName, brand),
-          brand,
-          ingredientsText: p.ingredients_text_he || p.ingredients_text || '',
-          allergens: p.allergens || '',
-          categories: p.categories || '',
-          imageUrl: p.image_front_url || p.image_url || '',
-          found: true,
-        };
+  // Tier 3: Direct Open Food Facts query for candidate codes
+  for (const code of candidateCodes) {
+    try {
+      const directRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
+      if (directRes.ok) {
+        const data = await directRes.json();
+        if (data.status === 1 && data.product) {
+          const p = data.product;
+          const brand = p.brands || p.brand_owner || '';
+          const rawName = p.product_name_he || p.product_name || p.generic_name_he || brand || `מוצר (${cleanBarcode})`;
+          return {
+            barcode: cleanBarcode,
+            productName: cleanRawProductName(rawName, brand),
+            brand,
+            ingredientsText: p.ingredients_text_he || p.ingredients_text || '',
+            allergens: p.allergens || '',
+            categories: p.categories || '',
+            imageUrl: p.image_front_url || p.image_url || '',
+            found: true,
+          };
+        }
       }
+    } catch (directErr) {
+      // continue to next variant
     }
-  } catch (directErr) {
-    console.warn('[BarcodeService] Direct API request failed:', directErr);
   }
 
-  // Tier 4: GS1 Manufacturer Prefix identification
-  const mfg = getManufacturerFromBarcode(cleanBarcode);
-  if (mfg) {
-    return {
-      barcode: cleanBarcode,
-      productName: `מוצר ${mfg.brand} (ברקוד ${cleanBarcode})`,
-      brand: mfg.brand,
-      categories: mfg.category,
-      found: true,
-    };
+  // Tier 4: GS1 Manufacturer Prefix identification for all candidate codes
+  for (const code of candidateCodes) {
+    const mfg = getManufacturerFromBarcode(code);
+    if (mfg) {
+      return {
+        barcode: cleanBarcode,
+        productName: `מוצר ${mfg.brand} (ברקוד ${cleanBarcode})`,
+        brand: mfg.brand,
+        categories: mfg.category,
+        found: true,
+      };
+    }
   }
 
   // Tier 5: Generic packaged product fallback

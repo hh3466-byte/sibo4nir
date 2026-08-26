@@ -73,58 +73,63 @@ async function startServer() {
         return res.status(400).json({ error: 'קוד ברקוד לא תקין', found: false });
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const candidateCodes = Array.from(
+        new Set([code, code.padStart(13, '0'), code.replace(/^0+/, '')].filter(Boolean))
+      );
 
-      try {
-        const offRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`, {
-          signal: controller.signal,
-          headers: {
-            'User-Agent': 'SIBOSafeApp/1.0 (https://sibo4nir-1.onrender.com; sibosafe@nir.app)',
-          },
-        });
+      for (const queryCode of candidateCodes) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-        clearTimeout(timeoutId);
+        try {
+          const offRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${queryCode}.json`, {
+            signal: controller.signal,
+            headers: {
+              'User-Agent': 'SIBOSafeApp/1.0 (https://sibo4nir-1.onrender.com; sibosafe@nir.app)',
+            },
+          });
 
-        if (offRes.ok) {
-          const data = await offRes.json();
-          if (data.status === 1 && data.product) {
-            const p = data.product;
-            const brand = p.brands || p.brand_owner || '';
-            const rawName =
-              p.product_name_he ||
-              p.product_name ||
-              p.generic_name_he ||
-              p.generic_name ||
-              brand ||
-              `מוצר (${code})`;
+          clearTimeout(timeoutId);
 
-            const ingredientsText =
-              p.ingredients_text_he ||
-              p.ingredients_text ||
-              p.ingredients_text_en ||
-              p.ingredients_text_with_allergens_he ||
-              '';
+          if (offRes.ok) {
+            const data = await offRes.json();
+            if (data.status === 1 && data.product) {
+              const p = data.product;
+              const brand = p.brands || p.brand_owner || '';
+              const rawName =
+                p.product_name_he ||
+                p.product_name ||
+                p.generic_name_he ||
+                p.generic_name ||
+                brand ||
+                `מוצר (${code})`;
 
-            const allergens = p.allergens || p.allergens_tags?.join(', ') || '';
-            const categories = p.categories || '';
-            const imageUrl = p.image_front_url || p.image_url || '';
+              const ingredientsText =
+                p.ingredients_text_he ||
+                p.ingredients_text ||
+                p.ingredients_text_en ||
+                p.ingredients_text_with_allergens_he ||
+                '';
 
-            return res.json({
-              barcode: code,
-              productName: rawName,
-              brand,
-              ingredientsText,
-              allergens,
-              categories,
-              imageUrl,
-              found: true,
-            });
+              const allergens = p.allergens || (p.allergens_tags ? p.allergens_tags.join(', ') : '');
+              const categories = p.categories || '';
+              const imageUrl = p.image_front_url || p.image_url || '';
+
+              return res.json({
+                barcode: code,
+                productName: rawName,
+                brand,
+                ingredientsText,
+                allergens,
+                categories,
+                imageUrl,
+                found: true,
+              });
+            }
           }
+        } catch (fetchErr) {
+          clearTimeout(timeoutId);
         }
-      } catch (fetchErr) {
-        clearTimeout(timeoutId);
-        console.warn('[Server Barcode Proxy] Open Food Facts error:', fetchErr);
       }
 
       return res.json({
