@@ -170,6 +170,20 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                 {result.shortVerdict}
               </p>
             </div>
+
+            {/* Direct High-Visibility Barcode / Label Scanner Button at the VERY TOP */}
+            {onScanBarcode && (
+              <div className="w-full max-w-md mx-auto pt-2">
+                <button
+                  type="button"
+                  onClick={onScanBarcode}
+                  className="w-full py-3.5 px-5 bg-white hover:bg-stone-50 text-stone-950 font-black text-sm sm:text-base rounded-2xl shadow-2xl border-2 border-white/90 transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 ring-4 ring-black/25"
+                >
+                  <Barcode className="w-5 h-5 text-indigo-600" />
+                  <span>📸 סריקת ברקוד / רכיבים חדשה</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
