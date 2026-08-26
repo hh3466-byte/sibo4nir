@@ -513,21 +513,64 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsFetchingBarcode(true);
     setBarcodeError(null);
 
+    // Modern Native BarcodeDetector
+    const hasNativeBarcodeDetector = 'BarcodeDetector' in window;
+    let nativeDetector: any = null;
+    if (hasNativeBarcodeDetector) {
+      try {
+        nativeDetector = new (window as any).BarcodeDetector({
+          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'],
+        });
+      } catch (e) {
+        nativeDetector = null;
+      }
+    }
+
     const reader = getZxingReader();
     const img = document.createElement('img');
     const objectUrl = URL.createObjectURL(file);
     img.src = objectUrl;
 
     img.onload = async () => {
+      // Step 1: Try Native Hardware GPU BarcodeDetector on full image (0ms)
+      if (nativeDetector) {
+        try {
+          const detected = await nativeDetector.detect(img);
+          if (detected && detected.length > 0 && detected[0]?.rawValue) {
+            const code = String(detected[0].rawValue).trim();
+            if (code && code.length >= 6) {
+              URL.revokeObjectURL(objectUrl);
+              logMobileEvent('barcode_photo_captured_gpu', { code });
+              await handleBarcodeLookup(code);
+              return;
+            }
+          }
+        } catch (gpuErr) {}
+      }
+
+      // Step 2: High-Speed Downscaled Canvas (Max 1280px) for Fast ZXing Decoding
       try {
+        const MAX_DIM = 1280;
+        let targetW = img.naturalWidth;
+        let targetH = img.naturalHeight;
+        if (targetW > MAX_DIM || targetH > MAX_DIM) {
+          if (targetW > targetH) {
+            targetH = Math.round((targetH * MAX_DIM) / targetW);
+            targetW = MAX_DIM;
+          } else {
+            targetW = Math.round((targetW * MAX_DIM) / targetH);
+            targetH = MAX_DIM;
+          }
+        }
+
         const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+        canvas.width = targetW;
+        canvas.height = targetH;
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const luminanceSource = new RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          const imgData = ctx.getImageData(0, 0, targetW, targetH);
+          const luminanceSource = new RGBLuminanceSource(imgData.data, targetW, targetH);
           let result = null;
           try {
             result = reader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(luminanceSource)));
@@ -538,9 +581,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           }
 
           if (result && result.getText()) {
-            URL.revokeObjectURL(objectUrl);
-            await handleBarcodeLookup(result.getText());
-            return;
+            const code = result.getText().trim();
+            if (code && code.length >= 6) {
+              URL.revokeObjectURL(objectUrl);
+              logMobileEvent('barcode_photo_captured_zxing', { code });
+              await handleBarcodeLookup(code);
+              return;
+            }
           }
         }
       } catch (zxErr) {
