@@ -248,24 +248,24 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     try {
       const prod = await fetchProductByBarcode(cleanCode);
-      if (prod.found) {
-        const cleanName = prod.productName || 'מוצר ארוז';
-        const textPrompt = prod.ingredientsText
-          ? `${cleanName} (רכיבים: ${prod.ingredientsText})`
-          : cleanName;
+      const cleanName = prod.productName || `מוצר ארוז (${cleanCode})`;
+      const textPrompt = prod.ingredientsText
+        ? `${cleanName} (רכיבים: ${prod.ingredientsText})`
+        : cleanName;
 
-        await onAnalyze({
-          textPrompt,
-          barcode: prod.barcode,
-          imageBase64: prod.imageUrl || undefined,
-        });
-      } else {
-        setBarcodeError(
-          `הברקוד (${cleanCode}) טרם נרשם במאגר. צלמי ישירות את רשימת הרכיבים בגב האריזה לקבלת ניתוח SIBO מדויק!`
-        );
-      }
+      await onAnalyze({
+        textPrompt,
+        barcode: cleanCode,
+        imageBase64: prod.imageUrl || undefined,
+      });
+      setScannedBarcodeSuccess(null);
     } catch (e: any) {
-      setBarcodeError('שגיאה בסריקת הברקוד. אנא נסי שוב או צלמי את רשימת הרכיבים בגב האריזה.');
+      console.warn('[BarcodeScanner] Lookup error, analyzing barcode name fallback:', e);
+      await onAnalyze({
+        textPrompt: `מוצר ארוז (ברקוד ${cleanCode})`,
+        barcode: cleanCode,
+      });
+      setScannedBarcodeSuccess(null);
     } finally {
       setIsFetchingBarcode(false);
     }

@@ -109,9 +109,12 @@ export default function App() {
       controller.abort();
     }, 35000);
 
-    // ⚡ Instant 0ms Client-Side SIBO Analysis for Text/Food Queries!
-    if (payload.textPrompt && !payload.imageBase64) {
+    // ⚡ Instant 0ms Client-Side SIBO Analysis for Text/Barcode Queries!
+    if (payload.textPrompt) {
       const instantResult = analyzeFoodClinically(payload.textPrompt, currentPhase);
+      if (payload.imageBase64) {
+        instantResult.imageUrl = payload.imageBase64;
+      }
       setAnalysisResult(instantResult);
       setActiveTab('scanner');
       playFeedbackTone(instantResult.status);
