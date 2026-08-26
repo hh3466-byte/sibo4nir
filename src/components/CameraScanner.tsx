@@ -15,7 +15,14 @@ import {
   CheckCircle2,
   Play,
 } from 'lucide-react';
-import { BrowserMultiFormatReader } from '@zxing/browser';
+import {
+  MultiFormatReader,
+  BarcodeFormat,
+  DecodeHintType,
+  RGBLuminanceSource,
+  BinaryBitmap,
+  HybridBinarizer,
+} from '@zxing/library';
 import { fetchProductByBarcode } from '../services/barcodeService';
 
 interface CameraScannerProps {
@@ -59,9 +66,32 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const nativeCameraInputRef = useRef<HTMLInputElement | null>(null);
   const barcodeFileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const zxingReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const zxingReaderRef = useRef<MultiFormatReader | null>(null);
   const barcodeScanLoopRef = useRef<number | null>(null);
   const isBarcodeScanningActiveRef = useRef<boolean>(false);
+
+  // Initialize ZXing with TRY_HARDER and exact 1D/2D formats
+  const getZxingReader = useCallback(() => {
+    if (!zxingReaderRef.current) {
+      const reader = new MultiFormatReader();
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+        BarcodeFormat.EAN_13,
+        BarcodeFormat.EAN_8,
+        BarcodeFormat.UPC_A,
+        BarcodeFormat.UPC_E,
+        BarcodeFormat.CODE_128,
+        BarcodeFormat.CODE_39,
+        BarcodeFormat.CODE_93,
+        BarcodeFormat.ITF,
+        BarcodeFormat.QR_CODE,
+      ]);
+      hints.set(DecodeHintType.TRY_HARDER, true);
+      reader.setHints(hints);
+      zxingReaderRef.current = reader;
+    }
+    return zxingReaderRef.current;
+  }, []);
 
   // Sync initialMode changes from parent (e.g. when user clicks "סרוק ברקוד" from result modal)
   useEffect(() => {
@@ -127,8 +157,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: targetFacing },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 },
         },
         audio: false,
       });
@@ -241,7 +271,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   }, [onAnalyze]);
 
-  // Real-Time Barcode Scanner Worker on the Unified Live Video Stream
+  // Real-Time High-Precision Barcode Scanner Worker
   useEffect(() => {
     if (mode !== 'barcode' || stagedImage || isLoading) {
       isBarcodeScanningActiveRef.current = false;
@@ -256,12 +286,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setBarcodeError(null);
     setScannedBarcodeSuccess(null);
 
-    if (!zxingReaderRef.current) {
-      zxingReaderRef.current = new BrowserMultiFormatReader();
-    }
+    const reader = getZxingReader();
 
     let lastScanTime = 0;
-    const scanIntervalMs = 250; // scan every 250ms for low CPU usage & high responsiveness
+    const scanIntervalMs = 180; // scan every 180ms for ultra-fast response
 
     // Modern Native BarcodeDetector (Hardware Accelerated if available)
     const hasNativeBarcodeDetector = 'BarcodeDetector' in window;
@@ -276,7 +304,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    // Temporary canvas for fast frame processing
+    // High-resolution cropped canvas for unblurred 1D barcode detection
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
@@ -287,7 +315,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
         lastScanTime = now;
 
-        // Try Native Hardware Barcode Detector first
+        // Strategy 1: Hardware GPU Native Barcode Detector
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
@@ -299,20 +327,31 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               return;
             }
           } catch (detErr) {
-            // fallback to zxing
+            // fallback to ZXing
           }
         }
 
-        // Fast ZXing Reader on Canvas Frame
-        if (zxingReaderRef.current && ctx) {
+        // Strategy 2: Pixel-Perfect Center Strip ZXing Reader with HybridBinarizer
+        if (ctx) {
           try {
-            const width = Math.min(video.videoWidth, 640);
-            const height = Math.round((video.videoHeight * width) / video.videoWidth);
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(video, 0, 0, width, height);
+            const vW = video.videoWidth;
+            const vH = video.videoHeight;
 
-            const result = zxingReaderRef.current.decodeFromCanvas(canvas);
+            // Crop center 80% width and 45% height without downscaling (preserves crisp 1px bars!)
+            const cropW = Math.floor(vW * 0.85);
+            const cropH = Math.floor(vH * 0.50);
+            const cropX = Math.floor((vW - cropW) / 2);
+            const cropY = Math.floor((vH - cropH) / 2);
+
+            canvas.width = cropW;
+            canvas.height = cropH;
+            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+            const imgData = ctx.getImageData(0, 0, cropW, cropH);
+            const luminanceSource = new RGBLuminanceSource(imgData.data, cropW, cropH);
+            const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
+
+            const result = reader.decode(binaryBitmap);
             if (result && result.getText()) {
               const code = result.getText();
               isBarcodeScanningActiveRef.current = false;
@@ -320,7 +359,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               handleBarcodeLookup(code);
               return;
             }
-          } catch (e) {
+          } catch (zxingErr) {
             // normal frame without barcode
           }
         }
@@ -340,7 +379,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         barcodeScanLoopRef.current = null;
       }
     };
-  }, [mode, stagedImage, isLoading, handleBarcodeLookup]);
+  }, [mode, stagedImage, isLoading, getZxingReader, handleBarcodeLookup]);
 
   // High-Resolution Native Mobile Photo Scan for Barcode
   const handleBarcodeFileCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -351,33 +390,40 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsFetchingBarcode(true);
     setBarcodeError(null);
 
-    try {
-      const reader = new BrowserMultiFormatReader();
-      const img = document.createElement('img');
-      const objectUrl = URL.createObjectURL(file);
-      img.src = objectUrl;
+    const reader = getZxingReader();
+    const img = document.createElement('img');
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
 
-      img.onload = async () => {
-        try {
-          const result = reader.decodeFromImageElement(img);
+    img.onload = async () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const luminanceSource = new RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
+          const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
+          const result = reader.decode(binaryBitmap);
           if (result && result.getText()) {
             URL.revokeObjectURL(objectUrl);
             await handleBarcodeLookup(result.getText());
             return;
           }
-        } catch (zxErr) {
-          // fallback to SIBO image analyzer
         }
-        URL.revokeObjectURL(objectUrl);
-        processImageFile(file);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        processImageFile(file);
-      };
-    } catch (err: any) {
+      } catch (zxErr) {
+        // fallback to SIBO image analyzer
+      }
+      URL.revokeObjectURL(objectUrl);
       processImageFile(file);
-    }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      processImageFile(file);
+    };
   };
 
   // Flip camera between front and back
