@@ -208,16 +208,19 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   // Manage Camera Mode Lifecycle (Food and Barcode modes use the same rock-solid stream)
   useEffect(() => {
-    const isCameraNeeded = (mode === 'camera' || mode === 'barcode') && !stagedImage;
+    const isCameraNeeded = mode === 'camera' || mode === 'barcode';
 
     if (isCameraNeeded) {
       if (!streamRef.current) {
         startCameraStream(facingMode);
+      } else if (videoRef.current) {
+        videoRef.current.play().catch(() => {});
+        setIsVideoPaused(false);
       }
     } else {
       stopCameraStream();
     }
-  }, [mode, facingMode, stagedImage, startCameraStream, stopCameraStream]);
+  }, [mode, facingMode, startCameraStream, stopCameraStream]);
 
   // Stop camera only when unmounting the entire component
   useEffect(() => {
@@ -550,16 +553,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          setStagedImage(compressedDataUrl);
-          stopCameraStream();
+          // ⚡ 1-TAP DIRECT ANALYSIS FOR CAMERA PHOTO!
+          onAnalyze({ imageBase64: compressedDataUrl, mimeType: 'image/jpeg' });
         } else {
-          setStagedImage(rawDataUrl);
-          stopCameraStream();
+          onAnalyze({ imageBase64: rawDataUrl, mimeType: 'image/jpeg' });
         }
       };
       img.onerror = () => {
-        setStagedImage(rawDataUrl);
-        stopCameraStream();
+        onAnalyze({ imageBase64: rawDataUrl, mimeType: 'image/jpeg' });
       };
       img.src = rawDataUrl;
     };

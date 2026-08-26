@@ -174,37 +174,6 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
 
         {/* Content Details Body with Large Clear Typography */}
         <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100 max-h-[62vh] overflow-y-auto">
-          {/* Packaged Product Barcode Recommendation Banner */}
-          {result.isPackagedProduct && showPackagedPrompt && (
-            <div className="pb-2">
-              <div className="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-xs">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                    <Barcode className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm sm:text-base font-black text-indigo-950 flex items-center gap-1.5">
-                      <span>💡 זוהה כמוצר ארוז / מסחרי</span>
-                    </h4>
-                    <p className="text-xs sm:text-sm text-indigo-900 mt-0.5 leading-relaxed font-medium">
-                      כדי לוודא שאין רכיבים מתסיסים סמויים (כמו סירופ פרוקטוז, אינולין או עמילן מוסף), <strong>מומלץ ביותר לסרוק את הברקוד 🏷️</strong> לקבלת דיוק של 100%!
-                    </p>
-                  </div>
-                </div>
-                {onScanBarcode && (
-                  <button
-                    id="btn-scan-barcode-from-result"
-                    type="button"
-                    onClick={onScanBarcode}
-                    className="w-full sm:w-auto shrink-0 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Barcode className="w-4 h-4" />
-                    <span>סרוק ברקוד 🏷️</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Main Product / Food Header Card - Giant & High Visibility */}
           <div className="p-5 sm:p-6 rounded-3xl bg-stone-50 border-2 border-stone-300 shadow-sm space-y-3">
