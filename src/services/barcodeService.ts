@@ -173,10 +173,29 @@ export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>
     ingredientsText: 'חלב מפוסטר דל לקטוז, חלבוני חלב, אנזים לקטאז',
     categories: 'יוגורטים עתירי חלבון',
   },
+  '7290000045138': {
+    productName: 'גבינת מוצרלה גד בייבי',
+    brand: 'מחלבות גד',
+    ingredientsText: 'חלב בקר מפוסטר, מלח, אנזים',
+    categories: 'גבינות חצי קשות',
+  },
+  '7290000045145': {
+    productName: 'גבינת פטה עיזים גד 16%',
+    brand: 'מחלבות גד',
+    ingredientsText: 'חלב עיזים מפוסטר, מלח, אנזים',
+    categories: 'גבינות עיזים',
+  },
+  '7290000045152': {
+    productName: 'גבינה לבנה תנובה 5%',
+    brand: 'תנובה',
+    ingredientsText: 'חלב מפוסטר, שמנת, מלח',
+    allergens: 'מכיל לקטוז',
+    categories: 'גבינות רכות',
+  },
 
   // Plant Based Milks
   '7290000045206': {
-    productName: 'משקה שקדים אורגני ללא סוכר (אלפרו / תנובה אלטרנטיב)',
+    productName: 'משקה שקדים אורגני ללא סוכר (תנובה Alternative)',
     brand: 'תנובה Alternative',
     ingredientsText: 'מים, שקדים (2.5%), מלח ים, מייצבים',
     categories: 'תחליפי חלב',
@@ -187,8 +206,46 @@ export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>
     ingredientsText: 'פולי סויה, מים, ויטמינים',
     categories: 'תחליפי חלב',
   },
+  '7290000045220': {
+    productName: 'משקה שיבולת שועל תנובה Alternative',
+    brand: 'תנובה Alternative',
+    ingredientsText: 'מים, שיבולת שועל, שמן חמניות, מלח',
+    categories: 'תחליפי חלב',
+  },
 
-  // Snacks & Grains
+  // Tuna & Canned Foods
+  '7290000050019': {
+    productName: 'טונה סטארקיסט בשמן זית כתית מעולה',
+    brand: 'סטארקיסט Starkist',
+    ingredientsText: 'נתחי טונה בהירה, שמן זית כתית מעולה, מלח',
+    categories: 'שימורי דגים',
+  },
+  '7290000050026': {
+    productName: 'טונה סטארקיסט במים',
+    brand: 'סטארקיסט Starkist',
+    ingredientsText: 'נתחי טונה בהירה, מים, מלח',
+    categories: 'שימורי דגים',
+  },
+  '7290000050033': {
+    productName: 'טונה פילטונה בשמן קנולה',
+    brand: 'פילטונה',
+    ingredientsText: 'טונה בהירה, שמן קנולה, מלח',
+    categories: 'שימורי דגים',
+  },
+  '7290000050040': {
+    productName: 'רסק עגבניות 28-30 BRIX פרי ניר / יכין',
+    brand: 'יכין / פרי ניר',
+    ingredientsText: '100% עגבניות',
+    categories: 'רסקים ושימורים',
+  },
+  '7290000050057': {
+    productName: 'זיתים ירוקים מנזנילו ללא חרצנים (בית השיטה)',
+    brand: 'בית השיטה',
+    ingredientsText: 'זיתים ירוקים, מים, מלח, חומצת לימון',
+    categories: 'חמוצים ושימורים',
+  },
+
+  // Snacks, Grains & Rice
   '7290000060018': {
     productName: 'במבה אסם קלאסית (בוטנים)',
     brand: 'אסם',
@@ -220,6 +277,101 @@ export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>
     ingredientsText: 'עיסת קקאו, סוכר, חמאת קקאו, אבקת קקאו',
     categories: 'ממתקים ושוקולד',
   },
+  '7290000060063': {
+    productName: 'אורז בסמטי קלאסי סוגת 1 ק״ג',
+    brand: 'סוגת',
+    ingredientsText: '100% אורז בסמטי לבן מובחר',
+    categories: 'אורז ודגנים',
+  },
+  '7290000060070': {
+    productName: 'אורז יסמין תאילנדי סוגת 1 ק״ג',
+    brand: 'סוגת',
+    ingredientsText: '100% אורז יסמין לבן',
+    categories: 'אורז ודגנים',
+  },
+  '7290000060087': {
+    productName: 'פסטה ברילה ללא גלוטן (תירס ואורז)',
+    brand: 'Barilla Gluten Free',
+    ingredientsText: 'קמח תירס לבן (60%), קמח תירס צהוב (29.5%), קמח אורז (10%), מים',
+    categories: 'פסטה ללא גלוטן',
+  },
+  '7290000060094': {
+    productName: 'פסטה ברילה ספגטי מס׳ 5 (חיטה רגילה)',
+    brand: 'Barilla',
+    ingredientsText: 'קמח סמולינה מחיטת דורום, מים (מכיל גלוטן)',
+    allergens: 'גלוטן וחיטה',
+    categories: 'פסטה רגילה',
+  },
+  '7290000060100': {
+    productName: 'שיבולת שועל להכנה מהירה (קוואקר) סוגת / קוואקר',
+    brand: 'Quaker / סוגת',
+    ingredientsText: '100% פתיתי שיבולת שועל מלאה',
+    categories: 'דגני בוקר וקוואקר',
+  },
+  '7290000060117': {
+    productName: 'טחינה גולמית 100% שומשום מלא אחוה',
+    brand: 'אחוה',
+    ingredientsText: '100% זרעי שומשום מלא טהור קלוי',
+    categories: 'ממרחים וטחינה',
+  },
+  '7290000060124': {
+    productName: 'טחינה גולמית אל ארז',
+    brand: 'אל ארז',
+    ingredientsText: '100% שומשום טהור מובחר',
+    categories: 'ממרחים וטחינה',
+  },
+
+  // Oils & Condiments
+  '7290000065013': {
+    productName: 'שמן זית כתית מעולה חמיצות 0.5% יד מרדכי',
+    brand: 'יד מרדכי',
+    ingredientsText: '100% שמן זית ישראלי כתית מעולה בכבישה קרה',
+    categories: 'שמני מאכל',
+  },
+  '7290000065020': {
+    productName: 'שמן זית כתית מעולה עץ הזית',
+    brand: 'עץ הזית',
+    ingredientsText: '100% שמן זית בכבישה קרה',
+    categories: 'שמני מאכל',
+  },
+  '7290000065037': {
+    productName: 'מיונז אמיתי הלמנס Hellmanns',
+    brand: 'Hellmanns / יוניליוור',
+    ingredientsText: 'שמן סויה/קנולה, מים, ביצים, חומץ, מלח, סוכר, חומצת לימון',
+    categories: 'רטבים וממרחים',
+  },
+
+  // Soft Drinks, Juices & Sodas
+  '7290000080016': {
+    productName: 'קוקה קולה קלאסית 1.5 ליטר (Coca Cola)',
+    brand: 'קוקה קולה / החברה המרכזית',
+    ingredientsText: 'מים, סוכר, פחמן דו חמצני, צבע מאכל קרמל, חומצה זרחתית, תמציות טבעיות, קפאין',
+    categories: 'משקאות קלים מוגזים',
+  },
+  '7290000080023': {
+    productName: 'קוקה קולה זירו 1.5 ליטר (Coca Cola Zero)',
+    brand: 'קוקה קולה',
+    ingredientsText: 'מים, פחמן דו חמצני, צבע מאכל קרמל, מווסתי חומציות, ממתיקים (אספרטיים, אססולפאם K), קפאין',
+    categories: 'משקאות דיאט ללא סוכר',
+  },
+  '7290000080030': {
+    productName: 'ספרייט ZERO ללא סוכר (Sprite Zero)',
+    brand: 'ספרייט',
+    ingredientsText: 'מים, פחמן דו חמצני, חומצת לימון, ממתיקים (אספרטיים, אססולפאם K), תמצית לימון ליים',
+    categories: 'משקאות דיאט ללא סוכר',
+  },
+  '7290000080047': {
+    productName: 'סודה טמפו מים מוגזים 1.5 ליטר',
+    brand: 'טמפו',
+    ingredientsText: 'מים מטוהרים, פחמן דו חמצני (100% טבעי ללא סוכר)',
+    categories: 'מים מוגזים וסודה',
+  },
+  '7290000080054': {
+    productName: 'מיץ תפוזים סחוט טרי 100% פריגת',
+    brand: 'פריגת',
+    ingredientsText: '100% מיץ תפוזים סחוט טבעי (עשיר בפרוקטוז טבעי)',
+    categories: 'מיצים סחוטים טבעיים',
+  },
 
   // Coffee & Teas
   '7290000070017': {
@@ -238,6 +390,12 @@ export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>
     productName: 'חליטת קמומיל וג׳ינג׳ר ויסוצקי',
     brand: 'ויסוצקי',
     ingredientsText: 'פרחי בבונג (קמומיל), שורש ג׳ינג׳ר, עשב לימון',
+    categories: 'תה וחליטות',
+  },
+  '7290000070048': {
+    productName: 'חליטת נענע ומנטה ויסוצקי',
+    brand: 'ויסוצקי',
+    ingredientsText: '100% עלי מנטה ונענע טהורים (מרגיע בטן SIBO)',
     categories: 'תה וחליטות',
   },
 };

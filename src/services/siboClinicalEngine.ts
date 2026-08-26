@@ -906,35 +906,38 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     }
   }
 
-  // 3. Fallback for Unknown / Generic Queries
+  // 3. Fallback for Unknown / Generic Queries (Strict Clinical Safety for Nir!)
   const smartSubs = getSmartCategoricalSubstitutions(cleanName);
-  const isGeneric = !cleanName || cleanName.includes('מאכל שצולם') || cleanName.includes('מאכל') || cleanName.includes('מוצר ארוז');
+  const isGeneric = !cleanName || cleanName.includes('מאכל שצולם') || cleanName.includes('מאכל') || cleanName.includes('מוצר ארוז') || cleanName.includes('לא מזוהה');
   const isDrink = /תה|משקה|מיץ|קולה|סודה|ספרייט|פאנטה|משקאות|drink|tea|beverage|fuzetea|fuze/i.test(cleanName + query);
 
   return {
-    status: isPhase1 ? 'YELLOW' : 'GREEN',
-    foodName: isGeneric ? (isDrink ? 'משקה ארוז / לא מזוהה' : 'מאכל ארוז / לא מזוהה') : cleanName,
-    englishName: isDrink ? 'Packaged Beverage' : 'Food Item',
-    shortVerdict: `נבדק לפי פרוטוקול SIBO (${isPhase1 ? 'שלב 1 קפדני' : 'שלב 2'})`,
-    detailedExplanation: isDrink
-      ? `המשקה "${cleanName}" נבדק על פי כללי SIBO. מומלץ לצרוך בכמות מתונה ולוודא שאינו מכיל תוספת סירופ פרוקטוז (HFCS), סוכר מרוכז או ממתיקים אלכוהוליים מתסיסים (סורביטול/מניטול).`
-      : isGeneric
-      ? 'זיהינו צילום של מוצר. כדי לוודא שאין רכיבים מתסיסים סמויים (כמו אינולין, אבקת שום/בצל או עמילן מוסף), מומלץ ביותר לסרוק את הברקוד 🏷️ או לצלם ישירות את טבלת הרכיבים בגב האריזה לקבלת דיוק של 100%!'
-      : `המאכל "${cleanName}" נבדק על פי כללי התסיסה של פרוטוקול SIBO. בשלב 1 הקפדני מומלץ לצרוך במנה מתונה בלבד ולוודא שאין תוספת שום, בצל, קמח חיטה או ממתיקים אלכוהוליים.`,
-    fodmapTriggers: isDrink ? ['סוכרים מוספים / פרוקטוז'] : ['דרושה בדיקת רכיבים מדויקת'],
+    status: isPhase1 ? 'RED' : 'YELLOW',
+    foodName: isGeneric ? (isDrink ? 'משקה ארוז (לא מזוהה במאגר)' : 'מוצר ארוז (לא מזוהה במאגר)') : cleanName,
+    englishName: isDrink ? 'Unidentified Beverage' : 'Unidentified Packaged Food',
+    shortVerdict: isPhase1
+      ? '⛔ זהירות רפואית: מוצר לא מזוהה - אסור לצרוך בשלב 1 ללא אימות רכיבים!'
+      : '⚠️ זהירות: מוצר לא מזוהה - מומלץ לוודא רכיבים לפני צריכה.',
+    detailedExplanation: `מוצר מסחרי זה אינו מזוהה במאגר המזון הבטוח של ניר.
+במזונות ובמשקאות תעשייתיים ישנו סיכון גבוה ביותר לרכיבי תסיסה סמויים ובלתי נראים (כמו סירופ פרוקטוז / HFCS, סיבי אינולין, אבקת שום ובצל, קמח חיטה או ממתיקים אלכוהוליים מתסיסים כגון סורביטול, מניטול ומלטיטול).
+
+🚨 הנחיה קלינית לניר:
+אין לצרוך מוצר זה בשלב 1 עד לצילום טבלת הרכיבים או הקלדת שמו המדויק לבדיקה!`,
+    fodmapTriggers: ['סיכון לרכיבי תסיסה סמויים (פרוקטוז/אינולין/שום/פוליאולים)'],
     phase1Compatibility: false,
-    phase2Compatibility: true,
-    maxSafePortion: isDrink ? 'עד 1 כוס (150-200 מ"ל)' : 'מנה קטנה ומדודה (עד 50-75 גרם)',
+    phase2Compatibility: false,
+    maxSafePortion: 'לא לצרוך עד לבדיקת רכיבים מדויקת',
     safeSubstitutions: smartSubs,
-    cookingTips: isDrink
-      ? ['להעדיף מים, סודה טבעית או חליטות צמחים ותה ירוק ללא סוכר']
-      : ['לוודא שאין תבלינים מתסיסים כמו אבקת שום או בצל'],
-    medicalReferences: [
-      'Dr. Allison Siebecker - SIBO Food Guide',
-      'Monash University FODMAP'
+    cookingTips: [
+      'צלמי את רשימת הרכיבים בגב האריזה לקבלת ניתוח AI מיידי ב-100% דיוק',
+      'או הקלידי את שם המוצר המדויק לחיפוש מהיר במאגר הקליני'
     ],
-    isPackagedProduct: isGeneric,
-    riskScore: 3,
+    medicalReferences: [
+      'Dr. Allison Siebecker - SIBO Food Guide (Packaged Foods Caution)',
+      'Monash University FODMAP Certification Standards'
+    ],
+    isPackagedProduct: true,
+    riskScore: 5,
     timestamp: Date.now(),
   };
 }

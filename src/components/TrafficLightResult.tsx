@@ -175,6 +175,47 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
         {/* Content Details Body with Large Clear Typography */}
         <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100 max-h-[62vh] overflow-y-auto">
 
+          {/* Unidentified Packaged Product - High-Priority Clinical Warning Card for Nir */}
+          {(result.isPackagedProduct || result.foodName.includes('לא מזוהה') || result.foodName.includes('מוצר ארוז')) && (
+            <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-rose-600 via-rose-700 to-red-800 text-white shadow-xl border-2 border-rose-300 space-y-4">
+              <div className="flex items-start gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center shrink-0 text-2xl font-black shadow-sm">
+                  ⛔
+                </div>
+                <div>
+                  <h4 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span>אזהרת בטיחות קלינית לניר: מוצר לא מזוהה!</span>
+                  </h4>
+                  <p className="text-xs sm:text-sm text-rose-100 mt-1 leading-relaxed font-medium">
+                    מוצר זה אינו מזוהה במאגר הבטוח. <strong>חל איסור מוחלט לצרוך מוצר זה בשלב 1 ללא אימות רכיבים</strong>, עקב סיכון גבוה לפרוקטוז סמוי, אינולין, אבקת שום/בצל או ממתיקים אלכוהוליים מתסיסים.
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons for Instant Resolution */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {onScanBarcode && (
+                  <button
+                    type="button"
+                    onClick={onScanBarcode}
+                    className="py-3 px-4 bg-white text-rose-950 font-black text-xs sm:text-sm rounded-xl shadow-md hover:bg-rose-50 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <Barcode className="w-4 h-4 text-rose-600" />
+                    <span>סרוק ברקוד / רכיבים 📸</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onReset}
+                  className="py-3 px-4 bg-rose-900/80 hover:bg-rose-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-rose-400/40 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <Search className="w-4 h-4" />
+                  <span>הקלד שם מוצר ידנית ✏️</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Main Product / Food Header Card - Giant & High Visibility */}
           <div className="p-5 sm:p-6 rounded-3xl bg-stone-50 border-2 border-stone-300 shadow-sm space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
