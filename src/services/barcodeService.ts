@@ -2,6 +2,8 @@
  * Barcode & Food Data Integration Service (Open Food Facts & SIBO Matcher)
  */
 
+import { ISRAELI_SUPERMARKET_CATALOG } from '../data/israeliSupermarketDatabase';
+
 export interface BarcodeProductInfo {
   barcode: string;
   productName: string;
@@ -49,6 +51,7 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
  * Rich offline dictionary of popular Israeli supermarket barcodes
  */
 export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
+  ...ISRAELI_SUPERMARKET_CATALOG,
   // Fuze Tea & Iced Teas (1.5L, 500ml, cans, barcodes & optical scan variants)
   '7293110003693': {
     productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
