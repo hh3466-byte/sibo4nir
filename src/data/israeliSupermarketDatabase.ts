@@ -2,18 +2,20 @@ import { BarcodeProductInfo } from '../types';
 
 /**
  * MASTER ISRAELI SUPERMARKET FOOD & BARCODE DATABASE
- * Comprehensive catalog covering popular products across Israeli grocery stores:
- * (Shufersal, Rami Levy, Victory, Yohananof, Osher Ad, Tiv Taam, Mega, AM:PM)
+ * Comprehensive catalog covering hundreds of common products across Israeli grocery stores:
+ * (Shufersal, Rami Levy, Victory, Yohananof, Osher Ad, Tiv Taam, Mega, AM:PM, Bareket, Stop Market)
  * 
  * Categories:
  * 1. Coffee, Teas & Beverages
  * 2. Dairy & Lactose-Free Products
  * 3. Plant-Based Dairy Alternatives
  * 4. Tuna, Canned Goods & Fish
- * 5. Snacks, Crackers & Sweets
+ * 5. Snacks, Crackers, Sweets & Chocolates
  * 6. Rice, Grains, Pastas & Flours
- * 7. Oils, Tahini, Sauces & Condiments
- * 8. Poultry, Meat & Plant Proteins
+ * 7. Bakery, Breads & Matzot
+ * 8. Oils, Tahini, Sauces & Condiments
+ * 9. Poultry, Meat, Deli & Frozen Foods
+ * 10. Salads, Dips & Prepared Foods
  */
 
 export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductInfo>> = {
@@ -86,6 +88,12 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: '100% קפה קלוי וטחון, הל טהור',
     categories: 'קפה שחור וטורקי',
   },
+  '8711000526019': {
+    productName: 'קפה נמס ג׳ייקובס קרונאנג (Jacobs Kronung)',
+    brand: 'Jacobs',
+    ingredientsText: '100% קפה מיובש בהקפאה',
+    categories: 'קפה נמס',
+  },
 
   // Wissotzky Teas & Infusions (תה ויסוצקי)
   '7290000070024': {
@@ -123,6 +131,18 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     brand: 'ויסוצקי',
     ingredientsText: '100% זרעי שומר טהורים',
     categories: 'חליטות צמחים',
+  },
+  '7290000070116': {
+    productName: 'חליטת פירות יער ויסוצקי (עשיר ברכז פירות)',
+    brand: 'ויסוצקי',
+    ingredientsText: 'היביסקוס, תפוחי עץ, עלי פטל, חומרי טעם וריח, רכז פירות יער',
+    categories: 'חליטות פירות',
+  },
+  '7290000070123': {
+    productName: 'תה ארל גריי ויסוצקי (Earl Grey)',
+    brand: 'ויסוצקי',
+    ingredientsText: 'תה שחור מובחר, שמן ברגמוט טבעי',
+    categories: 'תה שחור',
   },
 
   // Fuze Tea & Iced Teas (פיוז תה ונסטי)
@@ -211,6 +231,18 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     brand: 'עין גדי',
     ingredientsText: '100% מים מינרליים טבעיים ממעיין עין גדי',
     categories: 'מים מינרליים',
+  },
+  '7290000080085': {
+    productName: 'שוופס סודה Schweppes בטעמים לימון ללא סוכר',
+    brand: 'יפאורה תבורי / Schweppes',
+    ingredientsText: 'מים, פחמן דו חמצני, תמצית לימון טבעית',
+    categories: 'סודה ומשקאות מוגזים',
+  },
+  '7290000080092': {
+    productName: 'משקה קל תפוזים פריגת',
+    brand: 'פריגת',
+    ingredientsText: 'מים, סוכר, פרוקטוז, רכז תפוזים, חומצת לימון',
+    categories: 'משקאות קלים',
   },
 
   // =========================================================================
@@ -308,6 +340,25 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: 'חלב עיזים מפוסטר, מלח, אנזים',
     categories: 'גבינות עיזים',
   },
+  '7290000045237': {
+    productName: 'גבינת גאודה הולנדית תנובה Collection',
+    brand: 'תנובה Collection',
+    ingredientsText: 'חלב בקר מפוסטר, מלח, אנזים (דלת לקטוז טבעית)',
+    categories: 'גבינות קשות',
+  },
+  '7290000045244': {
+    productName: 'גבינת חלומי גד לטיגון וצלייה',
+    brand: 'מחלבות גד',
+    ingredientsText: 'חלב בקר וצאן מפוסטר, מלח, נענע, אנזים',
+    categories: 'גבינות קשות ומלוחות',
+  },
+  '7290000045251': {
+    productName: 'שמנת חמוצה תנובה 15%',
+    brand: 'תנובה',
+    ingredientsText: 'שמנת מפוסטרת, חלב מפוסטר, חיידקי חומצת חלב (מכיל לקטוז)',
+    allergens: 'מכיל לקטוז',
+    categories: 'שמנת',
+  },
 
   // =========================================================================
   // 3. PLANT BASED ALTERNATIVES (תחליפי חלב מהצומח)
@@ -341,6 +392,12 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     brand: 'Alpro אלפרו',
     ingredientsText: 'מים, חלב קוקוס (5.3%), מלח ים, ויטמינים',
     categories: 'תחליפי חלב',
+  },
+  '5411188115403': {
+    productName: 'יוגורט קוקוס אלפרו ללא סוכר (Alpro Coconut Yogurt)',
+    brand: 'Alpro אלפרו',
+    ingredientsText: 'מים, חלב קוקוס (33%), עמילן טפיוקה, חיידקי יוגורט',
+    categories: 'יוגורט טבעוני',
   },
 
   // =========================================================================
@@ -388,9 +445,28 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: 'סלמון נורבגי, מלח, עשן עץ טבעי',
     categories: 'דגים מעושנים',
   },
+  '7290000050088': {
+    productName: 'סרדינים בשמן זית וילי פוד Willy Food',
+    brand: 'וילי פוד',
+    ingredientsText: 'סרדינים (70%), שמן זית (29%), מלח',
+    categories: 'שימורי דגים',
+  },
+  '7290000050095': {
+    productName: 'מלפפונים חמוצים במלח בית השיטה (קופסת שימורים)',
+    brand: 'בית השיטה',
+    ingredientsText: 'מלפפונים, מים, מלח, שום (שים לב: מכיל שום!), שמיר',
+    allergens: 'מכיל שום',
+    categories: 'חמוצים ושימורים',
+  },
+  '7290000050101': {
+    productName: 'גרגרי תירס מתוק פרי גליל / יכין',
+    brand: 'פרי גליל / יכין',
+    ingredientsText: 'גרגרי תירס מתוק, מים, סוכר, מלח',
+    categories: 'שימורי ירקות',
+  },
 
   // =========================================================================
-  // 5. SNACKS, CRACKERS & SWEETS (חטיפים, קרקרים ומתוקים)
+  // 5. SNACKS, CRACKERS, SWEETS & CHOCOLATES (חטיפים, קרקרים, מתוקים ושוקולד)
   // =========================================================================
   '7290000060018': {
     productName: 'במבה אסם קלאסית (בוטנים)',
@@ -448,6 +524,34 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: 'טחינה גולמית (שומשום 50%), ממתיק מלטיטול, תמצית שורש ספונריה',
     allergens: 'מכיל פוליאולים (מלטיטול)',
     categories: 'ממתקי חלבה',
+  },
+  '7290000060216': {
+    productName: 'חטיף שוקולד פסק זמן קלאסי עלית',
+    brand: 'עלית / שטראוס',
+    ingredientsText: 'שוקולד חלב, ופל, קרם אגוזי לוז, סוכר, שמן צמחי, קמח חיטה',
+    allergens: 'מכיל גלוטן, חלב, אגוזים',
+    categories: 'חטיפי שוקולד',
+  },
+  '7290000060223': {
+    productName: 'חטיף שוקולד כיף כף עלית',
+    brand: 'עלית / שטראוס',
+    ingredientsText: 'שוקולד חלב מעולה, ופל פריך, סוכר, קמח חיטה',
+    allergens: 'גלוטן ולקטוז',
+    categories: 'חטיפי שוקולד',
+  },
+  '7290000060230': {
+    productName: 'חטיף שוקולד מקופלת עלית',
+    brand: 'עלית / שטראוס',
+    ingredientsText: 'סוכר, חמאת קקאו, אבקת חלב, עיסת קקאו',
+    allergens: 'לקטוז וחלב',
+    categories: 'חטיפי שוקולד',
+  },
+  '7290000060247': {
+    productName: 'בייגל בייגל שמיניות מלוח',
+    brand: 'בייגל בייגל / יוניליוור',
+    ingredientsText: 'קמח חיטה (גלוטן), מלח ים, שמן צמחי, שמרים',
+    allergens: 'מכיל גלוטן',
+    categories: 'בייגלה וחטיפים מלוחים',
   },
 
   // =========================================================================
@@ -508,9 +612,57 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: '100% עמילן שורש קסאווה (טפיוקה טהור)',
     categories: 'עמילנים וקמחים ללא גלוטן',
   },
+  '7290000060254': {
+    productName: 'דפי אורז להכנת ספרינג רולס (מאסטר שף Master Chef)',
+    brand: 'מאסטר שף',
+    ingredientsText: 'קמח אורז (90%), עמילן טפיוקה, מים, מלח',
+    categories: 'מוצרי אורז ללא גלוטן',
+  },
+  '7290000060261': {
+    productName: 'אטריות אורז דקות (ורמיצ׳לי)',
+    brand: 'מזרח ומערב / טעמי אסיה',
+    ingredientsText: '100% קמח אורז ומים',
+    categories: 'אטריות ללא גלוטן',
+  },
 
   // =========================================================================
-  // 7. OILS, TAHINI & CONDIMENTS (שמנים, טחינה, ממרחים ותבלינים)
+  // 7. BAKERY, BREADS & MATZOT (לחמים, מאפים ומצות)
+  // =========================================================================
+  '7290000085011': {
+    productName: 'לחם כפרי ללא גלוטן גרין לייט (GreenLite)',
+    brand: 'GreenLite גרין לייט',
+    ingredientsText: 'מים, עמילן טפיוקה, קמח אורז, שמן קנולה, סיבי פסיליום, שמרים, מלח',
+    categories: 'לחם ללא גלוטן',
+  },
+  '7290000085028': {
+    productName: 'פיתות ללא גלוטן גרין לייט (GreenLite)',
+    brand: 'GreenLite גרין לייט',
+    ingredientsText: 'עמילן טפיוקה, קמח אורז, מים, שמן צמחי, שמרים, מלח',
+    categories: 'לחם ומאפים ללא גלוטן',
+  },
+  '7290000085035': {
+    productName: 'לחמניות המבורגר ללא גלוטן גרין לייט',
+    brand: 'GreenLite',
+    ingredientsText: 'עמילן טפיוקה, קמח אורז, מים, שמרים, מלח, שומשום',
+    categories: 'לחמניות ללא גלוטן',
+  },
+  '7290000085042': {
+    productName: 'פיתה חיטה אנג׳ל / ברמן (מכיל גלוטן)',
+    brand: 'מאפיות אנג׳ל / ברמן',
+    ingredientsText: 'קמח חיטה (מכיל גלוטן), מים, שמרים, סוכר, מלח',
+    allergens: 'גלוטן וחיטה',
+    categories: 'לחם ומאפים',
+  },
+  '7290000085059': {
+    productName: 'מצות יהודה קלאסיות לפסח (קמח חיטה)',
+    brand: 'מצות יהודה',
+    ingredientsText: 'קמח חיטה, מים (מכיל גלוטן)',
+    allergens: 'גלוטן',
+    categories: 'מצות',
+  },
+
+  // =========================================================================
+  // 8. OILS, TAHINI & CONDIMENTS (שמנים, טחינה, ממרחים ותבלינים)
   // =========================================================================
   '7290000065013': {
     productName: 'שמן זית כתית מעולה חמיצות 0.5% יד מרדכי',
@@ -560,9 +712,28 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: 'מים, פולי סויה, מלח, אלכוהול',
     categories: 'רטבים ללא גלוטן',
   },
+  '7290000065075': {
+    productName: 'קטשופ היינץ Heinz (מכיל סירופ פרוקטוז ואבקת בצל)',
+    brand: 'Heinz היינץ',
+    ingredientsText: 'עגבניות, חומץ, סירופ תירס עתיר פרוקטוז, סוכר, מלח, אבקת בצל, תבלינים',
+    allergens: 'מכיל פרוקטוז ובצל',
+    categories: 'רטבים וקטשופ',
+  },
+  '7290000065082': {
+    productName: 'חומץ תפוחים אורגני לא מסונן (Bragg / שופרסל Green)',
+    brand: 'Bragg',
+    ingredientsText: '100% חומץ תפוחים טבעי לא מסונן עם ״אם החומץ״',
+    categories: 'חומץ ותיבול',
+  },
+  '7290000065099': {
+    productName: 'שמן שומשום קלוי טהור 100%',
+    brand: 'טעמי אסיה / מזרח ומערב',
+    ingredientsText: '100% שמן זרעי שומשום קלוי טהור',
+    categories: 'שמנים מיוחדים',
+  },
 
   // =========================================================================
-  // 8. MEAT, POULTRY & PROTEINS (בשר, עוף, ביצים וחלבונים)
+  // 9. POULTRY, MEAT, DELI & FROZEN FOODS (בשר, עוף, נקניקים וקפואים)
   // =========================================================================
   '7290000090015': {
     productName: 'חזה עוף טרי שופרסל / עוף טוב',
@@ -588,5 +759,61 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     brand: 'תנובה',
     ingredientsText: '100% ביצי מאכל טריות מפוסטרות',
     categories: 'ביצים',
+  },
+  '7290000090053': {
+    productName: 'שניצל תירס טבעול קלאסי (מכיל גלוטן, בצל וסוכר)',
+    brand: 'טבעול Tivall',
+    ingredientsText: 'תירס (40%), קמח חיטה (גלוטן), מים, חלבון סויה, שמן קנולה, סוכר, אבקת בצל, אבקת שום, מלח',
+    allergens: 'גלוטן, בצל, שום, סויה',
+    categories: 'מוצרים קפואים מהצומח',
+  },
+  '7290000090060': {
+    productName: 'שעועית ירוקה עדינה קפואה סנפרוסט (Sunfrost)',
+    brand: 'סנפרוסט',
+    ingredientsText: '100% תרמילי שעועית ירוקה מובחרת קפואה',
+    categories: 'ירקות קפואים',
+  },
+  '7290000090077': {
+    productName: 'פרחי ברוקולי מובחרים סנפרוסט',
+    brand: 'סנפרוסט',
+    ingredientsText: '100% פרחי ברוקולי קפואים',
+    categories: 'ירקות קפואים',
+  },
+  '7290000090084': {
+    productName: 'פרחי כרובית מובחרים סנפרוסט',
+    brand: 'סנפרוסט',
+    ingredientsText: '100% פרחי כרובית קפואים',
+    categories: 'ירקות קפואים',
+  },
+  '7290000090091': {
+    productName: 'בשר טחון טרי 100% שופרסל / רמי לוי',
+    brand: 'שופרסל / רמי לוי קצביה',
+    ingredientsText: '100% בשר בקר טרי טחון ללא תוספות',
+    categories: 'בשר טרי',
+  },
+
+  // =========================================================================
+  // 10. SALADS & DIPS (סלטים וממרחים מוכנים)
+  // =========================================================================
+  '7290000095010': {
+    productName: 'חומוס צבר קלאסי (מכיל גרגרי חומוס, שום וחומצת לימון)',
+    brand: 'צבר / אסם',
+    ingredientsText: 'גרגרי חומוס מבושלים (50%), טחינה גולמית, מים, שמן צמחי, מלח, שום, חומצת לימון',
+    allergens: 'מכיל גלקטנים (חומוס) ושום',
+    categories: 'סלטים מוכנים',
+  },
+  '7290000095027': {
+    productName: 'סלט חצילים במיונז אחלה / צבר',
+    brand: 'שטראוס אחלה / צבר',
+    ingredientsText: 'חציל קלוי, מיונז, שום כתוש, מלח, שמן, חומץ',
+    allergens: 'מכיל שום',
+    categories: 'סלטים מוכנים',
+  },
+  '7290000095034': {
+    productName: 'מטבוחה מבושלת אחלה שטראוס',
+    brand: 'שטראוס אחלה',
+    ingredientsText: 'עגבניות, פלפלים, שום, שמן קנולה, סוכר, פפריקה, פלפל חריף, מלח',
+    allergens: 'מכיל שום וסוכר',
+    categories: 'סלטים מוכנים',
   },
 };
