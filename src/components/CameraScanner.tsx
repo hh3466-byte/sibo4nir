@@ -343,10 +343,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    // High-speed undistorted canvas (640x360 16:9 ratio) preserving exact barcode bar proportions
+    // High-speed full-field canvas (540x720) covering 100% of the camera field of view
     const canvas = document.createElement('canvas');
-    canvas.width = 640;
-    canvas.height = 360;
+    canvas.width = 540;
+    canvas.height = 720;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     let frameCount = 0;
@@ -389,28 +389,17 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           }
         }
 
-        // Strategy 2: Undistorted Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid)
+        // Strategy 2: Full-Field ZXing Reader (GlobalHistogram + Hybrid) - 100% Field of View
         if (ctx && !hasScannedRef.current) {
           try {
             const vW = video.videoWidth;
             const vH = video.videoHeight;
 
-            // Crop a proportional center area maintaining aspect ratio
-            const targetAspect = 640 / 360; // 1.777
-            let cropW = vW;
-            let cropH = Math.floor(vW / targetAspect);
-            if (cropH > vH) {
-              cropH = vH;
-              cropW = Math.floor(vH * targetAspect);
-            }
+            // Draw full frame (scaled to 540x720) so barcodes anywhere in the screen are decoded
+            ctx.drawImage(video, 0, 0, vW, vH, 0, 0, 540, 720);
 
-            const cropX = Math.floor((vW - cropW) / 2);
-            const cropY = Math.floor((vH - cropH) / 2);
-
-            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, 640, 360);
-
-            const imgData = ctx.getImageData(0, 0, 640, 360);
-            const luminanceSource = new RGBLuminanceSource(imgData.data, 640, 360);
+            const imgData = ctx.getImageData(0, 0, 540, 720);
+            const luminanceSource = new RGBLuminanceSource(imgData.data, 540, 720);
 
             let result = null;
             try {
