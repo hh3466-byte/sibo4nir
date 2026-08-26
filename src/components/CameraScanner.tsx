@@ -13,6 +13,7 @@ import {
   Barcode,
   RotateCcw,
   CheckCircle2,
+  Play,
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { fetchProductByBarcode } from '../services/barcodeService';
@@ -38,6 +39,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const [cameraActive, setCameraActive] = useState(false);
   const [isInitializingCamera, setIsInitializingCamera] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isVideoPaused, setIsVideoPaused] = useState(false);
 
   // Staged snapshot for user review before sending to analysis (100% control for Nir!)
   const [stagedImage, setStagedImage] = useState<string | null>(null);
@@ -97,12 +99,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
     setCameraActive(false);
     setIsInitializingCamera(false);
+    setIsVideoPaused(false);
   }, []);
 
   // Universal Single Video Stream Starter (Supports both Food photo & Barcode)
   const startCameraStream = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
     setCameraError(null);
     setIsInitializingCamera(true);
+    setIsVideoPaused(false);
 
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => {
@@ -143,10 +147,12 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             await video.play();
             setCameraActive(true);
             setIsInitializingCamera(false);
+            setIsVideoPaused(false);
           } catch (playErr) {
             console.warn('[CameraScanner] Video play caught:', playErr);
             setCameraActive(true);
             setIsInitializingCamera(false);
+            setIsVideoPaused(true);
           }
         };
 
@@ -175,13 +181,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     const isCameraNeeded = (mode === 'camera' || mode === 'barcode') && !stagedImage;
 
     if (isCameraNeeded) {
-      if (!streamRef.current || !cameraActive) {
+      if (!streamRef.current) {
         startCameraStream(facingMode);
       }
     } else {
       stopCameraStream();
     }
-  }, [mode, facingMode, stagedImage]);
+  }, [mode, facingMode, stagedImage, startCameraStream, stopCameraStream]);
 
   // Stop camera only when unmounting the entire component
   useEffect(() => {
@@ -189,6 +195,18 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       stopCameraStream();
     };
   }, [stopCameraStream]);
+
+  // Force resume playback if paused by browser
+  const handleResumeVideo = async () => {
+    if (videoRef.current) {
+      try {
+        await videoRef.current.play();
+        setIsVideoPaused(false);
+      } catch (e) {
+        console.warn('Resume video caught:', e);
+      }
+    }
+  };
 
   // Lookup product by barcode from Open Food Facts & send to SIBO analysis
   const handleBarcodeLookup = useCallback(async (barcode: string) => {
@@ -590,6 +608,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('text');
+            stopCameraStream();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'text'
@@ -607,6 +626,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           onClick={() => {
             setStagedImage(null);
             setMode('upload');
+            stopCameraStream();
           }}
           className={`flex-1 py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer font-black text-xs sm:text-sm active:scale-95 ${
             mode === 'upload'
@@ -725,13 +745,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                       : '📸 המצלמה פועלת בשידור חי: כווני למוצר בנחת ולחצי על כפתור הצילום למטה'}
                   </div>
 
-                  <div className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex items-center justify-center shadow-inner">
+                  <div
+                    onClick={handleResumeVideo}
+                    className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex items-center justify-center shadow-inner cursor-pointer"
+                  >
                     {isFlashActive && (
                       <div className="absolute inset-0 bg-white z-30 animate-fade-out pointer-events-none" />
                     )}
 
                     {cameraError ? (
-                      <div className="p-6 text-center space-y-3 text-stone-300 max-w-md">
+                      <div className="p-6 text-center space-y-3 text-stone-300 max-w-md pointer-events-auto">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto text-amber-400">
                           <CameraOff className="w-6 h-6" />
                         </div>
@@ -760,6 +783,20 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                           className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                         />
 
+                        {/* If browser paused autoplay, show gentle resume button */}
+                        {isVideoPaused && (
+                          <div className="absolute inset-0 bg-stone-950/75 backdrop-blur-xs flex flex-col items-center justify-center gap-3 text-white z-20 pointer-events-auto">
+                            <button
+                              type="button"
+                              onClick={handleResumeVideo}
+                              className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-sm shadow-xl flex items-center gap-2 animate-bounce"
+                            >
+                              <Play className="w-5 h-5 fill-current" />
+                              <span>לחצי להפעלת שידור המצלמה ▶️</span>
+                            </button>
+                          </div>
+                        )}
+
                         {isInitializingCamera && (
                           <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-stone-300 z-10">
                             <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
@@ -768,7 +805,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                         )}
 
                         {/* Barcode Laser Overlay (When in Barcode Mode) */}
-                        {mode === 'barcode' && cameraActive && (
+                        {mode === 'barcode' && cameraActive && !isVideoPaused && (
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
                             <div className="w-64 h-36 sm:w-80 sm:h-44 border-2 border-dashed border-indigo-400/90 rounded-2xl flex items-center justify-center relative shadow-lg">
                               {/* Laser Line */}
@@ -781,7 +818,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                         )}
 
                         {/* Food Frame Target Guide (When in Camera Mode) */}
-                        {mode === 'camera' && cameraActive && (
+                        {mode === 'camera' && cameraActive && !isVideoPaused && (
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
                             <div className="w-56 h-56 sm:w-72 sm:h-72 border-2 border-dashed border-white/80 rounded-3xl flex items-center justify-center shadow-lg">
                               <span className="bg-stone-900/80 text-white text-xs px-3.5 py-1 rounded-full font-bold backdrop-blur-xs shadow-sm">
@@ -800,7 +837,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                         )}
 
                         {/* Top Status & Controls */}
-                        <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
+                        <div className="absolute top-3 right-3 flex items-center gap-2 z-20 pointer-events-auto">
                           {cameraActive && (
                             <div className="px-2.5 py-1 rounded-full bg-stone-900/80 backdrop-blur-xs border border-white/20 text-emerald-400 text-[11px] font-bold flex items-center gap-1.5 shadow-xs">
                               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -811,7 +848,10 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                           {cameraActive && (
                             <button
                               type="button"
-                              onClick={handleToggleFacingMode}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleFacingMode();
+                              }}
                               title="החלפת מצלמה קדמית/אחורית"
                               className="p-2 rounded-full bg-stone-900/80 hover:bg-stone-800 backdrop-blur-xs border border-white/20 text-white shadow-md active:scale-95 transition-all cursor-pointer"
                             >
