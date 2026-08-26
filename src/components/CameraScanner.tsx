@@ -93,20 +93,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     return zxingReaderRef.current;
   }, []);
 
-  // Sync initialMode changes from parent (e.g. when user clicks "סרוק ברקוד" from result modal)
-  useEffect(() => {
-    if (initialMode && initialMode !== mode) {
-      setMode(initialMode);
-      setStagedImage(null);
-      setBarcodeError(null);
-      setScannedBarcodeSuccess(null);
-      if (initialMode === 'barcode' || initialMode === 'camera') {
-        startCameraStream(facingMode);
-      }
-    }
-  }, [initialMode, facingMode, startCameraStream]);
-
-  // Stop camera tracks safely
+  // Stop camera tracks safely (Declared before useEffect hooks)
   const stopCameraStream = useCallback(() => {
     if (barcodeScanLoopRef.current) {
       cancelAnimationFrame(barcodeScanLoopRef.current);
@@ -135,7 +122,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     setIsVideoPaused(false);
   }, []);
 
-  // Universal Single Video Stream Starter (Supports both Food photo & Barcode)
+  // Universal Single Video Stream Starter (Declared before useEffect hooks)
   const startCameraStream = useCallback(async (targetFacing: 'environment' | 'user' = facingMode) => {
     setCameraError(null);
     setIsInitializingCamera(true);
@@ -208,6 +195,19 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       );
     }
   }, [facingMode]);
+
+  // Sync initialMode changes from parent (e.g. when user clicks "סרוק ברקוד" from result modal)
+  useEffect(() => {
+    if (initialMode && initialMode !== mode) {
+      setMode(initialMode);
+      setStagedImage(null);
+      setBarcodeError(null);
+      setScannedBarcodeSuccess(null);
+      if (initialMode === 'barcode' || initialMode === 'camera') {
+        startCameraStream(facingMode);
+      }
+    }
+  }, [initialMode, facingMode, startCameraStream]);
 
   // Manage Camera Mode Lifecycle (Food and Barcode modes use the same rock-solid stream)
   useEffect(() => {
