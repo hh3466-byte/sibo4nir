@@ -46,6 +46,79 @@ async function startServer() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
+  // API: Server-side Barcode Proxy (Eliminates CORS & Mobile Cellular latency)
+  app.get('/api/barcode/:code', async (req, res) => {
+    try {
+      const code = (req.params.code || '').trim().replace(/[^0-9]/g, '');
+      if (!code) {
+        return res.status(400).json({ error: 'קוד ברקוד לא תקין', found: false });
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+      try {
+        const offRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'SIBOSafeApp/1.0 (https://sibo4nir-1.onrender.com; sibosafe@nir.app)',
+          },
+        });
+
+        clearTimeout(timeoutId);
+
+        if (offRes.ok) {
+          const data = await offRes.json();
+          if (data.status === 1 && data.product) {
+            const p = data.product;
+            const brand = p.brands || p.brand_owner || '';
+            const rawName =
+              p.product_name_he ||
+              p.product_name ||
+              p.generic_name_he ||
+              p.generic_name ||
+              brand ||
+              `מוצר (${code})`;
+
+            const ingredientsText =
+              p.ingredients_text_he ||
+              p.ingredients_text ||
+              p.ingredients_text_en ||
+              p.ingredients_text_with_allergens_he ||
+              '';
+
+            const allergens = p.allergens || p.allergens_tags?.join(', ') || '';
+            const categories = p.categories || '';
+            const imageUrl = p.image_front_url || p.image_url || '';
+
+            return res.json({
+              barcode: code,
+              productName: rawName,
+              brand,
+              ingredientsText,
+              allergens,
+              categories,
+              imageUrl,
+              found: true,
+            });
+          }
+        }
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        console.warn('[Server Barcode Proxy] Open Food Facts error:', fetchErr);
+      }
+
+      return res.json({
+        barcode: code,
+        productName: `מוצר ארוז (${code})`,
+        found: false,
+      });
+    } catch (e: any) {
+      console.error('[Server Barcode Proxy] Critical error:', e);
+      return res.status(500).json({ error: e.message || 'שגיאת שרת', found: false });
+    }
+  });
+
   // API: Analyze Food from Image or Text Description
   app.post('/api/analyze-food', async (req, res) => {
     try {

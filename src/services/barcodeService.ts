@@ -123,63 +123,61 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     };
   }
 
-  // 2. Query Open Food Facts with a 3.5-second timeout
+  // 2. Query our fast server proxy (eliminates CORS and mobile carrier timeouts)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3500);
 
   try {
-    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${cleanBarcode}.json`, {
+    const proxyRes = await fetch(`/api/barcode/${cleanBarcode}`, {
       signal: controller.signal,
-      headers: {
-        'User-Agent': 'SIBOSafeApp/1.0 (https://sibo4nir-1.onrender.com; sibosafe@nir.app)',
-      },
     });
 
     clearTimeout(timeoutId);
 
-    if (response.ok) {
-      const data = await response.json();
-
-      if (data.status === 1 && data.product) {
-        const p = data.product;
-        const brand = p.brands || p.brand_owner || '';
-        const rawName =
-          p.product_name_he ||
-          p.product_name ||
-          p.generic_name_he ||
-          p.generic_name ||
-          brand ||
-          `מוצר ארוז (${cleanBarcode})`;
-
-        const productName = cleanRawProductName(rawName, brand);
-
-        const ingredientsText =
-          p.ingredients_text_he ||
-          p.ingredients_text ||
-          p.ingredients_text_en ||
-          p.ingredients_text_with_allergens_he ||
-          '';
-
-        const allergens = p.allergens || p.allergens_tags?.join(', ') || '';
-        const categories = p.categories || '';
-        const imageUrl = p.image_front_url || p.image_url || '';
-
+    if (proxyRes.ok) {
+      const data = await proxyRes.json();
+      if (data && data.productName) {
         return {
           barcode: cleanBarcode,
-          productName,
-          brand,
-          ingredientsText,
-          allergens,
-          categories,
-          imageUrl,
-          found: true,
+          productName: cleanRawProductName(data.productName, data.brand),
+          brand: data.brand || '',
+          ingredientsText: data.ingredientsText || '',
+          allergens: data.allergens || '',
+          categories: data.categories || '',
+          imageUrl: data.imageUrl || '',
+          found: Boolean(data.found),
         };
       }
     }
   } catch (err) {
-    console.warn('[BarcodeService] API request timeout or error, falling back to barcode identifier:', err);
+    console.warn('[BarcodeService] Proxy request timeout or error, falling back to direct API:', err);
   } finally {
     clearTimeout(timeoutId);
+  }
+
+  // 3. Fallback direct query to Open Food Facts
+  try {
+    const directRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${cleanBarcode}.json`);
+    if (directRes.ok) {
+      const data = await directRes.json();
+      if (data.status === 1 && data.product) {
+        const p = data.product;
+        const brand = p.brands || p.brand_owner || '';
+        const rawName = p.product_name_he || p.product_name || p.generic_name_he || brand || `מוצר (${cleanBarcode})`;
+        return {
+          barcode: cleanBarcode,
+          productName: cleanRawProductName(rawName, brand),
+          brand,
+          ingredientsText: p.ingredients_text_he || p.ingredients_text || '',
+          allergens: p.allergens || '',
+          categories: p.categories || '',
+          imageUrl: p.image_front_url || p.image_url || '',
+          found: true,
+        };
+      }
+    }
+  } catch (directErr) {
+    console.warn('[BarcodeService] Direct API request failed:', directErr);
   }
 
   // 3. Fallback when product is not indexed in Open Food Facts
