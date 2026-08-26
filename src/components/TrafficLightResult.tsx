@@ -211,6 +211,21 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
             </div>
           </div>
 
+          {/* Quick Action Button to Open Barcode Scanner */}
+          {onScanBarcode && (
+            <div className="pt-2">
+              <button
+                id="btn-scan-barcode-action"
+                type="button"
+                onClick={onScanBarcode}
+                className="w-full py-3.5 px-6 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-500 hover:to-blue-600 active:scale-95 text-white font-black text-sm sm:text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-2 ring-indigo-400/30"
+              >
+                <Barcode className="w-5 h-5 text-indigo-200" />
+                <span>🏷️ סרוק ברקוד באריזה (קריאת רכיבים 100% מדויקת) 📸</span>
+              </button>
+            </div>
+          )}
+
           {/* FODMAP & Fermentation Triggers - Large Badges */}
           <div className="pt-5 space-y-2.5">
             <h4 className="text-sm sm:text-base font-black text-stone-800 uppercase tracking-wider flex items-center gap-2">

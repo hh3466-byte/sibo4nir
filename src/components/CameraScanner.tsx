@@ -100,8 +100,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       setStagedImage(null);
       setBarcodeError(null);
       setScannedBarcodeSuccess(null);
+      if (initialMode === 'barcode' || initialMode === 'camera') {
+        startCameraStream(facingMode);
+      }
     }
-  }, [initialMode]);
+  }, [initialMode, facingMode, startCameraStream]);
 
   // Stop camera tracks safely
   const stopCameraStream = useCallback(() => {
