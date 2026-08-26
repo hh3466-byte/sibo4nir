@@ -50,6 +50,18 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
  */
 export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
   // Fuze Tea & Iced Teas (1.5L, 500ml, cans, barcodes)
+  '230416103693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '0230416103693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
   '233116101693': {
     productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
     brand: 'Fuze Tea / החברה המרכזית למשקאות',
@@ -529,9 +541,9 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     }
   }
 
-  // Tier 2: Query our fast server-side proxy (tests all variants)
+  // Tier 2: Query our fast server-side proxy (Max 1200ms timeout)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2500);
+  const timeoutId = setTimeout(() => controller.abort(), 1200);
 
   try {
     const proxyRes = await fetch(`/api/barcode/${cleanBarcode}`, {
@@ -556,39 +568,12 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
       }
     }
   } catch (err) {
-    console.warn('[BarcodeService] Proxy request timeout or error, falling back to direct API:', err);
+    // Proxy timeout or offline - seamlessly proceed to instant GS1 classification
   } finally {
     clearTimeout(timeoutId);
   }
 
-  // Tier 3: Direct Open Food Facts query for candidate codes
-  for (const code of candidateCodes) {
-    try {
-      const directRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
-      if (directRes.ok) {
-        const data = await directRes.json();
-        if (data.status === 1 && data.product) {
-          const p = data.product;
-          const brand = p.brands || p.brand_owner || '';
-          const rawName = p.product_name_he || p.product_name || p.generic_name_he || brand || `מוצר (${cleanBarcode})`;
-          return {
-            barcode: cleanBarcode,
-            productName: cleanRawProductName(rawName, brand),
-            brand,
-            ingredientsText: p.ingredients_text_he || p.ingredients_text || '',
-            allergens: p.allergens || '',
-            categories: p.categories || '',
-            imageUrl: p.image_front_url || p.image_url || '',
-            found: true,
-          };
-        }
-      }
-    } catch (directErr) {
-      // continue to next variant
-    }
-  }
-
-  // Tier 4: GS1 Manufacturer Prefix identification for all candidate codes
+  // Tier 3: Instant GS1 Israel Manufacturer Identification (0ms)
   for (const code of candidateCodes) {
     const mfg = getManufacturerFromBarcode(code);
     if (mfg) {
@@ -602,10 +587,10 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     }
   }
 
-  // Tier 5: Generic packaged product fallback
+  // Tier 4: Generic packaged product fallback (Safe RED Alert for Nir)
   return {
     barcode: cleanBarcode,
     productName: `מוצר ארוז (ברקוד ${cleanBarcode})`,
-    found: true,
+    found: false,
   };
 }
