@@ -167,6 +167,24 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         video.setAttribute('webkit-playsinline', 'true');
         video.srcObject = stream;
 
+        // Apply hardware continuous macro focus and slight optical zoom (1.2x) for razor-sharp barcodes
+        try {
+          const track = stream.getVideoTracks()[0];
+          if (track) {
+            const caps: any = track.getCapabilities ? track.getCapabilities() : {};
+            const adv: any = {};
+            if (caps.focusMode && caps.focusMode.includes('continuous')) {
+              adv.focusMode = 'continuous';
+            }
+            if (caps.zoom && caps.zoom.max >= 1.2) {
+              adv.zoom = Math.min(1.2, caps.zoom.max);
+            }
+            if (Object.keys(adv).length > 0) {
+              track.applyConstraints({ advanced: [adv] }).catch(() => {});
+            }
+          }
+        } catch (fErr) {}
+
         const onPlay = async () => {
           try {
             await video.play();
@@ -346,8 +364,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     const reader = getZxingReader();
 
-    let lastScanTime = 0;
-    const scanIntervalMs = 80; // 80ms interval for near-instant detection
+    let lastZxingScanTime = 0;
+    const zxingScanIntervalMs = 40; // 40ms interval for CPU ZXing
 
     // Modern Native BarcodeDetector (Hardware Accelerated if available)
     const hasNativeBarcodeDetector = 'BarcodeDetector' in window;
@@ -375,8 +393,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       if (!isBarcodeScanningActiveRef.current || mode !== 'barcode' || isProcessingBarcodeRef.current) return;
 
       const video = videoRef.current;
-      if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
-        lastScanTime = now;
+      if (video && video.readyState >= 2 && video.videoWidth > 0) {
         frameCount++;
 
         if (frameCount % 60 === 0) {
@@ -389,7 +406,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         const vW = video.videoWidth;
         const vH = video.videoHeight;
 
-        // Strategy 1: Hardware GPU Native Barcode Detector on full video frame (0ms CPU)
+        // Strategy 1: Instant Hardware GPU Native Barcode Detector on EVERY video frame (0ms throttle, 60 FPS)
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
@@ -411,8 +428,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           }
         }
 
-        // Strategy 2: Proportional Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid)
-        if (!isProcessingBarcodeRef.current) {
+        // Strategy 2: Proportional Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid) - runs every 40ms
+        if (!isProcessingBarcodeRef.current && (now - lastZxingScanTime >= zxingScanIntervalMs)) {
+          lastZxingScanTime = now;
           try {
             // Pass A: Central Crisp Macro Crop (600x600 square) for high-contrast barcode bars
             if (cropCtx && vW >= 600 && vH >= 600) {
