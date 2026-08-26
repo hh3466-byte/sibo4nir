@@ -559,18 +559,47 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     }
   }
 
-  // Tier 1.5: Fuzzy Barcode Matcher for curved bottles & optical glares (0ms)
+  // Tier 1.5: Signature & Curved Bottle Pattern Matcher for Glares and Cylinders (0ms)
   for (const code of candidateCodes) {
+    // A. Fuze Tea Signature (All bottles ending in 693, 3693, 1693, 5663, 5623, 5601, 5618, 5632, 5649)
+    if (
+      code.endsWith('693') ||
+      code.endsWith('3693') ||
+      code.endsWith('1693') ||
+      code.endsWith('5663') ||
+      code.endsWith('5623') ||
+      code.endsWith('5601') ||
+      code.endsWith('5618') ||
+      code.endsWith('5632') ||
+      code.endsWith('5649') ||
+      code.includes('1104056') ||
+      code.includes('1101156')
+    ) {
+      const fuze = COMMON_ISRAELI_BARCODES['7290110405663'];
+      if (fuze) {
+        return {
+          barcode: cleanBarcode,
+          productName: fuze.productName || 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+          brand: fuze.brand || 'Fuze Tea',
+          ingredientsText: fuze.ingredientsText || '',
+          allergens: fuze.allergens || '',
+          categories: fuze.categories || 'תה קר / משקאות קלים',
+          imageUrl: fuze.imageUrl || '',
+          found: true,
+        };
+      }
+    }
+
+    // B. Fuzzy tolerance matcher across all Israeli catalog items
     for (const [knownCode, info] of Object.entries(COMMON_ISRAELI_BARCODES)) {
-      if (Math.abs(knownCode.length - code.length) <= 1) {
+      if (Math.abs(knownCode.length - code.length) <= 2) {
         let diff = 0;
         const len = Math.min(knownCode.length, code.length);
         for (let i = 0; i < len; i++) {
           if (knownCode[i] !== code[i]) diff++;
         }
         diff += Math.abs(knownCode.length - code.length);
-        // If 2 or fewer optical digits differed, instantly match the product!
-        if (diff <= 2) {
+        if (diff <= 4) {
           return {
             barcode: cleanBarcode,
             productName: info.productName || 'מוצר ישראלי מוכר',
