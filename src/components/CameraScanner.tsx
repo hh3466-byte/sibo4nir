@@ -423,9 +423,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             if (detected && detected.length > 0 && detected[0]?.rawValue && !isProcessingBarcodeRef.current) {
               const code = String(detected[0].rawValue).trim();
               if (code && code.length >= 6) {
-                if (navigator.vibrate) {
-                  try { navigator.vibrate(80); } catch (vErr) {}
-                }
                 isBarcodeScanningActiveRef.current = false;
                 setScannedBarcodeSuccess(code);
                 logMobileEvent('barcode_captured_gpu', { code, format: detected[0].format });
@@ -462,9 +459,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               if (cropResult && cropResult.getText() && !isProcessingBarcodeRef.current) {
                 const code = cropResult.getText().trim();
                 if (code && code.length >= 6) {
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(80); } catch (vErr) {}
-                  }
                   isBarcodeScanningActiveRef.current = false;
                   setScannedBarcodeSuccess(code);
                   logMobileEvent('barcode_captured_zxing_crop', { code });
@@ -499,9 +493,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               if (fullResult && fullResult.getText() && !isProcessingBarcodeRef.current) {
                 const code = fullResult.getText().trim();
                 if (code && code.length >= 6) {
-                  if (navigator.vibrate) {
-                    try { navigator.vibrate(80); } catch (vErr) {}
-                  }
                   isBarcodeScanningActiveRef.current = false;
                   setScannedBarcodeSuccess(code);
                   logMobileEvent('barcode_captured_zxing_full', { code });
