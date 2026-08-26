@@ -49,7 +49,19 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
  * Rich offline dictionary of popular Israeli supermarket barcodes
  */
 export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
-  // Fuze Tea & Iced Teas (1.5L, 500ml, cans)
+  // Fuze Tea & Iced Teas (1.5L, 500ml, cans, barcodes)
+  '233116101693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '0233116101693': {
+    productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
   '7290110405663': {
     productName: 'תה קר בטעם אפרסק 1.5 ליטר (Fuze Tea פיוז תה)',
     brand: 'Fuze Tea / החברה המרכזית למשקאות',
