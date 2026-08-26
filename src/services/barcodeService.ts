@@ -27,7 +27,10 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
   '72900007': { brand: 'סוגת (Sugat)', defaultCategory: 'אורז / קטניות / סוכר' },
   '72900008': { brand: 'מאפיות אנג׳ל (Angel Bakery)', defaultCategory: 'לחמים ומאפים' },
   '72900009': { brand: 'מאפיות ברמן (Berman Bakery)', defaultCategory: 'לחמים ומאפים' },
-  '72901101': { brand: 'החברה המרכזית למשקאות / פיוז תה / קוקה קולה', defaultCategory: 'משקאות קלים / תה קר' },
+  '72901104': { brand: 'החברה המרכזית למשקאות / פיוז תה / קוקה קולה', defaultCategory: 'תה קר / משקאות קלים' },
+  '72901101': { brand: 'החברה המרכזית למשקאות / פיוז תה / קוקה קולה', defaultCategory: 'תה קר / משקאות קלים' },
+  '72901102': { brand: 'החברה המרכזית למשקאות / קוקה קולה', defaultCategory: 'משקאות קלים' },
+  '72901103': { brand: 'פריגת (Prigat)', defaultCategory: 'מיצים ומשקאות פרי' },
   '72900110': { brand: 'פריגת (Prigat)', defaultCategory: 'מיצים ומשקאות פרי' },
   '72900013': { brand: 'טבעול (Tivall)', defaultCategory: 'תחליפי בשר / קפואים' },
   '72900021': { brand: 'אחוה (Achva)', defaultCategory: 'טחינה / חלבה' },
@@ -46,7 +49,37 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
  * Rich offline dictionary of popular Israeli supermarket barcodes
  */
 export const COMMON_ISRAELI_BARCODES: Record<string, Partial<BarcodeProductInfo>> = {
-  // Fuze Tea & Iced Teas
+  // Fuze Tea & Iced Teas (1.5L, 500ml, cans)
+  '7290110405663': {
+    productName: 'תה קר בטעם אפרסק 1.5 ליטר (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea / החברה המרכזית למשקאות',
+    ingredientsText: 'מים, סוכר, פרוקטוז, מווסתי חומציות (חומצת לימון, נתרן ציטרט), תמצית תה שחור (0.1%), רכז מיץ אפרסק (0.1%), חומרי טעם וריח טבעיים, מעכב חמצון (חומצה אסקורבית)',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110405618': {
+    productName: 'תה קר בטעם מנגו-אננס 1.5 ליטר (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, סוכר, פרוקטוז, תמצית תה שחור, רכז מיץ מנגו ואננס',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110405601': {
+    productName: 'תה קר בטעם לימון 1.5 ליטר (Fuze Tea פיוז תה)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, סוכר, פרוקטוז, תמצית תה שחור, רכז מיץ לימון',
+    categories: 'תה קר / משקאות קלים',
+  },
+  '7290110405632': {
+    productName: 'תה קר ZERO ללא סוכר בטעם אפרסק 1.5 ליטר (Fuze Tea Zero)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, תמצית תה שחור, מווסתי חומציות, ממתיקים (אספרטיים, אססולפאם K, סוכרלוז)',
+    categories: 'תה קר ללא סוכר / משקאות דיאט',
+  },
+  '7290110405649': {
+    productName: 'תה קר בטעם אפרסק פחית 330 מ״ל (Fuze Tea)',
+    brand: 'Fuze Tea',
+    ingredientsText: 'מים, סוכר, פרוקטוז, תמצית תה שחור, רכז מיץ אפרסק',
+    categories: 'תה קר / משקאות קלים',
+  },
   '7290110115623': {
     productName: 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
     brand: 'Fuze Tea / החברה המרכזית למשקאות',

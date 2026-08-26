@@ -206,27 +206,39 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
             </div>
           )}
 
-          {/* Main Info Row: Food Name & Safe Portion - Big & High Contrast */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-2xl sm:text-3xl font-black text-stone-900 leading-snug">{result.foodName}</h3>
-                {result.englishName && (
-                  <span className="text-sm text-stone-400 font-normal">({result.englishName})</span>
-                )}
-              </div>
-              <p className="text-xs sm:text-sm text-stone-500 font-medium mt-0.5">זיהוי וניתוח מבוסס פרוטוקול SIBO קליני</p>
+          {/* Main Product / Food Header Card - Giant & High Visibility */}
+          <div className="p-5 sm:p-6 rounded-3xl bg-stone-50 border-2 border-stone-300 shadow-sm space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <span className="px-3.5 py-1.5 rounded-full bg-stone-900 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs">
+                <span>🏷️ שם המאכל / המוצר שנבדק:</span>
+              </span>
+              {result.barcode && (
+                <span className="px-3.5 py-1.5 rounded-full bg-indigo-100 border border-indigo-300 text-indigo-900 font-bold text-xs">
+                  ברקוד: {result.barcode}
+                </span>
+              )}
             </div>
 
-            {/* Max Safe Portion Badge - Large */}
-            <div className="bg-emerald-50/80 border-2 border-emerald-300 px-5 py-3 rounded-2xl flex items-center gap-3.5 shrink-0 shadow-xs">
-              <div className="text-right">
-                <span className="text-xs font-bold text-emerald-800 block uppercase tracking-wider">
-                  כמות בטוחה מומלצת
-                </span>
-                <span className="text-base sm:text-lg font-black text-emerald-950">{result.maxSafePortion}</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-2xl sm:text-4xl font-black text-stone-950 leading-tight">
+                  {result.foodName}
+                </h3>
+                {result.englishName && (
+                  <span className="text-sm text-stone-500 font-bold block mt-1">({result.englishName})</span>
+                )}
               </div>
-              <ShieldCheck className="w-6 h-6 text-emerald-600 shrink-0" />
+
+              {/* Max Safe Portion Badge */}
+              <div className="bg-white border-2 border-emerald-400 px-5 py-3 rounded-2xl flex items-center gap-3.5 shrink-0 shadow-sm">
+                <div className="text-right">
+                  <span className="text-[11px] font-black text-emerald-800 block uppercase tracking-wider">
+                    כמות בטוחה מומלצת
+                  </span>
+                  <span className="text-base sm:text-lg font-black text-emerald-950">{result.maxSafePortion}</span>
+                </div>
+                <ShieldCheck className="w-6 h-6 text-emerald-600 shrink-0" />
+              </div>
             </div>
           </div>
 

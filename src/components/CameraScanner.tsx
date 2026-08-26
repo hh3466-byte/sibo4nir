@@ -289,7 +289,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     const reader = getZxingReader();
 
     let lastScanTime = 0;
-    const scanIntervalMs = 120; // ultra-fast 120ms scan interval
+    const scanIntervalMs = 80; // 80ms interval for near-instant detection
 
     // Modern Native BarcodeDetector (Hardware Accelerated if available)
     const hasNativeBarcodeDetector = 'BarcodeDetector' in window;
@@ -304,7 +304,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    // Fixed-size high-speed canvas (640x240) for lightning-fast 5ms CPU processing
+    // Fixed-size high-speed canvas (640x240) for lightning-fast 3ms CPU processing
     const canvas = document.createElement('canvas');
     canvas.width = 640;
     canvas.height = 240;
@@ -317,12 +317,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
         lastScanTime = now;
 
-        // Strategy 1: Hardware GPU Native Barcode Detector (Fastest)
+        // Strategy 1: Hardware GPU Native Barcode Detector (1ms)
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
             if (detected && detected.length > 0 && detected[0].rawValue) {
               const code = detected[0].rawValue;
+              if (navigator.vibrate) {
+                try { navigator.vibrate(80); } catch (vErr) {}
+              }
               isBarcodeScanningActiveRef.current = false;
               setScannedBarcodeSuccess(code);
               handleBarcodeLookup(code);
@@ -333,7 +336,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           }
         }
 
-        // Strategy 2: High-Speed ZXing Center Strip Reader (5ms execution)
+        // Strategy 2: Dual Binarizer ZXing Reader (GlobalHistogram + Hybrid)
         if (ctx) {
           try {
             const vW = video.videoWidth;
@@ -349,11 +352,21 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
             const imgData = ctx.getImageData(0, 0, 640, 240);
             const luminanceSource = new RGBLuminanceSource(imgData.data, 640, 240);
-            const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
 
-            const result = reader.decode(binaryBitmap);
+            let result = null;
+            try {
+              result = reader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(luminanceSource)));
+            } catch (e1) {
+              try {
+                result = reader.decode(new BinaryBitmap(new HybridBinarizer(luminanceSource)));
+              } catch (e2) {}
+            }
+
             if (result && result.getText()) {
               const code = result.getText();
+              if (navigator.vibrate) {
+                try { navigator.vibrate(80); } catch (vErr) {}
+              }
               isBarcodeScanningActiveRef.current = false;
               setScannedBarcodeSuccess(code);
               handleBarcodeLookup(code);
@@ -405,8 +418,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           ctx.drawImage(img, 0, 0);
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const luminanceSource = new RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
-          const binaryBitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
-          const result = reader.decode(binaryBitmap);
+          let result = null;
+          try {
+            result = reader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(luminanceSource)));
+          } catch (e1) {
+            try {
+              result = reader.decode(new BinaryBitmap(new HybridBinarizer(luminanceSource)));
+            } catch (e2) {}
+          }
+
           if (result && result.getText()) {
             URL.revokeObjectURL(objectUrl);
             await handleBarcodeLookup(result.getText());
@@ -433,7 +453,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     startCameraStream(nextFacing);
   };
 
-  // Take Snapshot from video stream and stage it for Nir to review!
+  // Take Snapshot from video stream — 1-TAP DIRECT SIBO ANALYSIS!
   const captureSnapshot = () => {
     if (!videoRef.current) return;
 
@@ -444,7 +464,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
 
     setIsFlashActive(true);
-    setTimeout(() => setIsFlashActive(false), 200);
+    setTimeout(() => setIsFlashActive(false), 150);
 
     const canvas = document.createElement('canvas');
     const MAX_DIM = 1280;
@@ -477,9 +497,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-    // Stage photo for review
-    setStagedImage(dataUrl);
-    stopCameraStream();
+    // ⚡ 1-TAP DIRECT ANALYSIS (No staging delay, immediate traffic light!)
+    onAnalyze({ imageBase64: dataUrl, mimeType: 'image/jpeg' });
   };
 
   // User confirmed the photo -> send for SIBO analysis!
