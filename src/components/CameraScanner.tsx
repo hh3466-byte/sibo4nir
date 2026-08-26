@@ -254,10 +254,26 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   };
 
+  const hasScannedRef = useRef<boolean>(false);
+
   // Lookup product by barcode from Open Food Facts & send to SIBO analysis
   const handleBarcodeLookup = useCallback(async (barcode: string) => {
     const cleanCode = barcode.trim();
-    if (!cleanCode) return;
+    if (!cleanCode || hasScannedRef.current) return;
+
+    hasScannedRef.current = true;
+    isBarcodeScanningActiveRef.current = false;
+    if (barcodeScanLoopRef.current) {
+      cancelAnimationFrame(barcodeScanLoopRef.current);
+      barcodeScanLoopRef.current = null;
+    }
+
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause();
+        setIsVideoPaused(true);
+      } catch (pErr) {}
+    }
 
     setIsFetchingBarcode(true);
     setBarcodeError(null);
@@ -281,7 +297,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         barcode: cleanCode,
         imageBase64: prod.imageUrl || undefined,
       });
-      setScannedBarcodeSuccess(null);
     } catch (e: any) {
       console.warn('[BarcodeScanner] Lookup error, analyzing barcode name fallback:', e);
       logMobileEvent('barcode_lookup_fallback_error', { barcode: cleanCode, error: String(e) });
@@ -289,7 +304,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         textPrompt: `מוצר ארוז (ברקוד ${cleanCode})`,
         barcode: cleanCode,
       });
-      setScannedBarcodeSuccess(null);
     } finally {
       setIsFetchingBarcode(false);
     }
@@ -306,6 +320,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       return;
     }
 
+    hasScannedRef.current = false;
     isBarcodeScanningActiveRef.current = true;
     setBarcodeError(null);
     setScannedBarcodeSuccess(null);
@@ -337,7 +352,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     let frameCount = 0;
 
     const scanFrame = async (now: number) => {
-      if (!isBarcodeScanningActiveRef.current || mode !== 'barcode') return;
+      if (!isBarcodeScanningActiveRef.current || mode !== 'barcode' || hasScannedRef.current) return;
 
       const video = videoRef.current;
       if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
@@ -355,12 +370,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
-            if (detected && detected.length > 0 && detected[0]?.rawValue) {
+            if (detected && detected.length > 0 && detected[0]?.rawValue && !hasScannedRef.current) {
               const code = String(detected[0].rawValue).trim();
               if (code && code.length >= 6) {
                 if (navigator.vibrate) {
                   try { navigator.vibrate(80); } catch (vErr) {}
                 }
+                hasScannedRef.current = true;
                 isBarcodeScanningActiveRef.current = false;
                 setScannedBarcodeSuccess(code);
                 logMobileEvent('barcode_captured_gpu', { code, format: detected[0].format });
@@ -374,7 +390,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         }
 
         // Strategy 2: Undistorted Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid)
-        if (ctx) {
+        if (ctx && !hasScannedRef.current) {
           try {
             const vW = video.videoWidth;
             const vH = video.videoHeight;
@@ -405,12 +421,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               } catch (e2) {}
             }
 
-            if (result && result.getText()) {
+            if (result && result.getText() && !hasScannedRef.current) {
               const code = result.getText().trim();
               if (code && code.length >= 6) {
                 if (navigator.vibrate) {
                   try { navigator.vibrate(80); } catch (vErr) {}
                 }
+                hasScannedRef.current = true;
                 isBarcodeScanningActiveRef.current = false;
                 setScannedBarcodeSuccess(code);
                 logMobileEvent('barcode_captured_zxing', { code });
@@ -424,7 +441,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         }
       }
 
-      if (isBarcodeScanningActiveRef.current) {
+      if (isBarcodeScanningActiveRef.current && !hasScannedRef.current) {
         barcodeScanLoopRef.current = requestAnimationFrame(scanFrame);
       }
     };
