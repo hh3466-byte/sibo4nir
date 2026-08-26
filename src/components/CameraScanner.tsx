@@ -159,10 +159,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
       if (videoRef.current) {
         const video = videoRef.current;
-        video.srcObject = stream;
+        video.defaultMuted = true;
+        video.muted = true;
+        video.volume = 0;
+        video.playsInline = true;
         video.setAttribute('playsinline', 'true');
         video.setAttribute('webkit-playsinline', 'true');
-        video.muted = true;
+        video.srcObject = stream;
 
         const onPlay = async () => {
           try {
@@ -180,6 +183,22 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             setIsInitializingCamera(false);
             setIsVideoPaused(true);
             logMobileEvent('camera_play_blocked', { error: String(playErr) });
+
+            // Auto-resume camera video playback on first user touch anywhere
+            const handleFirstUserGesture = () => {
+              if (videoRef.current) {
+                videoRef.current.play().then(() => {
+                  setIsVideoPaused(false);
+                  logMobileEvent('camera_resumed_on_first_touch');
+                }).catch(() => {});
+              }
+              window.removeEventListener('touchstart', handleFirstUserGesture);
+              window.removeEventListener('pointerdown', handleFirstUserGesture);
+              window.removeEventListener('click', handleFirstUserGesture);
+            };
+            window.addEventListener('touchstart', handleFirstUserGesture, { once: true });
+            window.addEventListener('pointerdown', handleFirstUserGesture, { once: true });
+            window.addEventListener('click', handleFirstUserGesture, { once: true });
           }
         };
 
