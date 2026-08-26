@@ -24,6 +24,20 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('[SIBO-App] Uncaught render error:', error, errorInfo);
+    try {
+      fetch('/api/telemetry/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'react_render_crash',
+          data: {
+            errorMessage: error?.message,
+            errorStack: error?.stack?.substring(0, 400),
+            componentStack: errorInfo?.componentStack?.substring(0, 400),
+          },
+        }),
+      }).catch(() => {});
+    } catch {}
   }
 
   handleReload = () => {

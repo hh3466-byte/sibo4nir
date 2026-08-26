@@ -14,6 +14,7 @@ import {
   Barcode,
   RotateCcw,
   X,
+  Search,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
