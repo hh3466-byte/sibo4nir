@@ -328,11 +328,13 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     }
 
-    // Fixed-size high-speed canvas (640x240) for lightning-fast 3ms CPU processing
+    // High-speed undistorted canvas (640x360 16:9 ratio) preserving exact barcode bar proportions
     const canvas = document.createElement('canvas');
     canvas.width = 640;
-    canvas.height = 240;
+    canvas.height = 360;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    let frameCount = 0;
 
     const scanFrame = async (now: number) => {
       if (!isBarcodeScanningActiveRef.current || mode !== 'barcode') return;
@@ -340,42 +342,59 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       const video = videoRef.current;
       if (video && video.readyState >= 2 && video.videoWidth > 0 && now - lastScanTime >= scanIntervalMs) {
         lastScanTime = now;
+        frameCount++;
 
-        // Strategy 1: Hardware GPU Native Barcode Detector (1ms)
+        if (frameCount % 60 === 0) {
+          logMobileEvent('scanning_alive', {
+            frames: frameCount,
+            resolution: `${video.videoWidth}x${video.videoHeight}`,
+          });
+        }
+
+        // Strategy 1: Hardware GPU Native Barcode Detector on full video frame (0ms CPU)
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
-            if (detected && detected.length > 0 && detected[0].rawValue) {
-              const code = detected[0].rawValue;
-              if (navigator.vibrate) {
-                try { navigator.vibrate(80); } catch (vErr) {}
+            if (detected && detected.length > 0 && detected[0]?.rawValue) {
+              const code = String(detected[0].rawValue).trim();
+              if (code && code.length >= 6) {
+                if (navigator.vibrate) {
+                  try { navigator.vibrate(80); } catch (vErr) {}
+                }
+                isBarcodeScanningActiveRef.current = false;
+                setScannedBarcodeSuccess(code);
+                logMobileEvent('barcode_captured_gpu', { code, format: detected[0].format });
+                handleBarcodeLookup(code);
+                return;
               }
-              isBarcodeScanningActiveRef.current = false;
-              setScannedBarcodeSuccess(code);
-              handleBarcodeLookup(code);
-              return;
             }
           } catch (detErr) {
             // fallback to ZXing
           }
         }
 
-        // Strategy 2: Dual Binarizer ZXing Reader (GlobalHistogram + Hybrid)
+        // Strategy 2: Undistorted Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid)
         if (ctx) {
           try {
             const vW = video.videoWidth;
             const vH = video.videoHeight;
 
-            // Crop laser center strip: 85% width, 35% height
-            const cropW = Math.floor(vW * 0.85);
-            const cropH = Math.floor(vH * 0.35);
+            // Crop a proportional center area maintaining aspect ratio
+            const targetAspect = 640 / 360; // 1.777
+            let cropW = vW;
+            let cropH = Math.floor(vW / targetAspect);
+            if (cropH > vH) {
+              cropH = vH;
+              cropW = Math.floor(vH * targetAspect);
+            }
+
             const cropX = Math.floor((vW - cropW) / 2);
             const cropY = Math.floor((vH - cropH) / 2);
 
-            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, 640, 240);
+            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, 640, 360);
 
-            const imgData = ctx.getImageData(0, 0, 640, 240);
-            const luminanceSource = new RGBLuminanceSource(imgData.data, 640, 240);
+            const imgData = ctx.getImageData(0, 0, 640, 360);
+            const luminanceSource = new RGBLuminanceSource(imgData.data, 640, 360);
 
             let result = null;
             try {
@@ -387,14 +406,17 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
             }
 
             if (result && result.getText()) {
-              const code = result.getText();
-              if (navigator.vibrate) {
-                try { navigator.vibrate(80); } catch (vErr) {}
+              const code = result.getText().trim();
+              if (code && code.length >= 6) {
+                if (navigator.vibrate) {
+                  try { navigator.vibrate(80); } catch (vErr) {}
+                }
+                isBarcodeScanningActiveRef.current = false;
+                setScannedBarcodeSuccess(code);
+                logMobileEvent('barcode_captured_zxing', { code });
+                handleBarcodeLookup(code);
+                return;
               }
-              isBarcodeScanningActiveRef.current = false;
-              setScannedBarcodeSuccess(code);
-              handleBarcodeLookup(code);
-              return;
             }
           } catch (zxingErr) {
             // normal frame without barcode
