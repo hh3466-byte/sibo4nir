@@ -343,8 +343,18 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       });
     } finally {
       setIsFetchingBarcode(false);
+      // Automatically re-enable scanning after 600ms cooldown so subsequent scans work instantly!
+      setTimeout(() => {
+        isProcessingBarcodeRef.current = false;
+        if (mode === 'barcode' && !isLoading && !stagedImage) {
+          isBarcodeScanningActiveRef.current = true;
+          if (videoRef.current && videoRef.current.paused) {
+            videoRef.current.play().then(() => setIsVideoPaused(false)).catch(() => {});
+          }
+        }
+      }, 600);
     }
-  }, [onAnalyze]);
+  }, [onAnalyze, mode, isLoading, stagedImage]);
 
   // Real-Time High-Precision Barcode Scanner Worker
   useEffect(() => {
