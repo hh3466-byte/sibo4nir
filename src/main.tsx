@@ -28,11 +28,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   handleReload = () => {
     try {
-      localStorage.removeItem('sibo_nir_cached_state');
+      localStorage.clear();
+      sessionStorage.clear();
     } catch {
       // ignore
     }
-    window.location.reload();
+    window.location.href = window.location.origin + window.location.pathname;
   };
 
   render() {

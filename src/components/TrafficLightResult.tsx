@@ -233,8 +233,8 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
               <span>רכיבי תסיסה ו-FODMAP שזוהו:</span>
             </h4>
             <div className="flex flex-wrap gap-2.5">
-              {result.fodmapTriggers.length > 0 ? (
-                result.fodmapTriggers.map((trig, idx) => (
+              {(result.fodmapTriggers || []).length > 0 ? (
+                (result.fodmapTriggers || []).map((trig, idx) => (
                   <span
                     key={idx}
                     className={`text-sm sm:text-base font-extrabold px-4 py-2 rounded-xl border ${
@@ -263,18 +263,18 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
               <span>הסבר רפואי וביוכימי:</span>
             </h4>
             <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 sm:p-6 text-stone-900 text-sm sm:text-base leading-relaxed whitespace-pre-line font-medium shadow-inner">
-              {result.detailedExplanation}
+              {result.detailedExplanation || result.shortVerdict || 'נבדק על פי כללי פרוטוקול SIBO הקליני.'}
             </div>
           </div>
 
           {/* Multi-Ingredient breakdown if composite meal */}
-          {result.ingredientsBreakdown && result.ingredientsBreakdown.length > 0 && (
+          {(result.ingredientsBreakdown || []).length > 0 && (
             <div className="pt-5 space-y-3">
               <h4 className="text-sm sm:text-base font-black text-stone-800 uppercase tracking-wider">
                 פירוק רכיבי המנה לפי בטיחות SIBO:
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {result.ingredientsBreakdown.map((item, idx) => (
+                {(result.ingredientsBreakdown || []).map((item, idx) => (
                   <div
                     key={idx}
                     className={`p-3 sm:p-3.5 rounded-xl border flex items-center justify-between text-xs sm:text-sm font-bold ${
@@ -304,14 +304,14 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           )}
 
           {/* Safe Substitutions for Nir (חלופות בטוחות ומותרות) */}
-          {result.safeSubstitutions && result.safeSubstitutions.length > 0 && (
+          {(result.safeSubstitutions || []).length > 0 && (
             <div className="pt-5 space-y-3">
               <h4 className="text-sm sm:text-base font-black text-emerald-900 uppercase tracking-wider flex items-center gap-2">
                 <ChefHat className="w-4 h-4 text-emerald-600" />
                 <span>חלופות טעימות ומותרות שמתאימות לניר:</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {result.safeSubstitutions.map((sub, idx) => (
+                {(result.safeSubstitutions || []).map((sub, idx) => (
                   <button
                     key={idx}
                     onClick={() => {
@@ -328,13 +328,13 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           )}
 
           {/* Culinary & Cooking Tips */}
-          {result.cookingTips && result.cookingTips.length > 0 && (
+          {(result.cookingTips || []).length > 0 && (
             <div className="pt-5 space-y-2.5">
               <h4 className="text-sm sm:text-base font-black text-stone-800 uppercase tracking-wider">
                 טיפים להכנה והקלה על העיכול של ניר:
               </h4>
               <ul className="space-y-2">
-                {result.cookingTips.map((tip, idx) => (
+                {(result.cookingTips || []).map((tip, idx) => (
                   <li key={idx} className="text-xs sm:text-sm text-stone-800 flex items-start gap-2.5 font-medium">
                     <span className="text-emerald-600 font-black text-base leading-none">•</span>
                     <span>{tip}</span>
@@ -345,10 +345,10 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           )}
 
           {/* Medical References Footnote */}
-          {result.medicalReferences && result.medicalReferences.length > 0 && (
+          {(result.medicalReferences || []).length > 0 && (
             <div className="pt-4 text-xs text-stone-400 flex items-center gap-2">
               <span className="font-bold">מקורות רפואיים:</span>
-              <span>{result.medicalReferences.join(' | ')}</span>
+              <span>{(result.medicalReferences || []).join(' | ')}</span>
             </div>
           )}
         </div>
