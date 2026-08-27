@@ -197,12 +197,14 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                 <div className="w-14 h-14 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center shrink-0 text-3xl font-black shadow-md">
                   ⛔
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h4 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                    <span>אזהרת בטיחות קלינית לניר: מוצר לא מזוהה!</span>
+                    <span>שימו לב!!! מדובר במוצר ארוז.</span>
                   </h4>
                   <p className="text-xs sm:text-sm text-rose-100 leading-relaxed font-medium">
-                    מוצר זה אינו מזוהה במאגר הבטוח. <strong>חל איסור מוחלט לצרוך מוצר זה בשלב 1 ללא אימות רכיבים</strong>, עקב סיכון גבוה לפרוקטוז סמוי, אינולין, אבקת שום/בצל או ממתיקים אלכוהוליים מתסיסים.
+                    על מנת לבדוק את המרכיבים המדויקים, יש לסרוק את הברקוד בלחיצה על הכפתור.
+                    <br />
+                    <strong>ללא סריקת הברקוד, אין וודאות למציאת כל המרכיבים והאלרגנים, והמוצר אינו בטוח לשימוש.</strong>
                   </p>
                 </div>
               </div>
