@@ -392,10 +392,15 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
     // Proportional canvas dynamically matching video dimensions (100% true aspect ratio)
     const canvas = document.createElement('canvas');
-    const cropCanvas = document.createElement('canvas');
-    cropCanvas.width = 600;
-    cropCanvas.height = 600;
-    const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true });
+    const wideCanvas = document.createElement('canvas');
+    wideCanvas.width = 720;
+    wideCanvas.height = 360;
+    const wideCtx = wideCanvas.getContext('2d', { willReadFrequently: true });
+
+    const boostCanvas = document.createElement('canvas');
+    boostCanvas.width = 720;
+    boostCanvas.height = 360;
+    const boostCtx = boostCanvas.getContext('2d', { willReadFrequently: true });
 
     let frameCount = 0;
 
@@ -416,7 +421,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         const vW = video.videoWidth;
         const vH = video.videoHeight;
 
-        // Strategy 1: Instant Hardware GPU Native Barcode Detector on EVERY video frame (0ms throttle, 60 FPS)
+        // Strategy 1: Instant Hardware GPU Native Barcode Detector on raw video
         if (nativeDetector) {
           try {
             const detected = await nativeDetector.detect(video);
@@ -431,44 +436,100 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               }
             }
           } catch (detErr) {
-            // fallback to ZXing
+            // fallback
           }
         }
 
-        // Strategy 2: Proportional Aspect-Ratio ZXing Reader (GlobalHistogram + Hybrid) - runs every 40ms
-        if (!isProcessingBarcodeRef.current && (now - lastZxingScanTime >= zxingScanIntervalMs)) {
-          lastZxingScanTime = now;
+        // Strategy 2: Wide Horizontal Macro Crop (720x360) for Cylindrical Bottles & Reflective Packaging
+        if (wideCtx && vW >= 400 && vH >= 300) {
           try {
-            // Pass A: Central Crisp Macro Crop (600x600 square) for high-contrast barcode bars
-            if (cropCtx && vW >= 600 && vH >= 600) {
-              const startX = Math.floor((vW - 600) / 2);
-              const startY = Math.floor((vH - 600) / 2);
-              cropCtx.drawImage(video, startX, startY, 600, 600, 0, 0, 600, 600);
-              const cropData = cropCtx.getImageData(0, 0, 600, 600);
-              const cropLum = new RGBLuminanceSource(cropData.data, 600, 600);
+            const cropW = Math.min(vW, Math.floor(vW * 0.85));
+            const cropH = Math.min(vH, Math.floor(cropW * 0.5));
+            const startX = Math.floor((vW - cropW) / 2);
+            const startY = Math.floor((vH - cropH) / 2);
 
-              let cropResult = null;
+            wideCtx.drawImage(video, startX, startY, cropW, cropH, 0, 0, 720, 360);
+
+            // Pass 2A: Hardware GPU Detector on Wide Horizontal Crop
+            if (nativeDetector) {
               try {
-                cropResult = reader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(cropLum)));
-              } catch (e1) {
+                const detectedCrop = await nativeDetector.detect(wideCanvas);
+                if (detectedCrop && detectedCrop.length > 0 && detectedCrop[0]?.rawValue && !isProcessingBarcodeRef.current) {
+                  const code = String(detectedCrop[0].rawValue).trim();
+                  if (code && code.length >= 6) {
+                    isBarcodeScanningActiveRef.current = false;
+                    setScannedBarcodeSuccess(code);
+                    logMobileEvent('barcode_captured_gpu_wide', { code, format: detectedCrop[0].format });
+                    handleBarcodeLookup(code);
+                    return;
+                  }
+                }
+              } catch (cropGpuErr) {}
+            }
+
+            // Pass 2B: High-Contrast Filter for Glare / Plastic Bottles
+            if (boostCtx) {
+              const imgData = wideCtx.getImageData(0, 0, 720, 360);
+              const d = imgData.data;
+              for (let i = 0; i < d.length; i += 4) {
+                const gray = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8;
+                // S-curve contrast boost
+                const boosted = gray < 100 ? Math.max(0, gray * 0.5) : Math.min(255, (gray - 100) * 2.2 + 80);
+                d[i] = boosted;
+                d[i + 1] = boosted;
+                d[i + 2] = boosted;
+              }
+              boostCtx.putImageData(imgData, 0, 0);
+
+              // GPU Detector on High-Contrast Glare Filter
+              if (nativeDetector) {
                 try {
-                  cropResult = reader.decode(new BinaryBitmap(new HybridBinarizer(cropLum)));
-                } catch (e2) {}
+                  const detectedBoost = await nativeDetector.detect(boostCanvas);
+                  if (detectedBoost && detectedBoost.length > 0 && detectedBoost[0]?.rawValue && !isProcessingBarcodeRef.current) {
+                    const code = String(detectedBoost[0].rawValue).trim();
+                    if (code && code.length >= 6) {
+                      isBarcodeScanningActiveRef.current = false;
+                      setScannedBarcodeSuccess(code);
+                      logMobileEvent('barcode_captured_gpu_boost', { code, format: detectedBoost[0].format });
+                      handleBarcodeLookup(code);
+                      return;
+                    }
+                  }
+                } catch (boostGpuErr) {}
               }
 
-              if (cropResult && cropResult.getText() && !isProcessingBarcodeRef.current) {
-                const code = cropResult.getText().trim();
-                if (code && code.length >= 6) {
-                  isBarcodeScanningActiveRef.current = false;
-                  setScannedBarcodeSuccess(code);
-                  logMobileEvent('barcode_captured_zxing_crop', { code });
-                  handleBarcodeLookup(code);
-                  return;
+              // ZXing GlobalHistogram + Hybrid on High-Contrast Crop
+              if (!isProcessingBarcodeRef.current && (now - lastZxingScanTime >= zxingScanIntervalMs)) {
+                lastZxingScanTime = now;
+                const cropLum = new RGBLuminanceSource(imgData.data, 720, 360);
+                let zxResult = null;
+                try {
+                  zxResult = reader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(cropLum)));
+                } catch (e1) {
+                  try {
+                    zxResult = reader.decode(new BinaryBitmap(new HybridBinarizer(cropLum)));
+                  } catch (e2) {}
+                }
+
+                if (zxResult && zxResult.getText() && !isProcessingBarcodeRef.current) {
+                  const code = zxResult.getText().trim();
+                  if (code && code.length >= 6) {
+                    isBarcodeScanningActiveRef.current = false;
+                    setScannedBarcodeSuccess(code);
+                    logMobileEvent('barcode_captured_zxing_boost', { code });
+                    handleBarcodeLookup(code);
+                    return;
+                  }
                 }
               }
             }
+          } catch (wideErr) {}
+        }
 
-            // Pass B: Full Proportional Frame (scaled down preserving exact 1:1 aspect ratio)
+        // Strategy 3: Full Proportional Frame with ZXing GlobalHistogram + Hybrid
+        if (!isProcessingBarcodeRef.current && (now - lastZxingScanTime >= zxingScanIntervalMs)) {
+          lastZxingScanTime = now;
+          try {
             const targetW = 540;
             const targetH = Math.round(vH * (targetW / vW));
             if (canvas.width !== targetW || canvas.height !== targetH) {
@@ -502,7 +563,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
               }
             }
           } catch (zxingErr) {
-            // normal frame without barcode
+            // normal frame
           }
         }
       }
