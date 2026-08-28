@@ -14,6 +14,9 @@ import {
   RotateCcw,
   CheckCircle2,
   Play,
+  Mic,
+  MicOff,
+  Volume2,
 } from 'lucide-react';
 import {
   MultiFormatReader,
@@ -58,6 +61,11 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   const [stagedImage, setStagedImage] = useState<string | null>(null);
 
   const [textInput, setTextInput] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(true);
+  const recognitionRef = useRef<any>(null);
+
   const [barcodeInput, setBarcodeInput] = useState('');
   const [isFetchingBarcode, setIsFetchingBarcode] = useState(false);
   const [barcodeError, setBarcodeError] = useState<string | null>(null);
@@ -856,9 +864,99 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   };
 
+  // Web Speech API for Hebrew Voice Dictation
+  useEffect(() => {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      setIsSpeechSupported(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      recognition.lang = 'he-IL';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        if (transcript) {
+          setTextInput(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+          setSpeechError('יש לאשר גישה למיקרופון בהגדרות הדפדפן כדי לדבר');
+        } else if (event.error === 'no-speech') {
+          setSpeechError('לא נקלט קול, לחצי שוב על המיקרופון ודברי ברור');
+        } else {
+          setSpeechError('לא זוהה דיבור ברור, נסי שוב');
+        }
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    } catch (e) {
+      console.warn('Speech recognition init failed:', e);
+      setIsSpeechSupported(false);
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+    };
+  }, []);
+
+  const handleToggleVoiceInput = () => {
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+    } else {
+      if (!isSpeechSupported || !recognitionRef.current) {
+        alert('הדפדפן שלך אינו תומך בהכתבה קולית ישירה. אנא השתמשי בכפתור המיקרופון במקלדת הטלפון.');
+        return;
+      }
+      try {
+        setSpeechError(null);
+        if (navigator.vibrate) navigator.vibrate([50]);
+        recognitionRef.current.start();
+      } catch (err: any) {
+        console.warn('Recognition start failed:', err);
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+    }
+  };
+
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!textInput.trim()) return;
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+    }
     onAnalyze({ textPrompt: textInput.trim() });
   };
 
@@ -1411,26 +1509,101 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           {mode === 'text' && (
             <form onSubmit={handleTextSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="food-text-input" className="block text-xs font-black text-stone-700">
-                  שם המאכל, המנה או רשימת הרכיבים:
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="food-text-input" className="block text-xs font-black text-stone-700">
+                    שם המאכל, המנה או רשימת הרכיבים:
+                  </label>
+                  <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                    🎙️ ניתן גם לדבר במקום להקליד
+                  </span>
+                </div>
+
                 <div className="relative">
                   <input
                     id="food-text-input"
                     type="text"
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
-                    placeholder="למשל: קוטג', פיוז תה, חלב דל לקטוז, במבה, לחם כוסמין..."
-                    className="w-full pl-4 pr-11 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400 font-medium"
+                    placeholder="למשל: מיץ תפוזים סחוט, קפה שחור, קוטג', במבה, קקאו..."
+                    className={`w-full pl-12 pr-11 py-3.5 bg-stone-50 border rounded-2xl text-sm focus:ring-2 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400 font-medium ${
+                      isListening
+                        ? 'border-rose-400 ring-2 ring-rose-300 bg-rose-50/50'
+                        : 'border-stone-300 focus:ring-amber-500'
+                    }`}
                   />
                   <Search className="w-5 h-5 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+
+                  {/* Inline Microphone Button */}
+                  <button
+                    type="button"
+                    onClick={handleToggleVoiceInput}
+                    className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all cursor-pointer ${
+                      isListening
+                        ? 'bg-rose-500 text-white animate-pulse shadow-md'
+                        : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-2xs'
+                    }`}
+                    title={isListening ? 'לחצי לסיום הדיבור' : 'לחצי כדי לדבר למיקרופון'}
+                  >
+                    {isListening ? (
+                      <MicOff className="w-4 h-4" />
+                    ) : (
+                      <Mic className="w-4 h-4 text-amber-800" />
+                    )}
+                  </button>
                 </div>
               </div>
+
+              {/* Active Voice Listening Animation Banner */}
+              {isListening && (
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border border-rose-300 flex items-center justify-between gap-3 animate-fadeIn">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-600"></span>
+                    </span>
+                    <div>
+                      <p className="text-xs font-black text-rose-950">
+                        🎙️ מקשיב לך עכשיו... דברי ברור למיקרופון!
+                      </p>
+                      <p className="text-[11px] text-rose-800 font-medium">
+                        (למשל: "מיץ תפוזים פרי מור" או "חביתה עם שמן זית ומלפפון")
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleToggleVoiceInput}
+                    className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-xs cursor-pointer active:scale-95"
+                  >
+                    סיום דיבור 🛑
+                  </button>
+                </div>
+              )}
+
+              {/* Voice Error Alert if microphone blocked */}
+              {speechError && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-center gap-2 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span className="font-bold">{speechError}</span>
+                </div>
+              )}
+
+              {/* Voice Trigger Button (if not listening) */}
+              {!isListening && (
+                <button
+                  type="button"
+                  onClick={handleToggleVoiceInput}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 rounded-2xl text-xs sm:text-sm font-black text-amber-950 flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer active:scale-95"
+                >
+                  <Mic className="w-4 h-4 text-amber-700" />
+                  <span>🎙️ דברי למיקרופון (הכתבה קולית בעברית) ✨</span>
+                </button>
+              )}
 
               {/* Quick suggestions chips */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[11px] font-bold text-stone-400">חיפושים נפוצים:</span>
-                {['קוטג\'', 'פיוז תה', 'חלב דל לקטוז', 'במבה', 'חלב שקדים', 'אורז בסמטי', 'חומוס', 'קפה'].map((item) => (
+                {['מיץ תפוזים סחוט', 'קקאו טהור', 'קצפת צמחית', 'קוטג\' ללא לקטוז', 'פיוז תה', 'חלב שקדים', 'אורז בסמטי', 'חומוס', 'קפה'].map((item) => (
                   <button
                     key={item}
                     type="button"
@@ -1449,7 +1622,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                 <button
                   type="submit"
                   disabled={!textInput.trim() || isLoading}
-                  className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                 >
                   <Search className="w-4 h-4" />
                   <span>בדוק ברמזור SIBO 🚦</span>
