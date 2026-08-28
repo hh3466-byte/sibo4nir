@@ -41,30 +41,56 @@ export const MealAnalyzer: React.FC<MealAnalyzerProps> = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
-  const sampleRecipes = [
+  // 100% Safe SIBO Chef Recipes (0% Garlic, 0% Onion, 0% Gluten, 0% Fermentation)
+  const safeChefRecipes = [
     {
-      title: 'מוקפץ עוף אסייתי',
+      title: '🍲 מוקפץ עוף אסייתי בטוח ל-SIBO',
+      badge: '0% שום • 0% בצל • 0% גלוטן',
+      text: 'חזה עוף מוקפץ בשמן זית מושרה שום (Garlic Oil), עלי בצל ירוק (ירוק בלבד), קישוא, מקלות גזר, ג׳ינג׳ר טרי ורוטב תמרי ללא גלוטן',
+    },
+    {
+      title: '🥗 סלט ירקות וטחינה בטוח',
+      badge: 'ללא בצל • 0% תסיסה',
+      text: 'מלפפונים קלופים, עגבנייה קלופה, עלי שמיר, פטרוזיליה, שמן זית, מיץ לימון וטחינה גולמית 100% (ללא בצל וללא שום)',
+    },
+    {
+      title: '🥣 מרק עוף זהוב מרגיע בטן',
+      badge: 'ללא בצל • ללא אבקות מרק',
+      text: 'כרעי עוף טריים, גזר, קישוא, ג׳ינג׳ר טרי, ענף שמיר, מלח ים ושמן שום מושרה (ללא בצל וללא אבקות מרק)',
+    },
+    {
+      title: '🍳 ארוחת בוקר קלה ומזינה',
+      badge: '0% לקטוז • עשיר בחלבון',
+      text: 'שתי ביצי עין בשמן זית, מקלות מלפפון, תותים טריים, חלב שקדים ללא סוכר וגבינת פרמזן מיושנת (0% לקטוז)',
+    },
+    {
+      title: '🍳 שקשוקה ביתית בטוחה ל-SIBO',
+      badge: 'ללא בצל • שמן שום מושרה',
+      text: 'עגבניות טריות מרוסקות, שמן זית מושרה שום (Garlic Oil), עלי בצל ירוק (ירוק בלבד), כמון, פפריקה ו-2 ביצים טריות',
+    },
+    {
+      title: '🐟 פילה סלמון עסיסי בעשבי תיבול',
+      badge: 'אומגה 3 • דל FODMAP',
+      text: 'פילה סלמון טרי עם שמן זית, עשבי תיבול טריים (שמיר ופטרוזיליה), מיץ לימון, מלח ים ואורז בסמטי',
+    },
+  ];
+
+  // Common Trigger Dishes for Testing the Scanner (To see how SIBO AI detects forbidden items & fixes them)
+  const testTriggerRecipes = [
+    {
+      title: 'מוקפץ עוף רגיל במסעדה (מכיל שום, בצל, פטריות ונודלס מחיטה)',
+      expectedStatus: '🔴 בדיקת איתור שום, בצל וגלוטן',
       text: 'חזה עוף מוקפץ עם שום, בצל, קישוא, פטריות שמפיניון, רוטב סויה, כרובית ונודלס מחיטה',
     },
     {
-      title: 'סלט ישראלי עם טחינה',
+      title: 'סלט ישראלי רגיל (מכיל בצל חי וגרגרי חומוס)',
+      expectedStatus: '🔴 בדיקת איתור בצל חי וקטניות',
       text: 'עגבניות, מלפפונים, בצל סגול, פטרוזיליה, שמן זית, מיץ לימון, טחינה גולמית וגרגרי חומוס',
     },
     {
-      title: 'מרק עוף ביתי קלאסי',
+      title: 'מרק עוף מסורתי (מכיל בצל שלם ושיני שום)',
+      expectedStatus: '🔴 בדיקת איתור שום ובצל במרק',
       text: 'כרעי עוף, גזר, קישוא, שורש סלרי, בצל שלם, שיני שום, פטרוזיליה ושמיר',
-    },
-    {
-      title: 'ארוחת בוקר קלה',
-      text: 'שתי ביצים עין, שמן זית, מלפפון, תותים טריים, חלב שקדים ללא סוכר וגבינת פרמזן מיושנת',
-    },
-    {
-      title: 'שקשוקה עשירה',
-      text: 'עגבניות טריות, פלפל אדום, שום כתוש, בצל קצוץ, פפריקה, כמון ו-3 ביצים',
-    },
-    {
-      title: 'פילה סלמון בתנור',
-      text: 'פילה סלמון טרי עם שמן זית, שום כתוש, חרדל דיז׳ון, לימון, שמיר ואורז בסמטי',
     },
   ];
 
@@ -474,14 +500,20 @@ export const MealAnalyzer: React.FC<MealAnalyzerProps> = ({
           </div>
         </form>
 
-        {/* Preset Sample Dishes for Nir */}
+        {/* 100% SIBO-Safe Chef Recommendations */}
         <div className="pt-6 border-t border-stone-200 space-y-3">
-          <span className="text-xs font-black text-stone-800 uppercase tracking-wider block">
-            או לחצי על דוגמה למנה נפוצה בהמלצת שֵׁף דַּלָּה פּוּפוּ:
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black text-stone-900 flex items-center gap-1.5">
+              <ChefHat className="w-4 h-4 text-emerald-600" />
+              <span>מתכוני שֵׁף דַּלָּה פּוּפוּ בטוחים ב-100% (ללא שום, ללא בצל, 0% תסיסה):</span>
+            </span>
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+              0% פרוקטנים
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            {sampleRecipes.map((item, idx) => (
+            {safeChefRecipes.map((item, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -490,13 +522,55 @@ export const MealAnalyzer: React.FC<MealAnalyzerProps> = ({
                   setStagedImage(null);
                   onAnalyzeRecipe({ textPrompt: item.text });
                 }}
-                className="text-right p-3.5 rounded-2xl bg-stone-50 hover:bg-emerald-50 border border-stone-200 hover:border-emerald-300 transition-all text-xs space-y-1.5 group cursor-pointer shadow-2xs hover:shadow-sm active:scale-95"
+                className="text-right p-3.5 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border-2 border-emerald-200 hover:border-emerald-500 transition-all text-xs space-y-1.5 group cursor-pointer shadow-2xs hover:shadow-sm active:scale-95"
               >
-                <div className="font-extrabold text-stone-900 group-hover:text-emerald-900 flex items-center justify-between">
-                  <span>{item.title}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-emerald-600 rtl:rotate-180 transition-transform" />
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-stone-900 group-hover:text-emerald-950">
+                    {item.title}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-[-2px] rtl:rotate-180 transition-transform shrink-0" />
                 </div>
-                <p className="text-stone-500 line-clamp-2 leading-relaxed">{item.text}</p>
+                <span className="inline-block text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                  {item.badge}
+                </span>
+                <p className="text-stone-600 text-[11px] line-clamp-2 leading-relaxed">{item.text}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Diagnostic / Testing Section for Scanner Detection */}
+        <div className="pt-4 border-t border-dashed border-stone-200 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black text-stone-600 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span>דוגמאות לבדיקת יכולת הזיהוי של הסורק (מנות רגילות עם שום, בצל או גלוטן):</span>
+            </span>
+            <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+              בדיקת רמזור אדום 🚦
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {testTriggerRecipes.map((item, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setRecipeInput(item.text);
+                  setStagedImage(null);
+                  onAnalyzeRecipe({ textPrompt: item.text });
+                }}
+                className="text-right p-3 rounded-xl bg-stone-50 hover:bg-rose-50/60 border border-stone-200 hover:border-rose-300 transition-all text-xs space-y-1 group cursor-pointer shadow-2xs active:scale-95"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-stone-800 group-hover:text-rose-950 text-[11px]">
+                    {item.title}
+                  </span>
+                </div>
+                <span className="inline-block text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded">
+                  {item.expectedStatus}
+                </span>
               </button>
             ))}
           </div>

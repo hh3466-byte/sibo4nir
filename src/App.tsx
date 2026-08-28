@@ -387,6 +387,10 @@ export default function App() {
         isOpen={isHungerWizardOpen}
         onClose={() => setIsHungerWizardOpen(false)}
         onSelectFoodToAnalyze={handleExploreAlternative}
+        onOpenMealSuggestions={() => {
+          setIsHungerWizardOpen(false);
+          setIsMealSuggestionsOpen(true);
+        }}
       />
 
       {/* Allowed & Forbidden Modal */}

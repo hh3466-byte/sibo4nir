@@ -1,0 +1,38 @@
+[
+  {
+    "time": "2026-08-28T15:21:48.601Z",
+    "event": "react_render_crash",
+    "data": {
+      "errorMessage": "Rendered more hooks than during the previous render.",
+      "errorStack": "Error: Rendered more hooks than during the previous render.\n    at updateWorkInProgressHook (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:5792:19)\n    at updateMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:6540:20)\n    at Object.useMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:18969:20)\n    at",
+      "componentStack": "\n    at HungerRescueWizard (http://localhost:3000/src/components/HungerRescueWizard.tsx:753:3)\n    at div (<anonymous>)\n    at App (http://localhost:3000/src/App.tsx:22:43)\n    at ErrorBoundary (http://localhost:3000/src/main.tsx:8:5)"
+    }
+  },
+  {
+    "time": "2026-08-28T15:21:53.771Z",
+    "event": "react_render_crash",
+    "data": {
+      "errorMessage": "Rendered more hooks than during the previous render.",
+      "errorStack": "Error: Rendered more hooks than during the previous render.\n    at updateWorkInProgressHook (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:5792:19)\n    at updateMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:6540:20)\n    at Object.useMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:18969:20)\n    at",
+      "componentStack": "\n    at HungerRescueWizard (http://localhost:3000/src/components/HungerRescueWizard.tsx:753:3)\n    at div (<anonymous>)\n    at App (http://localhost:3000/src/App.tsx:22:43)\n    at ErrorBoundary (http://localhost:3000/src/main.tsx:8:5)"
+    }
+  },
+  {
+    "time": "2026-08-28T15:22:03.960Z",
+    "event": "react_render_crash",
+    "data": {
+      "errorMessage": "Rendered more hooks than during the previous render.",
+      "errorStack": "Error: Rendered more hooks than during the previous render.\n    at updateWorkInProgressHook (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:5792:19)\n    at updateMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:6540:20)\n    at Object.useMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:18969:20)\n    at",
+      "componentStack": "\n    at HungerRescueWizard (http://localhost:3000/src/components/HungerRescueWizard.tsx:753:3)\n    at div (<anonymous>)\n    at App (http://localhost:3000/src/App.tsx:22:43)\n    at ErrorBoundary (http://localhost:3000/src/main.tsx:8:5)"
+    }
+  },
+  {
+    "time": "2026-08-28T15:22:40.514Z",
+    "event": "react_render_crash",
+    "data": {
+      "errorMessage": "Rendered more hooks than during the previous render.",
+      "errorStack": "Error: Rendered more hooks than during the previous render.\n    at updateWorkInProgressHook (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:5792:19)\n    at updateMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:6540:20)\n    at Object.useMemo (http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=dc9f3e49:18969:20)\n    at",
+      "componentStack": "\n    at HungerRescueWizard (http://localhost:3000/src/components/HungerRescueWizard.tsx:753:3)\n    at div (<anonymous>)\n    at App (http://localhost:3000/src/App.tsx:22:43)\n    at ErrorBoundary (http://localhost:3000/src/main.tsx:8:5)"
+    }
+  }
+]
