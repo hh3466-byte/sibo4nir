@@ -352,8 +352,8 @@ export default function App() {
         {activeTab === 'recipe' && (
           <MealAnalyzer
             currentPhase={currentPhase}
-            onAnalyzeRecipe={async (recipeText) => {
-              await handleAnalyze({ textPrompt: recipeText });
+            onAnalyzeRecipe={async (payload) => {
+              await handleAnalyze(payload);
             }}
             isLoading={isLoading}
           />
