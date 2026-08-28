@@ -566,6 +566,49 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
     ],
     riskScore: 2,
   },
+  // --- בירה ומשקאות מאלט (Beer & Malt Beverages) - 100% RED לניר ---
+  {
+    keywords: [
+      'בירה',
+      'בירה שחורה',
+      'נשר מאלט',
+      'מאלט',
+      'מאלט סטאר',
+      'גולדסטאר',
+      'היינקן',
+      'קרלסברג',
+      'מכבי',
+      'טובורג',
+      'קורונה',
+      'פאולנר',
+      'ויינשטפן',
+      'סטלה ארטואה',
+      'גינס',
+      'בירת חיטה',
+      'בירת לאגר',
+      'סיידר תפוחים אלכוהולי',
+      'שנדי',
+      'לתת שעורה'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'RED',
+    foodNameHe: 'בירה ומשקאות מאלט / לתת (בירה לבנה, שחורה, לאגר וחיטה)',
+    foodNameEn: 'Beer & Malt Beverages',
+    verdictHe: 'אור אדום בוהק! בירה ומשקאות מאלט אסורים לחלוטין לניר ב-SIBO. 🛑🍺',
+    explanationHe: 'בירה מיוצרת מהתססה פעילה של דגנים עתירי פרוקטנים וגלקטנים (לתת שעורה או חיטה) בשילוב שמרים חיים. שאריות הפחמימות והסוכרים הלא-מותססים מגיעים ישירות למעי הדק ומזינים במהירות שיא את חיידקי ה-SIBO, מה שמוביל לייצור מאסיבי של גזים (מימן/מתאן), נפיחות בטנית מיידית וכאבי בטן עזים. בנוסף, הגיזוז (CO2) מרחיב את דפנות המעי ומשתק את מנגנון הניקוי החשוב MMC. בירה שחורה (מאלט) מסוכנת כפליים בשל תוספת סוכר פשוט מרוכז.',
+    fodmapTriggers: ['פרוקטנים וגלקטנים מלתת שעורה וחיטה', 'שמרים מתסיסים', 'גזים ו-CO2 מוגזים', 'סוכרים פשוטים (בבירה שחורה/מאלט)'],
+    maxSafePortionHe: '0 מ"ל (אסור לחלוטין)',
+    safeSubstitutions: [
+      '🍷 כוס יין אדום או לבן יבש בלבד (Dry Wine — עד 120 מ"ל, מכיל פחות מ-1 גרם סוכר שיורי)',
+      '🍸 ג׳ין או וודקה איכותית נקייה עם מי סודה ופלח לימון/נענע טרייה (0 FODMAP, ללא סוכר)',
+      '🍋 מי סודה צוננת עם לימון סחוט טרי, שורש ג׳ינג׳ר מגורר ועלי נענע'
+    ],
+    cookingTips: [
+      'להימנע לחלוטין מבירה (כולל בירה ללא אלכוהול - שמכילה עדיין לתת שעורה ופרוקטנים)',
+      'להימנע מבישול עם בירה (הפרוקטנים מהלתת נשארים בתבשיל גם לאחר אידוי האלכוהול)'
+    ],
+    riskScore: 5,
+  },
   // --- לחמים ודגנים (Breads & Grains) ---
   {
     keywords: ['לחם', 'דגנים', 'חיטה', 'פיתה', 'חלה', 'בגט', 'לחמניה', 'גלוטן', 'קמח לבן', 'קמח מלא', 'קוסקוס', 'פסטה', 'סולת', 'בורגול', 'שיפון', 'כוסמין רגיל', 'קרקרים', 'ביסקוויטים', 'בצק', 'פיצה'],
@@ -945,37 +988,40 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     }
   }
 
-  // 3. Fallback for Unknown / Generic Queries (Strict Clinical Safety for Nir!)
+  // 3. Fallback for Unknown / Generic Queries (Friendly Guidance for Nir)
   const smartSubs = getSmartCategoricalSubstitutions(cleanName);
-  const isGeneric = !cleanName || cleanName.includes('מאכל שצולם') || cleanName.includes('מאכל') || cleanName.includes('מוצר ארוז') || cleanName.includes('לא מזוהה');
+  const isGeneric =
+    !cleanName ||
+    cleanName.includes('מאכל שצולם') ||
+    cleanName.includes('מאכל') ||
+    cleanName.includes('מוצר ארוז') ||
+    cleanName.includes('לא מזוהה') ||
+    cleanName.includes('ברקוד') ||
+    cleanName.includes('יצרן ישראלי') ||
+    cleanName.startsWith('מוצר ');
   const isDrink = /תה|משקה|מיץ|קולה|סודה|ספרייט|פאנטה|משקאות|drink|tea|beverage|fuzetea|fuze/i.test(cleanName + query);
 
   return {
-    status: isPhase1 ? 'RED' : 'YELLOW',
-    foodName: isGeneric ? (isDrink ? 'משקה ארוז (לא מזוהה במאגר)' : 'מוצר ארוז (לא מזוהה במאגר)') : cleanName,
-    englishName: isDrink ? 'Unidentified Beverage' : 'Unidentified Packaged Food',
-    shortVerdict: isPhase1
-      ? 'שימו לב!!! מדובר במוצר ארוז. על מנת לבדוק את המרכיבים המדויקים, יש לסרוק את הברקוד בלחיצה על הכפתור.'
-      : '⚠️ זהירות: מוצר לא מזוהה - מומלץ לוודא רכיבים לפני צריכה.',
-    detailedExplanation: `שימו לב!!!
-מדובר במוצר ארוז.
-על מנת לבדוק את המרכיבים המדויקים, יש לסרוק את הברקוד בלחיצה על הכפתור.
-ללא סריקת הברקוד, אין וודאות למציאת כל המרכיבים והאלרגנים, והמוצר אינו בטוח לשימוש.`,
-    fodmapTriggers: ['סיכון לרכיבי תסיסה סמויים (פרוקטוז/אינולין/שום/פוליאולים)'],
+    status: 'RED',
+    foodName: isGeneric ? (isDrink ? 'משקה לא מזוהה' : 'מוצר לא מזוהה') : cleanName,
+    englishName: isDrink ? 'Unidentified Beverage' : 'Unidentified Food Item',
+    shortVerdict: 'מוצר לא מזוהה, אם מדובר במוצר ארוז, סרקי שוב את הברקוד או את רשימת הרכיבים, אם מדובר במשהו שהכנת לבד או הוכן במסעדה, אנא הקלידי במה מדובר.',
+    detailedExplanation: 'מוצר לא מזוהה, אם מדובר במוצר ארוז, סרקי שוב את הברקוד או את רשימת הרכיבים, אם מדובר במשהו שהכנת לבד או הוכן במסעדה, אנא הקלידי במה מדובר.',
+    fodmapTriggers: ['נדרש פירוט רכיבים / תיאור מנה לזיהוי קליני מדויק'],
     phase1Compatibility: false,
     phase2Compatibility: false,
-    maxSafePortion: 'לא לצרוך עד לבדיקת רכיבים מדויקת',
+    maxSafePortion: 'נא לסרוק ברקוד/רכיבים או להקליד את שם המנה',
     safeSubstitutions: smartSubs,
     cookingTips: [
-      'צלמי את רשימת הרכיבים בגב האריזה לקבלת ניתוח AI מיידי ב-100% דיוק',
-      'או הקלידי את שם המוצר המדויק לחיפוש מהיר במאגר הקליני'
+      'אם מדובר במוצר ארוז: סרקי שוב את הברקוד או צלמי את רשימת הרכיבים בגב האריזה',
+      'אם מדובר במנה ביתית או במסעדה: הקלידי את המרכיבים המרכזיים בחיפוש המהיר'
     ],
     medicalReferences: [
-      'Dr. Allison Siebecker - SIBO Food Guide (Packaged Foods Caution)',
+      'Dr. Allison Siebecker - SIBO Food Guide',
       'Monash University FODMAP Certification Standards'
     ],
     isPackagedProduct: true,
-    riskScore: 5,
+    riskScore: 3,
     timestamp: Date.now(),
   };
 }

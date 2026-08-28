@@ -9,6 +9,7 @@ interface HeaderProps {
   onTabChange: (tab: string) => void;
   onOpenHelp: () => void;
   onOpenInstallShare: () => void;
+  onOpenHungerWizard: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onTabChange,
   onOpenHelp,
   onOpenInstallShare,
+  onOpenHungerWizard,
 }) => {
   const isPhase1 = currentPhase === 'phase1_strict';
 
@@ -90,7 +92,15 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile buttons */}
-            <div className="flex items-center gap-1 lg:hidden">
+            <div className="flex items-center gap-1.5 lg:hidden">
+              <button
+                type="button"
+                onClick={onOpenHungerWizard}
+                className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md animate-pulse cursor-pointer"
+                title="אשף אני רעבה! מה לאכול עכשיו?"
+              >
+                <span>🥑 אני רעבה!</span>
+              </button>
               <button
                 onClick={onOpenInstallShare}
                 className="p-2 text-emerald-600 hover:text-emerald-800 rounded-lg hover:bg-emerald-50"
@@ -110,6 +120,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* SIBO Phase Selector & Principles & Share */}
           <div className="flex items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-end flex-wrap">
+            {/* Desktop Glowing SOS Button */}
+            <button
+              id="desktop-hunger-sos-btn"
+              type="button"
+              onClick={onOpenHungerWizard}
+              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 border border-amber-300 px-3.5 py-2 rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer active:scale-95 animate-pulse"
+              title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
+            >
+              <span className="text-sm">🥑</span>
+              <span>אני רעבה!!! (מה לאכול?) ✨</span>
+            </button>
             <button
               id="install-share-btn"
               type="button"

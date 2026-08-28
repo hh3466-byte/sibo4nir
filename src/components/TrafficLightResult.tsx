@@ -40,6 +40,23 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
     Boolean(result.isPackagedProduct)
   );
 
+  const isUnidentified = Boolean(
+    result.isPackagedProduct ||
+    result.foodName?.includes('לא מזוהה') ||
+    result.foodName?.includes('לא ברור') ||
+    result.foodName?.includes('לא ברורה') ||
+    result.foodName?.includes('לא ידוע') ||
+    result.foodName?.includes('לא ניתן לזהות') ||
+    result.foodName?.includes('מטושטש') ||
+    result.foodName?.includes('מוצר ארוז') ||
+    result.foodName?.includes('משקה לא מזוהה') ||
+    result.foodName?.includes('מוצר מסחרי שטרם זוהה') ||
+    result.shortVerdict?.includes('מוצר לא מזוהה') ||
+    result.detailedExplanation?.includes('מוצר לא מזוהה') ||
+    result.foodName?.toLowerCase().includes('unidentified') ||
+    result.foodName?.toLowerCase().includes('unknown')
+  );
+
   const statusConfig: Record<
     TrafficLightStatus,
     {
@@ -74,18 +91,22 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
       icon: AlertTriangle,
     },
     RED: {
-      title: 'אור אדום — אסור בתכלית לניר! 🔴',
-      subtitle: 'מאכל עתיר תסיסה (FODMAP גבוה / עמילן מרוכז). מזין את חיידקי ה-SIBO!',
-      color: 'text-rose-700',
-      bgBadge: 'bg-rose-100 text-rose-800 border-rose-300',
-      borderCol: 'border-rose-500',
-      glowColor: 'shadow-[0_0_40px_rgba(244,63,94,0.35)] ring-4 ring-rose-500/30',
-      bannerBg: 'bg-gradient-to-l from-rose-600 via-rose-700 to-red-800 text-white',
-      icon: XCircle,
+      title: isUnidentified ? 'מוצר לא מזוהה 🔍' : 'אור אדום — אסור בתכלית לניר! 🔴',
+      subtitle: isUnidentified
+        ? 'בדיקה משלימה לשמירה על בטיחות ניר (סריקה חוזרת או הקלדה)'
+        : 'מאכל עתיר תסיסה (FODMAP גבוה / עמילן מרוכז). מזין את חיידקי ה-SIBO!',
+      color: isUnidentified ? 'text-rose-900' : 'text-rose-700',
+      bgBadge: isUnidentified ? 'bg-gradient-to-r from-rose-100 to-amber-100 text-rose-950 border-amber-300' : 'bg-rose-100 text-rose-800 border-rose-300',
+      borderCol: isUnidentified ? 'border-amber-400' : 'border-rose-500',
+      glowColor: isUnidentified ? 'shadow-[0_0_40px_rgba(245,158,11,0.35)] ring-4 ring-amber-400/30' : 'shadow-[0_0_40px_rgba(244,63,94,0.35)] ring-4 ring-rose-500/30',
+      bannerBg: isUnidentified
+        ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-white'
+        : 'bg-gradient-to-l from-rose-600 via-rose-700 to-red-800 text-white',
+      icon: isUnidentified ? Search : XCircle,
     },
   };
 
-  const currentCfg = statusConfig[result.status] || statusConfig.YELLOW;
+  const currentCfg = isUnidentified ? statusConfig.RED : (statusConfig[result.status] || statusConfig.YELLOW);
 
   const content = (
     <div
@@ -124,28 +145,32 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
           <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
             {/* Realistic Traffic Light Graphic Unit */}
             <div className="flex items-center gap-3.5 bg-stone-950/85 p-2.5 sm:p-3 rounded-full border border-stone-700 shadow-inner">
-              {/* Red Light */}
+              {/* Red / Coral Light */}
               <div
                 className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  result.status === 'RED'
+                  isUnidentified
+                    ? 'bg-rose-400 shadow-[0_0_24px_#fb7185] ring-4 ring-rose-300/80 animate-pulse text-white font-black'
+                    : result.status === 'RED'
                     ? 'bg-rose-500 shadow-[0_0_28px_#f43f5e] ring-4 ring-rose-400 animate-pulse text-white font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
-                title="אדום - אסור"
+                title={isUnidentified ? 'אדום עדין - דורש זיהוי' : 'אדום - אסור'}
               >
-                {result.status === 'RED' && <XCircle className="w-6 h-6 sm:w-7 sm:h-7" />}
+                {isUnidentified ? <Search className="w-5 h-5 sm:w-6 sm:h-6" /> : result.status === 'RED' && <XCircle className="w-6 h-6 sm:w-7 sm:h-7" />}
               </div>
 
-              {/* Yellow Light */}
+              {/* Yellow / Amber Light */}
               <div
                 className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  result.status === 'YELLOW'
+                  isUnidentified
+                    ? 'bg-amber-400 shadow-[0_0_24px_#fbbf24] ring-4 ring-amber-300/80 animate-pulse text-stone-950 font-black'
+                    : result.status === 'YELLOW'
                     ? 'bg-yellow-300 shadow-[0_0_28px_#fde047] ring-4 ring-yellow-400 animate-pulse text-yellow-950 font-black'
                     : 'bg-stone-800/80 opacity-40'
                 }`}
-                title="צהוב - מוגבל"
+                title={isUnidentified ? 'ענבר - דורש בדיקה' : 'צהוב - מוגבל'}
               >
-                {result.status === 'YELLOW' && <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-950" />}
+                {isUnidentified ? <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-stone-950" /> : result.status === 'YELLOW' && <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-950" />}
               </div>
 
               {/* Green Light */}
@@ -190,50 +215,48 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
         {/* Content Details Body with Large Clear Typography */}
         <div className="p-6 sm:p-8 space-y-6 divide-y divide-stone-100 max-h-[62vh] overflow-y-auto">
 
-          {/* Unidentified Packaged Product - High-Priority Clinical Warning Card for Nir (ONLY when truly unrecognized and RED) */}
-          {(result.status === 'RED' && (result.foodName.includes('לא מזוהה') || result.foodName.includes('מוצר ארוז') || result.foodName.includes('מוצר מסחרי שטרם זוהה'))) && (
-            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-rose-600 via-rose-700 to-red-900 text-white shadow-2xl border-4 border-rose-300 space-y-5 animate-pulse-subtle">
+          {/* Unidentified Packaged Product - Soft Rose & Amber Sunset Card for Nir */}
+          {isUnidentified && (
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-rose-50 via-amber-50 to-orange-50/80 text-stone-900 shadow-xl border-2 border-rose-300/80 space-y-5">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center shrink-0 text-3xl font-black shadow-md">
-                  ⛔
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-amber-500 text-white flex items-center justify-center shrink-0 text-2xl font-black shadow-md ring-4 ring-rose-200">
+                  🔍
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                    <span>שימו לב!!! מדובר במוצר ארוז.</span>
+                  <h4 className="text-lg sm:text-xl font-black text-rose-950 flex items-center gap-2">
+                    <span>מוצר לא מזוהה</span>
                   </h4>
-                  <p className="text-xs sm:text-sm text-rose-100 leading-relaxed font-medium">
-                    על מנת לבדוק את המרכיבים המדויקים, יש לסרוק את הברקוד בלחיצה על הכפתור.
-                    <br />
-                    <strong>ללא סריקת הברקוד, אין וודאות למציאת כל המרכיבים והאלרגנים, והמוצר אינו בטוח לשימוש.</strong>
+                  <p className="text-sm sm:text-base text-stone-800 leading-relaxed font-medium">
+                    אם מדובר במוצר ארוז, סרקי שוב את הברקוד או את רשימת הרכיבים, אם מדובר במשהו שהכנת לבד או הוכן במסעדה, אנא הקלידי במה מדובר.
                   </p>
                 </div>
               </div>
 
               {/* Action Buttons for Instant Resolution */}
-              <div className="space-y-2.5 pt-2">
+              <div className="space-y-2.5 pt-1">
                 {onScanBarcode && (
                   <button
                     type="button"
                     onClick={onScanBarcode}
-                    className="w-full py-4 px-6 bg-white hover:bg-rose-50 text-rose-950 font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-95 ring-4 ring-rose-400/50"
+                    className="w-full py-4 px-6 bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-95 ring-4 ring-amber-300/50"
                   >
-                    <Barcode className="w-6 h-6 text-rose-600" />
-                    <span>📸 סרקי ברקוד / רכיבים באריזה (בדיקת AI מיידית)</span>
+                    <Barcode className="w-6 h-6 text-white" />
+                    <span>📸 סרקי שוב את הברקוד או את רשימת הרכיבים</span>
                   </button>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={onReset}
-                    className="py-3 px-4 bg-rose-900/90 hover:bg-rose-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-rose-400/40 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+                    className="py-3.5 px-4 bg-white hover:bg-amber-50 text-stone-900 font-extrabold text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
                   >
-                    <Search className="w-4 h-4" />
-                    <span>הקלד שם מוצר ידנית ✏️</span>
+                    <Search className="w-4 h-4 text-amber-600" />
+                    <span>✏️ הקלידי במה מדובר (מנה ביתית / מסעדה)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => onExploreAlternative('קפה שחור')}
-                    className="py-3 px-4 bg-emerald-700/90 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-400/40 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+                    className="py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-xl border border-emerald-500/40 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
                   >
                     <span>☕ זה קפה שחור? לחצי כאן</span>
                   </button>

@@ -2,6 +2,17 @@ export type TrafficLightStatus = 'GREEN' | 'YELLOW' | 'RED';
 
 export type SiboPhase = 'phase1_strict' | 'phase2_moderate';
 
+export interface BarcodeProductInfo {
+  barcode: string;
+  productName: string;
+  brand?: string;
+  ingredientsText?: string;
+  allergens?: string;
+  categories?: string;
+  imageUrl?: string;
+  found: boolean;
+}
+
 export interface IngredientItem {
   name: string;
   status: TrafficLightStatus;

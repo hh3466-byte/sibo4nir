@@ -3,23 +3,18 @@
  */
 
 import { ISRAELI_SUPERMARKET_CATALOG } from '../data/israeliSupermarketDatabase';
-
-export interface BarcodeProductInfo {
-  barcode: string;
-  productName: string;
-  brand?: string;
-  ingredientsText?: string;
-  allergens?: string;
-  categories?: string;
-  imageUrl?: string;
-  found: boolean;
-}
+import { BarcodeProductInfo } from '../types';
+export type { BarcodeProductInfo };
 
 /**
  * GS1 Israel Manufacturer Prefixes for instant recognition of unindexed Israeli barcodes
  */
 export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defaultCategory: string }> = {
   '72900000': { brand: 'תנובה (Tnuva)', defaultCategory: 'מוצרי חלב / מזון ישראלי' },
+  '729000018': { brand: 'טמפו משקאות (גולדסטאר / מכבי / היינקן)', defaultCategory: 'בירה ומשקאות אלכוהוליים' },
+  '729000027': { brand: 'מבשלות בירה ישראל / IBBL (קרלסברג / טובורג)', defaultCategory: 'בירה ומשקאות אלכוהוליים' },
+  '72900018': { brand: 'טמפו משקאות (Tempo)', defaultCategory: 'בירה ומשקאות' },
+  '72900027': { brand: 'מבשלות בירה ישראל (IBBL)', defaultCategory: 'בירה ומשקאות' },
   '72900001': { brand: 'טרה / משק צוריאל (Tara)', defaultCategory: 'מוצרי חלב / גבינות' },
   '72900002': { brand: 'אסם (Osem)', defaultCategory: 'חטיפים / מאפים / פסטות' },
   '72900003': { brand: 'ויסוצקי (Wissotzky)', defaultCategory: 'תה / חליטות צמחים' },
@@ -559,11 +554,13 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     };
   }
 
-  // Generate candidate variants (raw, 13-digit zero-padded, trimmed zero)
+  // Generate candidate variants (raw, 13-digit, 12-digit UPC, 14-digit GTIN, trimmed zero)
   const candidateCodes = Array.from(
     new Set([
       cleanBarcode,
       cleanBarcode.padStart(13, '0'),
+      cleanBarcode.padStart(12, '0'),
+      cleanBarcode.padStart(14, '0'),
       cleanBarcode.replace(/^0+/, ''),
     ].filter(Boolean))
   );
@@ -601,65 +598,9 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     }
   }
 
-  // Tier 1.5: Signature & Curved Bottle Pattern Matcher for Glares and Cylinders (0ms)
-  for (const code of candidateCodes) {
-    // A. Fuze Tea Signature (All bottles ending in 693, 3693, 1693, 5663, 5623, 5601, 5618, 5632, 5649)
-    if (
-      code.endsWith('693') ||
-      code.endsWith('3693') ||
-      code.endsWith('1693') ||
-      code.endsWith('5663') ||
-      code.endsWith('5623') ||
-      code.endsWith('5601') ||
-      code.endsWith('5618') ||
-      code.endsWith('5632') ||
-      code.endsWith('5649') ||
-      code.includes('1104056') ||
-      code.includes('1101156')
-    ) {
-      const fuze = COMMON_ISRAELI_BARCODES['7290110405663'];
-      if (fuze) {
-        return {
-          barcode: cleanBarcode,
-          productName: fuze.productName || 'תה קר בטעם אפרסק (Fuze Tea פיוז תה)',
-          brand: fuze.brand || 'Fuze Tea',
-          ingredientsText: fuze.ingredientsText || '',
-          allergens: fuze.allergens || '',
-          categories: fuze.categories || 'תה קר / משקאות קלים',
-          imageUrl: fuze.imageUrl || '',
-          found: true,
-        };
-      }
-    }
-
-    // B. Fuzzy tolerance matcher across all Israeli catalog items
-    for (const [knownCode, info] of Object.entries(COMMON_ISRAELI_BARCODES)) {
-      if (Math.abs(knownCode.length - code.length) <= 2) {
-        let diff = 0;
-        const len = Math.min(knownCode.length, code.length);
-        for (let i = 0; i < len; i++) {
-          if (knownCode[i] !== code[i]) diff++;
-        }
-        diff += Math.abs(knownCode.length - code.length);
-        if (diff <= 4) {
-          return {
-            barcode: cleanBarcode,
-            productName: info.productName || 'מוצר ישראלי מוכר',
-            brand: info.brand || '',
-            ingredientsText: info.ingredientsText || '',
-            allergens: info.allergens || '',
-            categories: info.categories || '',
-            imageUrl: info.imageUrl || '',
-            found: true,
-          };
-        }
-      }
-    }
-  }
-
-  // Tier 2: Query our fast server-side proxy (Max 1200ms timeout)
+  // Tier 2: Query our fast server-side proxy (4500ms timeout for reliable cellular & Open Food Facts data)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 1200);
+  const timeoutId = setTimeout(() => controller.abort(), 4500);
 
   try {
     const proxyRes = await fetch(`/api/barcode/${cleanBarcode}`, {
@@ -695,18 +636,18 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     if (mfg) {
       return {
         barcode: cleanBarcode,
-        productName: `מוצר ${mfg.brand} (ברקוד ${cleanBarcode})`,
+        productName: `מוצר לא מזוהה (${mfg.brand}, ברקוד ${cleanBarcode})`,
         brand: mfg.brand,
         categories: mfg.category,
-        found: true,
+        found: false,
       };
     }
   }
 
-  // Tier 4: Generic packaged product fallback (Safe RED Alert for Nir)
+  // Tier 4: Generic packaged product fallback
   return {
     barcode: cleanBarcode,
-    productName: `מוצר ארוז (ברקוד ${cleanBarcode})`,
+    productName: `מוצר לא מזוהה (ברקוד ${cleanBarcode})`,
     found: false,
   };
 }

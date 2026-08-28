@@ -13,6 +13,7 @@ import { SiboPrinciplesModal } from './components/SiboPrinciplesModal';
 import { AllowedForbiddenModal } from './components/AllowedForbiddenModal';
 import { MealSuggestionsModal } from './components/MealSuggestionsModal';
 import { InstallShareModal } from './components/InstallShareModal';
+import { HungerRescueWizard } from './components/HungerRescueWizard';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
 import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug } from 'lucide-react';
 
@@ -35,6 +36,7 @@ export default function App() {
   const [isAllowedForbiddenOpen, setIsAllowedForbiddenOpen] = useState(false);
   const [isMealSuggestionsOpen, setIsMealSuggestionsOpen] = useState(false);
   const [isInstallShareOpen, setIsInstallShareOpen] = useState(false);
+  const [isHungerWizardOpen, setIsHungerWizardOpen] = useState(false);
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
 
   // Diary Entries
@@ -230,10 +232,43 @@ export default function App() {
         }}
         onOpenHelp={() => setIsPrinciplesModalOpen(true)}
         onOpenInstallShare={() => setIsInstallShareOpen(true)}
+        onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
       />
 
       {/* Main App Content Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-28">
+        {/* Prominent SOS Starving Banner for Nir */}
+        <div className="max-w-4xl mx-auto">
+          <button
+            id="banner-hunger-sos-btn"
+            type="button"
+            onClick={() => setIsHungerWizardOpen(true)}
+            className="w-full p-4 sm:p-4.5 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white font-black text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all flex items-center justify-between gap-3 border-2 border-amber-200 active:scale-98 cursor-pointer group animate-pulse"
+          >
+            <div className="flex items-center gap-3 text-right">
+              <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition-transform shrink-0 border border-white/30">
+                🥑
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-white text-stone-900 rounded-full shadow-2xs">
+                    חירום שובע
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black tracking-tight leading-tight">
+                    אני רעבה!!! (מה לאכול עכשיו?) ✨
+                  </h3>
+                </div>
+                <p className="text-xs text-amber-100 font-bold mt-0.5">
+                  פתרונות ב-3 דקות • צילום מקרר ומזווה • תחנות דלק • איתור מסעדות וסופרים סביבך
+                </p>
+              </div>
+            </div>
+            <div className="px-3.5 py-2 bg-stone-950/80 hover:bg-stone-950 text-amber-300 font-extrabold text-xs sm:text-sm rounded-xl shadow-md shrink-0 border border-amber-400/40">
+              פתחי אשף ⚡
+            </div>
+          </button>
+        </div>
+
         {/* Error Alert if any */}
         {errorMsg && (
           <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-sm flex items-center justify-between gap-3 animate-fadeIn">
@@ -322,9 +357,18 @@ export default function App() {
         {activeTab === 'consult' && <SIBOAssistantModal currentPhase={currentPhase} />}
       </main>
 
-      {/* Floating Action Button: הצעות לארוחות בלבד */}
+      {/* Floating Action Buttons: אני רעבה + הצעות לארוחות */}
       <FloatingActionButtons
         onOpenMealSuggestions={() => setIsMealSuggestionsOpen(true)}
+        onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
+      />
+
+      {/* Hunger Rescue SOS Wizard Modal */}
+      <HungerRescueWizard
+        currentPhase={currentPhase}
+        isOpen={isHungerWizardOpen}
+        onClose={() => setIsHungerWizardOpen(false)}
+        onSelectFoodToAnalyze={handleExploreAlternative}
       />
 
       {/* Allowed & Forbidden Modal */}

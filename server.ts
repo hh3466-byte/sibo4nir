@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import fs from 'fs';
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -35,7 +36,6 @@ async function startServer() {
     res.setHeader('Content-Type', 'image/x-icon');
     const distPath = path.join(process.cwd(), 'dist', 'favicon.ico');
     const pubPath = path.join(process.cwd(), 'public', 'favicon.ico');
-    const fs = require('fs');
     if (fs.existsSync(distPath)) return res.sendFile(distPath);
     if (fs.existsSync(pubPath)) return res.sendFile(pubPath);
     res.status(404).end();
@@ -83,12 +83,18 @@ async function startServer() {
       }
 
       const candidateCodes = Array.from(
-        new Set([code, code.padStart(13, '0'), code.replace(/^0+/, '')].filter(Boolean))
+        new Set([
+          code,
+          code.padStart(13, '0'),
+          code.padStart(12, '0'),
+          code.padStart(14, '0'),
+          code.replace(/^0+/, ''),
+        ].filter(Boolean))
       );
 
       for (const queryCode of candidateCodes) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
 
         try {
           const offRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${queryCode}.json`, {
@@ -182,7 +188,13 @@ async function startServer() {
 - "YELLOW" (אור צהוב - מוגבל / זהירות): המאכל מותר אך ורק בכמות מדודה וקטנה מאוד (כמו 1/2 כוס קישוא, עד 10 שקדים, 1/4 כוס אורז, 4 עגבניות שרי, 1/8 אבוקדו) או שהוא אסור בשלב 1 ומותר בשלב 2.
 - "RED" (אור אדום - אסור בתכלית): המאכל עשיר ברכיבים מתסיסים (פרוקטנים כמו שום/בצל/חיטה, גלקטנים/קטניות, לקטוז מחלב ניגר, מניטול מפטריות/כרובית, סורביטול, עודף פרוקטוז כמו תפוח/אגס/דבש, או ממתיקים כוהליים כמו קסיליטול). אסור לחלוטין לניר!
 
-עליך לזהות בדיוק מה מופיע בתמונה או בתיאור, להסביר בשפה ברורה ומעודדת בעברית, לפרט את טריגרי ה-FODMAP המדויקים, לציין כמויות בטוחות בגרמים, ולהציע חלופות טעימות ומותרות שמתאימות לניר.
+כלל בטיחות קריטי עבור תמונות לא ברורות / אריזות ללא רכיבים:
+אם התמונה מטושטשת, חשוכה, לא ברורה, או שמדובר באריזת מוצר שרשימת הרכיבים שלה אינה גלויה וקריאה, או שאין וודאות רפואית מלאה לגבי מרכיבי המנה:
+- עליך לקבוע status: "RED"
+- foodName: "מוצר לא מזוהה" (או "משקה לא מזוהה")
+- shortVerdict: "מוצר לא מזוהה, אם מדובר במוצר ארוז, סרקי שוב את הברקוד או את רשימת הרכיבים, אם מדובר במשהו שהכנת לבד או הוכן במסעדה, אנא הקלידי במה מדובר."
+- detailedExplanation: "מוצר לא מזוהה, אם מדובר במוצר ארוז, סרקי שוב את הברקוד או את רשימת הרכיבים, אם מדובר במשהו שהכנת לבד או הוכן במסעדה, אנא הקלידי במה מדובר."
+- isPackagedProduct: true
 
 כלל קריטי ובל יעבור עבור safeSubstitutions (חלופות בטוחות):
 החלופות חייבות להיות תואמות באופן קולינרי לקטגוריית המאכל הנבדק! אסור בתכלית להציע חלופה גנרית שאינה שייכת לאותה קטגוריה (לדוגמה: אסור להציע מלפפון או חזה עוף כחלופה לקפה, עוגה או פסטה!).
@@ -357,6 +369,129 @@ async function startServer() {
       } catch (e) {
         res.status(500).json({ error: 'שגיאה בניתוח המאכל' });
       }
+    }
+  });
+
+  // API: SIBO Fridge & Hunger SOS AI Chef
+  app.post('/api/fridge-chef', async (req, res) => {
+    try {
+      const { imageBase64, mimeType = 'image/jpeg', textScenario = '', locationType = 'home', phase = 'phase1_strict' } = req.body;
+      const isPhase1 = phase === 'phase1_strict';
+
+      const systemInstruction = `
+אתה שף חירום קליני מומחה ל-SIBO (צמיחת יתר של חיידקים במעי הדק) עבור ניר.
+ניר כרגע רעבה מאוד (במצב "Hangry" ועומס קוגניטיבי), והיא זקוקה לפתרון שובע מיידי, טעים, מהיר (2-5 דקות) ובטוח לחלוטין לפי פרוטוקול SIBO ${isPhase1 ? 'שלב 1 קפדני (הרעבת חיידקים)' : 'שלב 2 (הרחבה מבוקרת)'}.
+
+כללי מפתח:
+1. תחושת שובע מהירה (Satiety): השתמש בשילוב של חלבון איכותי (ביצים, טונה, עוף, סלמון מעושן, פרמזן) ושומן בריא (שמן זית, טחינה גולמית עד 2 כפות, שמן שום) יחד עם פחמימות בטוחות (פריכיות אורז מלא/לבן, אורז בסמטי מבושל).
+2. בטיחות מוחלטת: 0 שום, 0 בצל, 0 קטניות, 0 חיטה/גלוטן, 0 סוכרים פשוטים או חלב ניגר.
+3. טון מרגיע ומעודד: תן לה משפט ראשון חם ומרגיע שמוריד מיד את מפלס הלחץ.
+4. מהירות הכנה: הצעות של 2 עד 5 דקות בלבד.
+`;
+
+      const parts: any[] = [];
+      if (imageBase64) {
+        const cleanBase64 = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
+        parts.push({
+          inlineData: {
+            mimeType: mimeType || 'image/jpeg',
+            data: cleanBase64,
+          },
+        });
+      }
+
+      const promptText = `
+ניר רעבה עכשיו ומבקשת עזרה!
+מיקום/הקשר: ${locationType}
+תיאור נוסף: "${textScenario || 'נא לסרוק את התמונה או להציע פתרונות מהירים'}"
+שלב: ${isPhase1 ? 'שלב 1 קפדני' : 'שלב 2'}
+${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים ל-SIBO והרכב מהם 2-3 ארוחות שובע מהירות (בתוך 3-5 דקות).' : 'הרכב עבורה 2-3 ארוחות שובע מיידיות וקלות ביותר שמתאימות להקשר זה.'}
+`;
+      parts.push({ text: promptText });
+
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      let response: any = null;
+
+      for (const model of modelsToTry) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout for ${model}`)), 12000)
+          );
+
+          const aiCall = ai.models.generateContent({
+            model,
+            contents: { parts },
+            config: {
+              systemInstruction,
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  scenarioTitle: { type: Type.STRING, description: 'כותרת התרחיש (למשל: פתרון שובע מהיר במטבח)' },
+                  calmMessage: { type: Type.STRING, description: 'משפט מרגיע ומחבק לניר שיוריד לחץ' },
+                  prepTimeMinutes: { type: Type.INTEGER, description: 'זמן הכנה בדקות' },
+                  suggestedMeals: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        title: { type: Type.STRING, description: 'שם המנה המהירה' },
+                        timeToMake: { type: Type.STRING, description: 'זמן הכנה (למשל: 3 דקות)' },
+                        ingredients: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'מצרכים נדרשים' },
+                        simpleSteps: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'שלבי הכנה קצרים וקלים' },
+                        satietyReason: { type: Type.STRING, description: 'למה המנה הזו משביעה ובטוחה' },
+                      },
+                      required: ['title', 'timeToMake', 'ingredients', 'simpleSteps', 'satietyReason'],
+                    },
+                  },
+                  safeIngredientsIdentified: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'מצרכים בטוחים שזוהו' },
+                  cautionWarnings: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'ממה להימנע' },
+                  quickTip: { type: Type.STRING, description: 'טיפ שובע קצר' },
+                },
+                required: ['scenarioTitle', 'calmMessage', 'prepTimeMinutes', 'suggestedMeals', 'safeIngredientsIdentified', 'quickTip'],
+              },
+            },
+          });
+
+          response = await Promise.race([aiCall, timeoutPromise]);
+          if (response?.text) break;
+        } catch (err: any) {
+          console.warn(`[FridgeChef API] Model ${model} failed:`, err?.message);
+        }
+      }
+
+      if (response?.text) {
+        return res.json(JSON.parse(response.text));
+      }
+
+      // Fallback emergency meal set if AI is offline
+      return res.json({
+        scenarioTitle: 'פתרונות שובע מהירים ב-3 דקות (חירום)',
+        calmMessage: 'ניר, את בידיים טובות! הנה 3 ארוחות בזק שמשביעות מיד ושומרות על הבטן שלך שקטה.',
+        prepTimeMinutes: 3,
+        suggestedMeals: [
+          {
+            title: '🍳 חביתת 2 ביצים בשמן זית + פריכיות אורז ומלפפון',
+            timeToMake: '3 דקות',
+            ingredients: ['2 ביצים טריות', 'כף שמן זית כתית מעולה', '2-3 פריכיות אורז 100%', 'מלפפון טרי פרוס עם מלח ים'],
+            simpleSteps: ['מחממים מחבת עם שמן זית', 'טורפים 2 ביצים עם מעט מלח ומטגנים דקה וחצי', 'מגישים על פריכיות עם מלפפון רענן'],
+            satietyReason: 'חלבון מלא ושומן בריא שמעניקים שובע מיידי לשעות ללא שום תסיסה חיידקית.',
+          },
+          {
+            title: '🐟 סלט טונה מהיר עם שמן זית, מלפפון וטחינה גולמית',
+            timeToMake: '2 דקות',
+            ingredients: ['קופסת טונה בשמן זית / מים', 'מלפפון קצוץ', 'כף טחינה גולמית 100%', 'מעט מיץ לימון ומלח'],
+            simpleSteps: ['פותחים את קופסת הטונה לקערה', 'מוסיפים מלפפון קצוץ, כף טחינה גולמית ומלח', 'מערבבים ואוכלים עם פריכיות או ישירות במזלג'],
+            satietyReason: '0 פחמימות, חלבון עשיר ושומן איכותי המייצב את רמות הסוכר בדם.',
+          },
+        ],
+        safeIngredientsIdentified: ['ביצים', 'טונה', 'שמן זית', 'מלפפון', 'פריכיות אורז', 'טחינה גולמית'],
+        cautionWarnings: ['להימנע לחלוטין מתוספת בצל, שום, רטבים תעשייתיים או לחם רגיל'],
+        quickTip: 'שילוב של חלבון ושומן בריא (ביצה/טונה + שמן זית) משביע פי 3 ומעניק אנרגיה יציבה.',
+      });
+    } catch (e: any) {
+      console.error('[Fridge Chef API] Error:', e);
+      return res.status(500).json({ error: 'שגיאה בהפעלת אשף החירום' });
     }
   });
 
