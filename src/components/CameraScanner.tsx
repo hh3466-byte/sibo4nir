@@ -1388,6 +1388,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         <span className="inline-flex items-center gap-1 font-bold text-rose-800 bg-rose-100/80 border border-rose-300 px-3 py-1 rounded-xl shadow-2xs">
           🔴 אור אדום (אסור בתכלית)
         </span>
+        <span className="inline-flex items-center gap-1 font-bold text-rose-950 bg-gradient-to-r from-rose-100 via-amber-100 to-orange-100 border border-amber-300 px-3 py-1 rounded-xl shadow-2xs">
+          🔍 מוצר לא מזוהה (סריקה חוזרת / הקלדה)
+        </span>
       </div>
     </div>
   );
