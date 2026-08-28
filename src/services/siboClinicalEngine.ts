@@ -999,7 +999,7 @@ export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhas
   // 1. Salad questions (e.g., "אני רוצה להכין סלט איזה ירקות אני יכול להשתמש", "איזה ירקות מותרים לסלט", "מה לשים בסלט", "סלט ירקות לסיבו", "איך להכין סלט")
   const isSaladQuery =
     norm.includes('סלט') ||
-    (norm.includes('ירקות') && (norm.includes('להכין') || norm.includes('להשתמש') || norm.includes('איזה ירקות') || norm.includes('מותרים לסלט') || norm.includes('אפשר לשים')));
+    (norm.includes('ירק') && (norm.includes('להכין') || norm.includes('להשתמש') || norm.includes('איזה ירקות') || norm.includes('מותרים לסלט') || norm.includes('אפשר לשים') || norm.includes('באיזה')));
 
   if (isSaladQuery) {
     return {
@@ -1038,7 +1038,260 @@ export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhas
     };
   }
 
-  // 2. Allowed Vegetables General Guide (e.g. "איזה ירקות מותר", "ירקות מותרים", "ירקות לסיבו", "רשימת ירקות")
+  // 2. Soup & Broth questions (e.g., "אני רוצה להכין מרק", "איך להכין מרק", "מרק עוף", "מרק ירקות", "איזה מרק מותר")
+  const isSoupQuery =
+    norm.includes('מרק') ||
+    norm.includes('ציר') ||
+    (norm.includes('לבשל') && norm.includes('מרק'));
+
+  if (isSoupQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'מרק עוף וירקות בטוח ל-SIBO 🍲',
+      englishName: 'SIBO-Safe Chicken & Vegetable Soup',
+      shortVerdict: 'אור ירוק! מרק ביתי עשיר, מזין וקל לעיכול — מושלם ל-SIBO!',
+      detailedExplanation: 'מדריך להכנת מרק מושלם ל-SIBO:\n\n' +
+        '🟢 מצרכים מותרים למרק (אור ירוק):\n' +
+        '• עוף טרי / כרעיים / חזה עוף / שפונדרה בקר / הודו\n' +
+        '• ירקות מותרים: גזר מבושל, קישוא / זוקיני חתוך, שורש פטרוזיליה בכמות קטנה, דלעת (בשלב 2)\n' +
+        '• עשבי תיבול טריים: שמיר, פטרוזיליה, כוסברה, טימין, עלי דפנה\n' +
+        '• תיבול עשיר: מלח ים / הימלאיה, פלפל שחור, כורכום, ג\'ינג\'ר טרי מגורר\n' +
+        '• שמן זית מושרה בשום (Garlic-Infused Oil) — מעניק למרק ארומת שום משגעת ללא שום תסיסה!\n\n' +
+        '🔴 מה אסור להכניס למרק (אור אדום):\n' +
+        '• בצל חי (לבן/סגול), כרישה, שאלוט ושום כתוש (הטריגרים הקשים ביותר ב-SIBO!)\n' +
+        '• אבקת מרק קנויה מסחרית (מכילה אבקת שום/בצל, סוכר, מונוסודיום גלוטמט וגלוטן)\n' +
+        '• קטניות (עדשים, שעועית, חומוס, אפונה, גריסים)\n' +
+        '• פטריות, כרובית, ברוקולי\n' +
+        '• סלרי בכמות גדולה (מותר עד 1/4 גבעול דק בלבד).\n\n' +
+        '💡 סוד השפים ל-SIBO:\n' +
+        'מטגנים שיני שום שלמות ב-2 כפות שמן זית בסיר כ-3 דקות עד להזהבה ומוציאים את שיני השום מהסיר לפני הוספת המים! השמן סופג את טעם השום המושלם ללא פרוקטנים (הפרוקטן אינו מסיס בשמן).',
+      fodmapTriggers: ['מרק דל FODMAP ללא בצל וללא אבקות מרק'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'קערת מרק גדולה ועשירה עם עוף וירקות מותרים',
+      safeSubstitutions: [
+        '🍲 מרק עוף צח עם גזר, קישוא, שמיר ושמן שום',
+        '🥩 מרק בקר עשיר עם עשבי תיבול ושורש פטרוזיליה',
+        '🥣 מרק כתום עדין: גזר, דלעת מדודה, ג\'ינג\'ר וחלב קוקוס טבעי (בשלב 2)',
+        '🧄 שמן זית מושרה שום להעשרת הטעם'
+      ],
+      cookingTips: [
+        'להכין ציר מרק ביתי אמיתי מעצמות ועוף ללא שום אבקות מרק תעשייתיות',
+        'להוסיף כורכום וג\'ינג\'ר טרי שמסייעים להפחתת דלקתיות ושיפור תנועתיות המעי'
+      ],
+      medicalReferences: [
+        'Dr. Allison Siebecker - SIBO Specific Food Guide',
+        'Dr. Nirala Jacobi - Bi-Phasic Diet Protocols'
+      ],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 3. Meats, Poultry & Fish (בשר, עוף, דגים ותבשילים)
+  const isMeatFishQuery =
+    (norm.includes('עוף') || norm.includes('חזה עוף') || norm.includes('בשר') || norm.includes('סטייק') || norm.includes('סלמון') || norm.includes('דג') || norm.includes('דגים') || norm.includes('קציצות') || norm.includes('פרגיות') || norm.includes('הודו') || norm.includes('בקר')) &&
+    (norm.includes('להכין') || norm.includes('לבשל') || norm.includes('איך') || norm.includes('איזה') || norm.includes('מותר') || norm.includes('לתבל') || norm.includes('אני רוצה'));
+
+  if (isMeatFishQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'בשר, עוף ודגים ל-SIBO 🍗',
+      englishName: 'SIBO-Safe Meats, Poultry & Fresh Fish',
+      shortVerdict: 'אור ירוק! חלבונים טהורים מותרים, משביעים ודלי תסיסה לחלוטין!',
+      detailedExplanation: 'מדריך מנות עיקריות בטוחות ל-SIBO:\n\n' +
+        '🟢 חלבונים מותרים (0 FODMAP, בטוחים לחלוטין):\n' +
+        '• חזה עוף טרי, כרעיים, פולקע, שוקיים, פרגיות נקיות\n' +
+        '• בשר בקר טרי: אנטרקוט, סינטה, פילה, בקר טחון נקי (ללא בצל/לחם)\n' +
+        '• דגי ים טריים: סלמון, דניס, לברק, מוסר, טונה בשמן זית/מים\n' +
+        '• בשר הודו טרי\n\n' +
+        '🧂 תיבול מומלץ ובטוח:\n' +
+        '• שמן זית כתית מעולה, שמן זית מושרה בשום (Garlic Oil)\n' +
+        '• עשבי תיבול: פטרוזיליה, שמיר, כוסברה, רוזמרין, טימין, בזיליקום, עלי דפנה\n' +
+        '• תבלינים טהורים: מלח ים, פלפל שחור, פפריקה מתוקה/חריפה, כמון, כורכום, ג\'ינג\'ר טרי\n' +
+        '• עלי בצל ירוק (החלק הירוק העליון בלבד)\n\n' +
+        '🔴 ממה להימנע (אור אדום):\n' +
+        '• תיבול בבצל קצוץ, אבקת בצל, שום חי או אבקת שום\n' +
+        '• רטבים קנויים (טריאקי, ברביקיו, צ\'ילי מתוק, רוטב סויה עתיר חיטה, מרינדות מוכנות)\n' +
+        '• קציצות המכילות פירורי לחם או בצל (להחליף בקמח שקדים וגזר מגורר דק).',
+      fodmapTriggers: ['0 FODMAP בחלבון טהור'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'מנה רגילה ומשביעה (150-250 גרם לארוחה)',
+      safeSubstitutions: [
+        '🍗 חזה עוף צלוי בשמן זית, פפריקה, כמון ועשבי תיבול',
+        '🐟 פילה סלמון עסיסי בתנור עם לימון ושמיר',
+        '🥩 סטייק אנטרקוט במחבת עם שמן שום ורוזמרין',
+        '🧆 קציצות בקר אפויות עם קישוא מגורר ושמן שום ללא בצל'
+      ],
+      cookingTips: [
+        'להכין מרינדה ביתית משמן זית, שמן שום, לימון, פפריקה וכמון במקום רטבים קנויים',
+        'במסעדות: לבקש נתח בשר או דג צלוי במחבת נקייה עם שמן זית ומלח בלבד'
+      ],
+      medicalReferences: ['Dr. Siebecker SIBO Guide', 'Monash University Low FODMAP Diet'],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 4. Eggs, Omelettes & Shakshuka (ביצים, חביתות ושקשוקה)
+  const isEggQuery =
+    (norm.includes('ביצ') || norm.includes('חבית') || norm.includes('שקשוקה') || norm.includes('מקושקשת')) &&
+    (norm.includes('להכין') || norm.includes('לבשל') || norm.includes('איך') || norm.includes('איזה') || norm.includes('מותר') || norm.includes('אפשר') || norm.includes('אני רוצה') || norm.length <= 15);
+
+  if (isEggQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'ביצים, חביתות ושקשוקה ל-SIBO 🍳',
+      englishName: 'SIBO-Safe Eggs, Omelettes & Shakshuka',
+      shortVerdict: 'אור ירוק! ביצים הן חלבון מושלם, קל לעיכול ונטול FODMAP לחלוטין!',
+      detailedExplanation: 'מדריך להכנת מנות ביצים ל-SIBO:\n\n' +
+        '🟢 רעיונות מנצחים ובטוחים:\n' +
+        '• חביתת עשבי תיבול: 2 ביצים טרופות עם פטרוזיליה, שמיר, עלי בצל ירוק (ירוק בלבד), מלח ופלפל, מטוגנות ב-1 כף שמן זית / חמאת גהי.\n' +
+        '• שקשוקה בטוחה ל-SIBO: רוטב מ-2 עגבניות טריות קצוצות מבושלות בשמן זית ושמן שום, כמון, פפריקה מתוקה ומלח (ללא בצל וללא שום חי!), עם 2 ביצים מעל.\n' +
+        '• ביצים קשות: 2 ביצים קשות עם שמן זית כתית מעולה, מלח הימלאיה ועלי רוקט/מלפפון.\n' +
+        '• ביצת עין / מקושקשת: בשמן זית או גהי לצד סלט ירקות ירוק.\n\n' +
+        '🔴 ממה להימנע:\n' +
+        '• טיגון בבצל או שום רגיל.\n' +
+        '• הוספת חלב פרה רגיל או גבינות רכות לחביתה (מותר להוסיף 20-30 גרם פרמז\'ן מיושן או גבינת פטה עיזים).',
+      fodmapTriggers: ['0 FODMAP בביצים'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: '2-3 ביצים לארוחה',
+      safeSubstitutions: [
+        '🍳 חביתת ירק עשירה בשמן זית ועשבי תיבול',
+        '🍅 שקשוקה ביתית בשמן שום ללא בצל',
+        '🥚 זוג ביצים קשות עם שמן זית ומלח'
+      ],
+      cookingTips: ['ביצים ושמן זית הם הפתרון המהיר והמשביע ביותר בהתקף רעב'],
+      medicalReferences: ['Dr. Siebecker SIBO Specific Food Guide'],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 5. Bread, Pasta & Doughs (לחם, פסטה, מאפים ותחליפים)
+  const isBreadPastaQuery =
+    (norm.includes('פסטה') || norm.includes('לחם') || norm.includes('פיתה') || norm.includes('פיצה') || norm.includes('בצק') || norm.includes('נודלס') || norm.includes('קרקר')) &&
+    (norm.includes('להכין') || norm.includes('איזה') || norm.includes('מותר') || norm.includes('אפשר') || norm.includes('לאכול') || norm.includes('אני רוצה'));
+
+  if (isBreadPastaQuery) {
+    return {
+      status: 'YELLOW',
+      foodName: 'מדריך לחמים, פסטות ותחליפי בצק ל-SIBO 🥖',
+      englishName: 'SIBO Bread & Pasta Guidelines',
+      shortVerdict: 'אור צהוב — יש להשתמש בתחליפים דלי פרוקטנים וללא גלוטן מותסס!',
+      detailedExplanation: 'הנחיות ללחם, פסטה ובצקים ב-SIBO:\n\n' +
+        '🟢 תחליפים בטוחים ומאושרים (אור ירוק):\n' +
+        '• נודלס זוקיני (Zoodles) — רצועות קישוא מוקפצות בשמן שום ועגבניות טריות\n' +
+        '• דפי אורז קריספיים ממולאים ברצועות עוף וירקות מותרים\n' +
+        '• פריכיות אורז 100% (לבן או מלא) — עד 2-3 פריכיות לארוחה\n' +
+        '• קרקרים מקמח שקדים וזרעי צ\'יה (ללא חיטה וללא סוכר)\n' +
+        '• פסטה מאורז חום או קינואה בכמות מדודה (עד 1/2 כוס מבושלת בשלב 2)\n' +
+        '• לחם מחמצת כוסמין 100% אמיתי בהתססה איטית ממושכת (בשלב 2 בלבד, פרוסה 1)\n\n' +
+        '🔴 מאפים אסורים ב-SIBO (אור אדום):\n' +
+        '• לחם לבן, לחם אחיד, פיתות, חלות, באגטים, לחמניות רגילות\n' +
+        '• פסטה רגילה מחיטת דורום, פיצה רגילה, בצק עלים, בורקסים\n' +
+        '• מאפים ללא גלוטן מסחריים המכילים קמח סויה, אינולין, סיבים פרה-ביוטיים או אבקת חלב.',
+      fodmapTriggers: ['פרוקטנים מחיטה ושעורה', 'עמילן מרוכז'],
+      phase1Compatibility: false,
+      phase2Compatibility: true,
+      maxSafePortion: 'לפי התחליף: זודלס חופשי / פריכיות 2-3 יח\' / פסטת אורז 1/2 כוס (שלב 2)',
+      safeSubstitutions: [
+        '🥒 נודלס קישואים (Zoodles) עם שמן זית ופרמז\'ן',
+        '🍚 פריכיות אורז עם טחינה או חמאת שקדים',
+        '🥟 דפי אורז אפויים או ממולאים',
+        '🍞 לחם מחמצת כוסמין 100% (בשלב 2)'
+      ],
+      cookingTips: ['להכין זודלס במכשיר ספירלייזר ולהקפיץ 2 דקות בלבד במחבת כדי שיישאר פריך'],
+      medicalReferences: ['Monash Low FODMAP Diet', 'Dr. Jacobi Bi-Phasic Diet'],
+      riskScore: 3,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 6. Cheeses & Dairy (גבינות ומוצרי חלב)
+  const isDairyGuideQuery =
+    (norm.includes('גבינ') || norm.includes('חלב') || norm.includes('יוגורט') || norm.includes('קוטג') || norm.includes('פרמזן')) &&
+    (norm.includes('איזה') || norm.includes('מותר') || norm.includes('אפשר') || norm.includes('לאכול') || norm.includes('רשימ') || norm.includes('אני רוצה'));
+
+  if (isDairyGuideQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'מדריך גבינות ומוצרי חלב ל-SIBO 🧀',
+      englishName: 'SIBO Safe Cheeses & Dairy Guide',
+      shortVerdict: 'אור ירוק לגבינות קשות מיושנות וחלב דל לקטוז / שקדים!',
+      detailedExplanation: 'מדריך מוצרי חלב וגבינות בטוחות לניר:\n\n' +
+        '🟢 גבינות ומוצרי חלב מותרים (אור ירוק - כמעט 0% לקטוז):\n' +
+        '• גבינת פרמז\'ן מיושנת (Aged Parmesan) — תהליך היישון מפרק כמעט 100% מהלקטוז! (עד 40 גרם)\n' +
+        '• גבינת פטה עיזים / כבשים איכותית — דלת לקטוז באופן טבעי (עד 30-40 גרם)\n' +
+        '• גבינת צ\'דר מיושנת, מנצ\'גו, פקורינו או גאודה מיושנת (עד 40 גרם)\n' +
+        '• חמאת גהי (Ghee / חמאה מזוקקת) — נקייה ממוצקי חלב ומלקטוז\n' +
+        '• חלב דל לקטוז או 0% לקטוז (חלב תנובה דל לקטוז)\n' +
+        '• חלב שקדים טהור ללא סוכר וללא תוספי גומי\n' +
+        '• יוגורט קוקוס טבעי ללא סוכר מוסף\n' +
+        '• קצפת צמחית / פרווה (כמו ריץ\' או השף הלבן פרווה)\n\n' +
+        '🔴 מוצרי חלב אסורים (אור אדום - עתירי לקטוז מתסיס):\n' +
+        '• חלב פרה רגיל (ניגר), לבן, רוויון, שוקו\n' +
+        '• קוטג\' רגיל, גבינה לבנה 5%/9%, גבינת שמנת, ריקוטה, מסקרפונה\n' +
+        '• גלידות שמנת חלביות, יוגורט פרה רגיל, קינוחי חלב מסחריים.',
+      fodmapTriggers: ['לקטוז (Lactose) בחלב ניגר'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'גבינות קשות: עד 40 גרם / חלב דל לקטוז: עד 1 כוס',
+      safeSubstitutions: [
+        '🧀 פרמז\'ן מיושן מגורר מעל סלט או ביצים',
+        '🥛 חלב דל לקטוז או חלב שקדים טהור',
+        '🧈 חמאת גהי מזוקקת',
+        '🥥 יוגורט קוקוס טבעי'
+      ],
+      cookingTips: ['להעדיף גבינות קשות עם כיתוב "מיושנת 12 חודשים ומעלה" המכילות אפס לקטוז'],
+      medicalReferences: ['Dr. Siebecker SIBO Guide', 'Monash FODMAP Certified'],
+      riskScore: 2,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 7. Desserts, Sweets & Chocolate (מתוקים, קינוחים ושוקולד)
+  const isDessertQuery =
+    (norm.includes('קינוח') || norm.includes('מתוק') || norm.includes('שוקולד') || norm.includes('עוג') || norm.includes('גלידה') || norm.includes('קקאו')) &&
+    (norm.includes('איזה') || norm.includes('מותר') || norm.includes('אפשר') || norm.includes('להכין') || norm.includes('לאכול') || norm.includes('אני רוצה'));
+
+  if (isDessertQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'קינוחים ומתוקים בטוחים ל-SIBO 🍫',
+      englishName: 'SIBO Safe Treats & Desserts',
+      shortVerdict: 'אור ירוק לקינוחים דלי פרוקטוז וללא סוכר מעובד!',
+      detailedExplanation: 'קינוחים ומתוקים מותרים לניר:\n\n' +
+        '🟢 מתוקים בטוחים ומפנקים:\n' +
+        '• שוקו שקדים חם / קר: 1 כפית אבקת קקאו 100% טהור (עלית) + 1 כוס חלב שקדים ללא סוכר + 1 כפית סירופ מייפל טהור 100%.\n' +
+        '• שוקולד מריר איכותי 85% מוצקי קקאו ומעלה (1-2 קוביות מדודות).\n' +
+        '• תותים טריים חתוכים (עד 5-6 תותים) עם מעט מייפל טהור או קצפת צמחית.\n' +
+        '• כוס אוכמניות כחולות טריות עם יוגורט קוקוס ללא סוכר.\n' +
+        '• פנקייק SIBO ביתי: 1 ביצה + 2 כפות קמח שקדים + מעט קינמון ומייפל טהור.\n\n' +
+        '🔴 מתוקים אסורים ב-SIBO:\n' +
+        '• שוקולד חלב רגיל, שוקולד לבן, ממתקים, ופלים, עוגות ועוגיות מסחריות\n' +
+        '• דבש, סילאן, אגבה, סירופ תירס עתיר פרוקטוז (HFCS)\n' +
+        '• ממתיקים כוהליים: סורביטול, מניטול, קסיליטול, מלטיטול (מתסיסים את המעי הדק בעוצמה!).',
+      fodmapTriggers: ['פרוקטוז חופשי', 'פוליאולים'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'מנת קינוח מדודה קטנה בסיום ארוחה',
+      safeSubstitutions: [
+        '🍫 שוקולד מריר 85%+ איכותי',
+        '☕ שוקו קקאו טהור עם חלב שקדים ומייפל טהור',
+        '🍓 תותים טריים עם קצפת צמחית',
+        '🥞 פנקייק מקמח שקדים וביצים'
+      ],
+      cookingTips: ['ההמתקה היחידה המאושרת ב-SIBO היא סירופ מייפל טהור 100% (אינו מכיל פרוקטוז חופשי)'],
+      medicalReferences: ['Dr. Siebecker SIBO Guide'],
+      riskScore: 2,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 8. Allowed Vegetables General Guide (e.g. "איזה ירקות מותר", "ירקות מותרים", "ירקות לסיבו", "רשימת ירקות")
   const isVegGuideQuery =
     (norm.includes('ירקות') || norm.includes('ירק')) &&
     (norm.includes('מותר') || norm.includes('מותרים') || norm.includes('אפשר') || norm.includes('רשימ') || norm.includes('איזה'));
@@ -1076,7 +1329,7 @@ export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhas
     };
   }
 
-  // 3. Breakfast / Meal Ideas / Hunger SOS Questions (e.g. "מה אפשר לאכול", "מה לאכול לארוחת בוקר/ערב", "מה אפשר להכין לאכול", "רעיונות לארוחה")
+  // 3. Breakfast / Meal Ideas / Hunger SOS Questions (e.g. "מה אפשר לאכול", "מה לאכול לארוחת בוקר/ערב", "מה אפשר להכין לאכול", "מה לנשנש", "רעיונות לארוחה")
   const isMealIdeasQuery =
     norm.includes('מה אפשר לאכול') ||
     norm.includes('מה מותר לאכול') ||
@@ -1092,7 +1345,12 @@ export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhas
     norm.includes('רעיונות לארוח') ||
     norm.includes('מתכונ') ||
     norm.includes('רעיונות לאוכל') ||
-    norm.includes('אוכל לסיבו');
+    norm.includes('אוכל לסיבו') ||
+    norm.includes('נשנוש') ||
+    norm.includes('לנשנש') ||
+    norm.includes('חטיף') ||
+    norm.includes('רעבה') ||
+    norm.includes('רעב');
 
   if (isMealIdeasQuery) {
     return {

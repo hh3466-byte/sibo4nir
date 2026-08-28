@@ -293,6 +293,26 @@ assertEqual(vegQueryRes.status, 'GREEN', 'Vegetable guide returns GREEN status')
 const mealQueryRes = analyzeFoodClinically('מה אפשר לאכול לארוחת בוקר', 'phase1_strict');
 assertEqual(mealQueryRes.status, 'GREEN', 'Breakfast guide returns GREEN status');
 
+const soupQueryRes = analyzeFoodClinically('אני רוצה להכין מרק', 'phase1_strict');
+assertEqual(soupQueryRes.status, 'GREEN', 'Soup guide returns GREEN status');
+assert(soupQueryRes.foodName.includes('מרק'), 'Soup food name is identified properly');
+assert(soupQueryRes.detailedExplanation.includes('בצל חי'), 'Soup guide warns against onion');
+
+const chickenQueryRes = analyzeFoodClinically('איך לתבל עוף', 'phase1_strict');
+assertEqual(chickenQueryRes.status, 'GREEN', 'Meat & Poultry guide returns GREEN status');
+
+const eggQueryRes = analyzeFoodClinically('איך להכין שקשוקה לסיבו', 'phase1_strict');
+assertEqual(eggQueryRes.status, 'GREEN', 'Egg & Shakshuka guide returns GREEN status');
+
+const dairyQueryRes = analyzeFoodClinically('איזה גבינות מותר', 'phase1_strict');
+assertEqual(dairyQueryRes.status, 'GREEN', 'Dairy & Cheese guide returns GREEN status');
+
+const dessertQueryRes = analyzeFoodClinically('איזה מתוק מותר', 'phase1_strict');
+assertEqual(dessertQueryRes.status, 'GREEN', 'Dessert & Sweet guide returns GREEN status');
+
+const breadQueryRes = analyzeFoodClinically('איזה לחם מותר', 'phase1_strict');
+assertEqual(breadQueryRes.status, 'YELLOW', 'Bread & Pasta guide returns YELLOW status');
+
 // Test Unidentified product fallback (Strict safety & friendly guidance for Nir)
 const unknownRes = analyzeFoodClinically('מוצר ארוז לא מזוהה 9999999', 'phase1_strict');
 assertEqual(unknownRes.status, 'RED', 'Unidentified product flags RED in Phase 1 for safety');
