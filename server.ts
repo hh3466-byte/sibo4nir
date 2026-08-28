@@ -306,7 +306,7 @@ const systemInstruction = `
       parts.push({ text: promptText });
 
       // Helper to generate content with model fallback
-      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
       let response: any = null;
 
       for (const model of modelsToTry) {
@@ -494,7 +494,7 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
 `;
       parts.push({ text: promptText });
 
-      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
       let response: any = null;
 
       for (const model of modelsToTry) {
@@ -678,7 +678,7 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
 4. אם רלוונטי, ציין טיפ פרקטי למטבח או לאכילה מחוץ לבית.
 `;
 
-      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
       let response: any = null;
       let lastError: any = null;
 
