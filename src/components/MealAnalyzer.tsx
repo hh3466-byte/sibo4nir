@@ -243,10 +243,10 @@ export const MealAnalyzer: React.FC<MealAnalyzerProps> = ({
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-xs">
           <ChefHat className="w-4 h-4 text-emerald-700" />
-          <span>בדיקת מתכונים, מנות ותפריטי מסעדות</span>
+          <span>בדיקת מתכונים • המלצת שֵׁף דַּלָּה פּוּפוּ 👨‍🍳</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
-          בודק מנות, מתכונים ותפריטים 🍳
+          בודק מנות, מתכונים ותפריטים — המלצת שֵׁף דַּלָּה פּוּפוּ 🍳
         </h2>
         <p className="text-xs sm:text-sm text-stone-600 max-w-2xl mx-auto leading-relaxed">
           מתכננת לבשל מנה או מזמינה במסעדה? הקלידי, הקריאי במיקרופון או צלמי את המתכון / התפריט — המערכת תפרק כל רכיב, תסמן באור אדום את מה שמתסיס ותציע חלופות מותאמות לניר.
@@ -477,7 +477,7 @@ export const MealAnalyzer: React.FC<MealAnalyzerProps> = ({
         {/* Preset Sample Dishes for Nir */}
         <div className="pt-6 border-t border-stone-200 space-y-3">
           <span className="text-xs font-black text-stone-800 uppercase tracking-wider block">
-            או לחצי על דוגמה למנה נפוצה לבדיקה מהירה:
+            או לחצי על דוגמה למנה נפוצה בהמלצת שֵׁף דַּלָּה פּוּפוּ:
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">

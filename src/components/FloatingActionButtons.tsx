@@ -27,18 +27,17 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         <span className="tracking-wide">אני רעבה!!! ✨</span>
       </button>
 
-      {/* הצעות לארוחות Floating Button */}
+      {/* הצעות לארוחות Floating Button - המלצת שֵׁף דַּלָּה פּוּפוּ */}
       <button
         id="btn-floating-meal-suggestions"
         type="button"
         onClick={onOpenMealSuggestions}
-        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-full font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-xl border border-emerald-300/40 active:scale-95 group cursor-pointer backdrop-blur-xs"
-        title="הצעות לארוחות מומלצות לניר"
+        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-xl border border-emerald-300/40 active:scale-95 group cursor-pointer backdrop-blur-xs ring-2 ring-emerald-400/20"
+        title="המלצת שֵׁף דַּלָּה פּוּפוּ — מתכונים מותאמים ל-SIBO"
       >
         <ChefHat className="w-4 h-4 text-emerald-100 group-hover:rotate-12 transition-transform" />
-        <span className="tracking-wide">הצעות לארוחות 🍲</span>
+        <span className="tracking-wide">המלצת שֵׁף דַּלָּה פּוּפוּ 🍲</span>
       </button>
     </div>
   );
 };
-

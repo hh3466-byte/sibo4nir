@@ -114,13 +114,13 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-1.5">
               <ChefHat className="w-3.5 h-3.5" />
-              <span>תפריטים ומתכונים מותאמים אישית ל-SIBO</span>
+              <span>המלצת שֵׁף דַּלָּה פּוּפוּ ל-SIBO 👨‍🍳</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-              מתכונים וארוחות ל-SIBO 🍲
+              מתכונים וארוחות — המלצת שֵׁף דַּלָּה פּוּפוּ 🍲
             </h2>
             <p className="text-xs sm:text-sm text-stone-500">
-              תפריטים קלים, מזינים וטעימים ללא שום, ללא בצל ו-0% תסיסה — לחצי על כל ארוחה לצפייה במתכון המלא!
+              תפריטים קלים, מזינים וטעימים ללא שום, ללא בצל ו-0% תסיסה בהמלצת שֵׁף דַּלָּה פּוּפוּ — לחצי על כל ארוחה לצפייה במתכון המלא!
             </p>
           </div>
 
@@ -273,8 +273,9 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               </div>
 
               <div>
-                <div className="inline-block px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
-                  {selectedRecipe.tag}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-100 text-emerald-900 text-xs font-black mb-2 shadow-2xs">
+                  <ChefHat className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>המלצת שֵׁף דַּלָּה פּוּפוּ • {selectedRecipe.tag}</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-stone-900 mb-1">
                   {selectedRecipe.title}
@@ -354,8 +355,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between gap-1 text-xs">
-                          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2.5 py-0.5 rounded-lg">
-                            {meal.tag}
+                          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+                            <span>⭐ המלצת שֵׁף דַּלָּה פּוּפוּ</span>
+                            <span>•</span>
+                            <span>{meal.tag}</span>
                           </span>
                           <span className="text-stone-400 flex items-center gap-1 font-mono">
                             <Clock className="w-3.5 h-3.5" />
@@ -372,7 +375,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
                       </div>
 
                       <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-emerald-700">
-                        <span>צפי במתכון המלא 📖</span>
+                        <span>צפי במתכון של שֵׁף דַּלָּה פּוּפוּ 📖</span>
                         <span className="bg-emerald-100 group-hover:bg-emerald-600 group-hover:text-white w-7 h-7 rounded-xl flex items-center justify-center transition-all">
                           <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                         </span>
@@ -388,7 +391,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
         {/* Modal Footer */}
         <div className="border-t border-stone-100 pt-3 flex items-center justify-between shrink-0">
           <span className="text-[11px] sm:text-xs text-stone-500 font-medium">
-            🍽️ כל המתכונים מכילים 0% שום רגיל, 0% בצל ו-0% לקטוז.
+            🍽️ כל המתכונים בהמלצת שֵׁף דַּלָּה פּוּפוּ מכילים 0% שום רגיל, 0% בצל ו-0% לקטוז.
           </span>
           <button
             onClick={onClose}

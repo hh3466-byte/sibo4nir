@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
     {
       id: 'recipe',
       label: 'בדיקת מתכון 🍳',
-      desc: 'פירוק מנה לרכיבים',
+      desc: 'המלצת שֵׁף דַּלָּה פּוּפוּ',
       activeColor: 'bg-amber-500 text-white shadow-md ring-2 ring-amber-400/30',
       inactiveColor: 'bg-amber-50/80 text-amber-900 border border-amber-200/80 hover:bg-amber-100',
     },

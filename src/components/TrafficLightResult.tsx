@@ -434,7 +434,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                   <div className="flex items-center gap-2">
                     <ChefHat className="w-5 h-5 text-emerald-400" />
                     <h4 className="text-base sm:text-lg font-black tracking-tight">
-                      מתכונים מותאמים ל-SIBO המכילים את מה שחיפשת! 🍲
+                      מתכונים בהמלצת שֵׁף דַּלָּה פּוּפוּ 🍲
                     </h4>
                   </div>
                   {onOpenRecipe && (
@@ -443,14 +443,14 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                       onClick={() => onOpenRecipe(result.foodName)}
                       className="px-3.5 py-1.5 rounded-full bg-emerald-400 hover:bg-emerald-300 text-stone-950 text-xs font-black transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm"
                     >
-                      <span>ספר המתכונים המלא 📖</span>
+                      <span>ספר המתכונים של שֵׁף דַּלָּה פּוּפוּ 📖</span>
                       <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                     </button>
                   )}
                 </div>
 
                 <p className="text-xs sm:text-sm text-emerald-200">
-                  הנה מתכונים ביתיים מוכנים לניר עם המרכיבים המדויקים, ללא בצל, ללא שום ו-0% תסיסה:
+                  הנה מתכונים ביתיים מוכנים לניר בהמלצת שֵׁף דַּלָּה פּוּפוּ עם המרכיבים המדויקים, ללא בצל, ללא שום ו-0% תסיסה:
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
@@ -464,7 +464,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="bg-emerald-400/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold">
-                            {recipe.tag}
+                            ⭐ שֵׁף דַּלָּה פּוּפוּ • {recipe.tag}
                           </span>
                           <span className="text-emerald-300/80 flex items-center gap-1 font-mono">
                             <Clock className="w-3 h-3" />
@@ -476,7 +476,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                         </h5>
                       </div>
                       <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs font-bold text-emerald-300">
-                        <span>צפי במתכון המלא</span>
+                        <span>צפי במתכון של שֵׁף דַּלָּה פּוּפוּ</span>
                         <span className="bg-emerald-400 text-stone-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] group-hover:translate-x-[-2px] transition-all">
                           ←
                         </span>
