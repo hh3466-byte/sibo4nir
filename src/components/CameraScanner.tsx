@@ -864,15 +864,29 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     }
   };
 
-  // Web Speech API for Hebrew Voice Dictation
-  useEffect(() => {
+  // Web Speech API for Hebrew Voice Dictation - Dynamic Desktop & Mobile Lifecycle
+  const handleToggleVoiceInput = () => {
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRec) {
-      setIsSpeechSupported(false);
+      setSpeechError('הדפדפן שלך אינו תומך בהכתבה קולית ישירה (מומלץ לפתוח ב-Google Chrome או Edge במחשב).');
       return;
     }
 
     try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+
       const recognition = new SpeechRec();
       recognition.lang = 'he-IL';
       recognition.continuous = false;
@@ -895,12 +909,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
       recognition.onerror = (event: any) => {
         console.warn('Speech recognition error:', event.error);
-        if (event.error === 'not-allowed') {
-          setSpeechError('יש לאשר גישה למיקרופון בהגדרות הדפדפן כדי לדבר');
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          setSpeechError('גישת המיקרופון חסומה. לחצי על סמל המנעול/הגדרות בשורת הכתובת בדפדפן ואשרי שימוש במיקרופון 🎤');
         } else if (event.error === 'no-speech') {
-          setSpeechError('לא נקלט קול, לחצי שוב על המיקרופון ודברי ברור');
+          setSpeechError('לא נקלט קול, לחצי שוב על המיקרופון ודברי בקול ברור.');
+        } else if (event.error === 'network') {
+          setSpeechError('שגיאת רשת בשירות זיהוי הדיבור. בדקי חיבור לאינטרנט.');
         } else {
-          setSpeechError('לא זוהה דיבור ברור, נסי שוב');
+          setSpeechError('לא זוהה דיבור, לחצי שוב על המיקרופון ודברי ברור.');
         }
         setIsListening(false);
       };
@@ -910,11 +926,16 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       };
 
       recognitionRef.current = recognition;
-    } catch (e) {
-      console.warn('Speech recognition init failed:', e);
-      setIsSpeechSupported(false);
+      if (navigator.vibrate) navigator.vibrate([50]);
+      recognition.start();
+    } catch (err: any) {
+      console.warn('Recognition start failed:', err);
+      setSpeechError('לא ניתן להפעיל את המיקרופון. אנא ודאי שיש מיקרופון מחובר ומאושר במחשב.');
+      setIsListening(false);
     }
+  };
 
+  useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         try {
@@ -923,30 +944,6 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       }
     };
   }, []);
-
-  const handleToggleVoiceInput = () => {
-    if (isListening) {
-      try {
-        recognitionRef.current?.stop();
-      } catch {}
-      setIsListening(false);
-    } else {
-      if (!isSpeechSupported || !recognitionRef.current) {
-        alert('הדפדפן שלך אינו תומך בהכתבה קולית ישירה. אנא השתמשי בכפתור המיקרופון במקלדת הטלפון.');
-        return;
-      }
-      try {
-        setSpeechError(null);
-        if (navigator.vibrate) navigator.vibrate([50]);
-        recognitionRef.current.start();
-      } catch (err: any) {
-        console.warn('Recognition start failed:', err);
-        try {
-          recognitionRef.current.stop();
-        } catch {}
-      }
-    }
-  };
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1525,7 +1522,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                     placeholder="למשל: מיץ תפוזים סחוט, קפה שחור, קוטג', במבה, קקאו..."
-                    className={`w-full pl-12 pr-11 py-3.5 bg-stone-50 border rounded-2xl text-sm focus:ring-2 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400 font-medium ${
+                    className={`w-full pl-28 pr-11 py-3.5 bg-stone-50 border rounded-2xl text-sm focus:ring-2 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400 font-medium ${
                       isListening
                         ? 'border-rose-400 ring-2 ring-rose-300 bg-rose-50/50'
                         : 'border-stone-300 focus:ring-amber-500'
@@ -1533,23 +1530,41 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                   />
                   <Search className="w-5 h-5 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
 
-                  {/* Inline Microphone Button */}
-                  <button
-                    type="button"
-                    onClick={handleToggleVoiceInput}
-                    className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all cursor-pointer ${
-                      isListening
-                        ? 'bg-rose-500 text-white animate-pulse shadow-md'
-                        : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-2xs'
-                    }`}
-                    title={isListening ? 'לחצי לסיום הדיבור' : 'לחצי כדי לדבר למיקרופון'}
-                  >
-                    {isListening ? (
-                      <MicOff className="w-4 h-4" />
-                    ) : (
-                      <Mic className="w-4 h-4 text-amber-800" />
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                    {textInput && (
+                      <button
+                        type="button"
+                        onClick={() => setTextInput('')}
+                        className="text-stone-400 hover:text-stone-700 text-xs font-bold w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center cursor-pointer"
+                        title="נקה טקסט"
+                      >
+                        ✕
+                      </button>
                     )}
-                  </button>
+                    {/* Inline Microphone Button with Desktop Label */}
+                    <button
+                      type="button"
+                      onClick={handleToggleVoiceInput}
+                      className={`p-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        isListening
+                          ? 'bg-rose-500 text-white animate-pulse shadow-md ring-2 ring-rose-300'
+                          : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-2xs'
+                      }`}
+                      title={isListening ? 'לחצי לסיום הדיבור' : 'חיפוש קולי - לחצי ודברי למיקרופון במחשב או בטלפון'}
+                    >
+                      {isListening ? (
+                        <>
+                          <MicOff className="w-4 h-4" />
+                          <span className="text-xs font-bold hidden sm:inline">הפסק</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="w-4 h-4 text-amber-800" />
+                          <span className="text-xs font-bold hidden sm:inline text-amber-950">מיקרופון</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 

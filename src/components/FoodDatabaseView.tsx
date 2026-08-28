@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { SiboPhase, SiboFoodItem, TrafficLightStatus, FoodCategory } from '../types';
 import { SIBO_FOOD_DATABASE, SIBO_CATEGORIES_INFO } from '../data/siboDatabase';
 import { fuzzyHebrewMatch } from '../utils/textUtils';
@@ -15,6 +15,9 @@ import {
   Info,
   ChefHat,
   RotateCcw,
+  Mic,
+  MicOff,
+  AlertCircle,
 } from 'lucide-react';
 
 interface FoodDatabaseViewProps {
@@ -30,6 +33,87 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | TrafficLightStatus>('all');
   const [selectedItem, setSelectedItem] = useState<SiboFoodItem | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  const handleToggleVoiceSearch = () => {
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      setSpeechError('הדפדפן שלך אינו תומך בהכתבה קולית ישירה (מומלץ לפתוח ב-Google Chrome או Edge במחשב).');
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+
+      const recognition = new SpeechRec();
+      recognition.lang = 'he-IL';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        if (transcript) {
+          setSearchTerm(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error in DB search:', event.error);
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          setSpeechError('גישת המיקרופון חסומה. לחצי על סמל המנעול בשורת הכתובת ואשרי מיקרופון 🎤');
+        } else if (event.error === 'no-speech') {
+          setSpeechError('לא נקלט קול, לחצי שוב על המיקרופון ודברי ברור.');
+        } else {
+          setSpeechError('לא זוהה דיבור ברור, נסי שוב.');
+        }
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      if (navigator.vibrate) navigator.vibrate([50]);
+      recognition.start();
+    } catch (err) {
+      console.warn('Recognition start failed:', err);
+      setSpeechError('לא ניתן להפעיל מיקרופון. אנא ודאי שיש מיקרופון פעיל במחשב.');
+      setIsListening(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+    };
+  }, []);
 
   const isPhase1 = currentPhase === 'phase1_strict';
 
@@ -123,18 +207,41 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="חיפוש מאכל בעברית או באנגלית (למשל: קוטג', חלב דל לקטוז, במבה, אורז, תות, אבוקדו)..."
-              className="w-full pl-10 pr-11 py-3.5 bg-stone-50 border border-stone-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+              className={`w-full pl-20 pr-11 py-3.5 bg-stone-50 border rounded-2xl text-sm focus:ring-2 focus:outline-hidden transition-all text-stone-900 placeholder:text-stone-400 font-medium ${
+                isListening
+                  ? 'border-rose-400 ring-2 ring-rose-300 bg-rose-50/50'
+                  : 'border-stone-300 focus:ring-emerald-500'
+              }`}
             />
             <Search className="w-5 h-5 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
-            {searchTerm && (
+            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="text-stone-400 hover:text-stone-700 text-xs font-bold w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center cursor-pointer"
+                  title="נקה חיפוש"
+                >
+                  ✕
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-xs font-bold w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center cursor-pointer"
+                onClick={handleToggleVoiceSearch}
+                className={`p-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse shadow-md'
+                    : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-2xs'
+                }`}
+                title={isListening ? 'לחצי לסיום הדיבור' : 'חיפוש קולי - לחצי ודברי למיקרופון'}
               >
-                ✕
+                {isListening ? (
+                  <MicOff className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4 text-amber-800" />
+                )}
               </button>
-            )}
+            </div>
           </div>
 
           {/* Status Filter Buttons */}
@@ -182,6 +289,38 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Voice Dictation Active Banner */}
+        {isListening && (
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border border-rose-300 flex items-center justify-between gap-3 animate-fadeIn">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-600"></span>
+              </span>
+              <div>
+                <p className="text-xs font-black text-rose-950">
+                  🎙️ מקשיב לך עכשיו... דברי למיקרופון (למשל: "אבוקדו", "חלב שקדים", "אורז")!
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleVoiceSearch}
+              className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-xs cursor-pointer active:scale-95"
+            >
+              סיום דיבור 🛑
+            </button>
+          </div>
+        )}
+
+        {/* Speech Error Banner */}
+        {speechError && (
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-center gap-2 animate-fadeIn">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span className="font-bold">{speechError}</span>
+          </div>
+        )}
 
         {/* Category Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">

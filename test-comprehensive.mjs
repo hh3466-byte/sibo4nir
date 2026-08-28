@@ -278,6 +278,21 @@ assertEqual(whipTest.status, 'GREEN', 'Plant-based Whipping Cream (Richs) is GRE
 const chefLavanWhip = analyzeFoodClinically('קצפת צמחית השף הלבן פרווה', 'phase1_strict');
 assertEqual(chefLavanWhip.status, 'GREEN', 'Chef Lavan Plant-based Whipping Cream is GREEN');
 
+// Test Conversational Questions & Advisory Recommender (e.g. Salad, Vegetables, Meals)
+const saladQueryRes = analyzeFoodClinically('אני רוצה להכין סלט איזה ירקות אני יכול להשתמש', 'phase1_strict');
+assertEqual(saladQueryRes.status, 'GREEN', 'Salad conversational question returns GREEN status');
+assert(saladQueryRes.foodName.includes('סלט'), 'Salad food name is identified properly');
+assert(saladQueryRes.detailedExplanation.includes('מלפפון'), 'Salad guide includes cucumber');
+assert(saladQueryRes.detailedExplanation.includes('חסה'), 'Salad guide includes lettuce');
+assert(saladQueryRes.detailedExplanation.includes('שמן זית'), 'Salad guide includes olive oil');
+assert(saladQueryRes.detailedExplanation.includes('בצל חי'), 'Salad guide warns against raw onion');
+
+const vegQueryRes = analyzeFoodClinically('איזה ירקות מותרים', 'phase1_strict');
+assertEqual(vegQueryRes.status, 'GREEN', 'Vegetable guide returns GREEN status');
+
+const mealQueryRes = analyzeFoodClinically('מה אפשר לאכול לארוחת בוקר', 'phase1_strict');
+assertEqual(mealQueryRes.status, 'GREEN', 'Breakfast guide returns GREEN status');
+
 // Test Unidentified product fallback (Strict safety & friendly guidance for Nir)
 const unknownRes = analyzeFoodClinically('מוצר ארוז לא מזוהה 9999999', 'phase1_strict');
 assertEqual(unknownRes.status, 'RED', 'Unidentified product flags RED in Phase 1 for safety');

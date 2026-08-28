@@ -763,7 +763,7 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
   },
   // --- קטניות וחומוס (Legumes) ---
   {
-    keywords: ['חומוס', 'עדשים', 'שעועית', 'פול', 'אפונה', 'פלאפל', 'סויה', 'טופו רך', 'מש', 'תורמוס'],
+    keywords: ['חומוס', 'עדשים', 'שעועית', 'פול', 'אפונה', 'פלאפל', 'סויה', 'טופו רך', 'שעועית מש', 'תורמוס'],
     statusPhase1: 'RED',
     statusPhase2: 'YELLOW',
     foodNameHe: 'קטניות (חומוס, עדשים, שעועית)',
@@ -990,10 +990,220 @@ const CLINICAL_SIBO_RULES: ClinicalRule[] = [
 ];
 
 /**
+ * Detect conversational questions, meal preparation advice, and category recommendations (e.g. salads, allowed vegetables, breakfast ideas)
+ */
+export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhase): FoodAnalysisResult | null {
+  const norm = normalizeHebrew(query);
+  const isPhase1 = phase === 'phase1_strict';
+
+  // 1. Salad questions (e.g., "אני רוצה להכין סלט איזה ירקות אני יכול להשתמש", "איזה ירקות מותרים לסלט", "מה לשים בסלט", "סלט ירקות לסיבו", "איך להכין סלט")
+  const isSaladQuery =
+    norm.includes('סלט') ||
+    (norm.includes('ירקות') && (norm.includes('להכין') || norm.includes('להשתמש') || norm.includes('איזה ירקות') || norm.includes('מותרים לסלט') || norm.includes('אפשר לשים')));
+
+  if (isSaladQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'סלט ירקות עשיר ובטוח ל-SIBO 🥗',
+      englishName: 'SIBO-Safe Fresh Salad & Allowed Vegetables',
+      shortVerdict: 'אור ירוק! ניתן ומומלץ להכין סלט עשיר, מרענן ומשביע מירקות ירוקים דלי תסיסה!',
+      detailedExplanation: 'הירקות המותרים לסלט ללא הגבלה (0 תסיסה): מלפפון ירוק טרי (קלוף/שטוף היטב), חסה ערבית/רומית/אייסברג, עלי ארוגולה, עלי רוקט, תרד בייבי, עשבי תיבול (פטרוזיליה, שמיר, כוסברה, נענע, בזיליקום), ועלי בצל ירוק (החלק הירוק בלבד!).\n\n' +
+        'ירקות צהובים מדודים בבטחה: עגבנייה (עד 1/2 עגבנייה בינונית או 4 שרי), פלפל אדום/ירוק (עד 1/3 פלפל), גזר מגורר (עד 75 גרם), צנוניות (2-3 יח\'), זיתים (5-6 יח\').\n\n' +
+        'רוטב מושלם לסיבו (0% תסיסה): 2 כפות שמן זית כתית מעולה, מיץ מ-1/2 לימון סחוט טרי, מלח הימלאיה, פלפל שחור, ושמן זית מושרה בשום (Garlic Oil - מעניק ארומת שום מושלמת ללא שום נפיחות!).\n\n' +
+        'תוספות חלבון משביעות: ביצה קשה חתוכה, טונה בשמן זית, רצועות חזה עוף צלויות קרות, או 30 גרם גבינת פרמז\'ן / פטה עיזים.\n\n' +
+        'מה אסור לשים בסלט (אדום): בצל חי מכל סוג, שום כתוש, פטריות, כרובית, ברוקולי חי, קטניות, תירס ורטבים תעשייתיים מוכנים.',
+      fodmapTriggers: ['ירקות דלי FODMAP ללא תסיסה', 'שמן זית כתית מעולה', 'מיץ לימון סחוט'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'קערת סלט גדולה ועשירה המבוססת על ירקות ירוקים מותרים',
+      safeSubstitutions: [
+        '🥗 סלט ירוק עשיר: מלפפון, חסה, ארוגולה, שמיר, עלי בצל ירוק ולימון',
+        '🍳 סלט ניסואז בטוח: חסה, מלפפון, טונה, ביצה קשה וזיתים',
+        '🍗 סלט קיסר מותאם: חסה רומית, רצועות עוף צלויות, שמן זית ופרמז\'ן',
+        '🫒 רוטב שמן זית כתית מעולה + לימון + שמן שום מושרה (0 תסיסה)'
+      ],
+      cookingTips: [
+        'לחתוך את הירקות טריים בסמוך לארוחה לספיגה מיטבית של ויטמינים',
+        'להשתמש בשמן זית מושרה בשום (Garlic Oil) לקבלת טעם שום אמיתי ללא תסיסה',
+        'להוסיף חלבון (ביצה קשה / טונה / עוף) כדי להפוך את הסלט לארוחה מאוזנת ומשביעה',
+        'להימנע לחלוטין מרוטבי סלט תעשייתיים המכילים סירופ תירס, סוכר או אבקות תיבול'
+      ],
+      medicalReferences: [
+        'Dr. Allison Siebecker - SIBO Specific Food Guide (SSFG)',
+        'Monash University Low FODMAP Certified Research',
+        'Dr. Nirala Jacobi - Bi-Phasic Diet Protocol'
+      ],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 2. Allowed Vegetables General Guide (e.g. "איזה ירקות מותר", "ירקות מותרים", "ירקות לסיבו", "רשימת ירקות")
+  const isVegGuideQuery =
+    (norm.includes('ירקות') || norm.includes('ירק')) &&
+    (norm.includes('מותר') || norm.includes('מותרים') || norm.includes('אפשר') || norm.includes('רשימ') || norm.includes('איזה'));
+
+  if (isVegGuideQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'מדריך הירקות המותרים ל-SIBO 🥦',
+      englishName: 'SIBO Safe Vegetables Clinical Guide',
+      shortVerdict: 'אור ירוק! מגוון עשיר של ירקות דלי FODMAP מותרים ובטוחים לניר!',
+      detailedExplanation: 'מדריך ירקות מלא ומאושר ל-SIBO:\n\n' +
+        '🟢 ירקות ירוקים חופשיים (ללא הגבלה): מלפפון (קלוף/טרי), כל סוגי החסות, ארוגולה, עלי רוקט, תרד בייבי, עשבי תיבול (פטרוזיליה, שמיר, כוסברה, נענע, בזיליקום), עלי בצל ירוק (ירוק בלבד), נבטי אלפלפא.\n\n' +
+        '🟡 ירקות צהובים מדודים (בכמות קטנה): קישוא/זוקיני מבושל (עד 1/2 כוס), גזר מבושל/טרי (עד 75 גרם), עגבנייה (עד 1/2 עגבנייה או 4 שרי), פלפל אדום/ירוק (עד 1/3 פלפל), חציל קלוי (עד 1/2 כוס), דלעת מבושלת (עד 1/2 כוס), צנונית (2-3 יח\').\n\n' +
+        '🔴 ירקות אסורים בתכלית (אדום): שום, בצל, כרישה, שאלוט, כרובית, ברוקולי, כרוב ניצנים, פטריות מכל הסוגים, ארטישוק, אספרגוס, שומר טרי, קטניות.',
+      fodmapTriggers: ['ירקות דלי FODMAP ללא תסיסה'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'לפי הפירוט: ירקות ירוקים חופשי, צהובים בכמות מדודה',
+      safeSubstitutions: [
+        '🥒 מלפפון טרי וחסה פריכה',
+        '🥕 גזר מבושל היטב בשמן זית',
+        '🍆 קישוא / חציל קלוי במחבת עם שמן זית ושמן שום',
+        '🌿 עשבי תיבול טריים ועלי בצל ירוק'
+      ],
+      cookingTips: [
+        'בישול, אידוי או אפייה של ירקות מרככים את הסיבים ומקלים מאוד על העיכול',
+        'להשתמש בשמן זית מושרה שום (Garlic Oil) לקבלת ארומת שום ללא פרוקטנים'
+      ],
+      medicalReferences: [
+        'Dr. Allison Siebecker - SIBO Specific Food Guide',
+        'Monash University Low FODMAP Diet'
+      ],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 3. Breakfast / Meal Ideas / Hunger SOS Questions (e.g. "מה אפשר לאכול", "מה לאכול לארוחת בוקר/ערב", "מה אפשר להכין לאכול", "רעיונות לארוחה")
+  const isMealIdeasQuery =
+    norm.includes('מה אפשר לאכול') ||
+    norm.includes('מה מותר לאכול') ||
+    norm.includes('מה לאכול') ||
+    norm.includes('מה אפשר להכין') ||
+    norm.includes('מה להכין') ||
+    norm.includes('מה אפשר לבשל') ||
+    norm.includes('מה לבשל') ||
+    norm.includes('להכין לאכול') ||
+    norm.includes('ארוחת בוקר') ||
+    norm.includes('ארוחת ערב') ||
+    norm.includes('ארוחת צהריים') ||
+    norm.includes('רעיונות לארוח') ||
+    norm.includes('מתכונ') ||
+    norm.includes('רעיונות לאוכל') ||
+    norm.includes('אוכל לסיבו');
+
+  if (isMealIdeasQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'תפריט והמלצות לארוחות בריאות ל-SIBO 🍽️',
+      englishName: 'SIBO Safe Meal Ideas & Nutrition Guide',
+      shortVerdict: 'אור ירוק! שפע ארוחות טעימות, משביעות וקלות לעיכול לניר!',
+      detailedExplanation: 'רעיונות לארוחות מושלמות ובטוחות ל-SIBO:\n\n' +
+        '🍳 ארוחת בוקר מהירה: חביתת 2 ביצים עם עשבי תיבול בשמן זית + מלפפון וגבינת פרמז\'ן/פטה, או 2 ביצים קשות עם שמן זית ומלח, או יוגורט קוקוס ללא סוכר עם 4-5 תותים ואגוזי מלך מדודים.\n\n' +
+        '🍗 ארוחת צהריים משביעה: חזה עוף צלוי בשמן זית ופפריקה + קישואים מוקפצים בשמן שום + 1/2 כוס אורז בסמטי לבן (בשלב 1), או פילה סלמון בתנור עם לימון ועשבי תיבול + גזר אפוי וסלט חסה.\n\n' +
+        '🥗 ארוחת ערב קלה: קערת סלט עשיר (חסה, ארוגולה, מלפפון, טונה בשמן זית, ביצה קשה ולימון), או מרק עוף צח (ללא בצל/שום) עם חלקי עוף, גזר וקישוא.\n\n' +
+        '🍓 נשנוש בטוח בין ארוחות (במרווח 3.5 שעות): פריכיות אורז עם כף חמאת שקדים טהורה, או כוס תותים/אוכמניות, או חופן אגוזי מלך (עד 30 גרם).',
+      fodmapTriggers: ['ארוחות דלות FODMAP ומאוזנות'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'ארוחה רגילה ומשביעה (להקפיד על שובע נעים ללא עומס)',
+      safeSubstitutions: [
+        '🍳 חביתת ירק עשירה בשמן זית + מלפפון',
+        '🍗 חזה עוף צלוי עם גזר ואורז בסמטי מדוד',
+        '🐟 פילה סלמון עסיסי עם סלט ירוק',
+        '🥗 סלט טונה וביצה קשה עם שמן זית ולימון'
+      ],
+      cookingTips: [
+        'לשמור על מרווח של 3.5-4 שעות בין ארוחה לארוחה כדי לאפשר למנגנון הניקוי של המעי (MMC) לפעול',
+        'להקפיד על שתיית מים או תה ג\'ינג\'ר טרי בין הארוחות'
+      ],
+      medicalReferences: [
+        'Dr. Allison Siebecker - SIBO Specific Food Guide',
+        'Dr. Nirala Jacobi - Bi-Phasic SIBO Meal Protocols'
+      ],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 4. Fruit Guide (e.g. "איזה פירות מותר", "פירות מותרים")
+  const isFruitGuideQuery =
+    (norm.includes('פירות') || norm.includes('פרי')) &&
+    (norm.includes('מותר') || norm.includes('מותרים') || norm.includes('אפשר') || norm.includes('רשימ') || norm.includes('איזה'));
+
+  if (isFruitGuideQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'מדריך הפירות המותרים ל-SIBO 🍓',
+      englishName: 'SIBO Safe Fruits Clinical Guide',
+      shortVerdict: 'אור ירוק! פירות נבחרים דלי פרוקטוז וסורביטול מותרים בכמות מדודה!',
+      detailedExplanation: 'פירות מותרים ובטוחים (אור ירוק): תות שדה טרי (עד 5-6 יח\'), אוכמניות כחולות טריות (עד 1/4 כוס), קיווי טרי (1 יח\' - מסייע גם לפריסטלטיקה ועיכול!), פטל טרי (עד 1/3 כוס), תפוז או קלמנטינה שלמה (1 יח\'), מלון קנטלופ (עד 1/2 כוס), בננה ירוקה/בוסר (1 יח\').\n\n' +
+        'פירות אסורים (אור אדום): תפוח, אגס, מנגו, ענבים, אבטיח, דובדבנים, שזיף, אפרסק, פירות יבשים, בננה צהובה בשלה מאוד.',
+      fodmapTriggers: ['פירות דלי פרוקטוז'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: 'מנת פרי אחת בכל פעם (עד 1 כוס פירות יער או 1 פרי בינוני)',
+      safeSubstitutions: [
+        '🍓 תותים טריים',
+        '🫐 אוכמניות כחולות',
+        '🥝 קיווי טרי',
+        '🍊 תפוז / קלמנטינה טרייה'
+      ],
+      cookingTips: ['לאכול פרי יחד עם ארוחה או כחלק מקינוח מדוד ולא לאכול כמויות גדולות בבת אחת'],
+      medicalReferences: ['Monash University Low FODMAP Diet', 'Dr. Allison Siebecker SIBO Guide'],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  // 5. Drinks Guide (e.g. "מה מותר לשתות", "שתייה מותרת", "משקאות לסיבו")
+  const isDrinkGuideQuery =
+    norm.includes('לשתות') ||
+    norm.includes('שתייה') ||
+    norm.includes('משקאות') ||
+    norm.includes('מה לשתות');
+
+  if (isDrinkGuideQuery) {
+    return {
+      status: 'GREEN',
+      foodName: 'מדריך השתייה והמשקאות ל-SIBO 🫖',
+      englishName: 'SIBO Safe Beverages Clinical Guide',
+      shortVerdict: 'אור ירוק! משקאות מרגיעים ומאיצי תנועתיות מותרים ובטוחים לניר!',
+      detailedExplanation: 'משקאות מומלצים ובטוחים (אור ירוק): מים צוננים עם פלח לימון סחוט או עלי נענע, חליטת שורש ג\'ינג\'ר טרי פרוס במים רותחים (מאיץ MMC מעולה!), תה ירוק/שחור ללא סוכר, חליטת נענע/קמומיל, קפה שחור/אספרסו ללא חלב פרה, קפה עם חלב שקדים טהור ללא סוכר, סודה טבעית.\n\n' +
+        'משקאות אסורים (אור אדום): משקאות מוגזים ממותקים, מיצי פירות סחוטים מסחריים (מיץ תפוחים/ענבים), משקאות דיאט עם ממתיקים כוהליים, בירה רגילה/שחורה, חלב פרה רגיל.',
+      fodmapTriggers: ['משקאות דלי FODMAP'],
+      phase1Compatibility: true,
+      phase2Compatibility: true,
+      maxSafePortion: '2-3 ליטר מים וחליטות ביום',
+      safeSubstitutions: [
+        '🫚 חליטת ג\'ינג\'ר טרי חמה',
+        '🍵 תה ירוק עם נענע ולימון',
+        '☕ קפה שחור או עם חלב שקדים טהור',
+        '🍋 סודה צוננת עם לימון'
+      ],
+      cookingTips: ['לשתות חליטת ג\'ינג\'ר טרי כחצי שעה לפני הארוחה או שעתיים לאחריה לשיפור ריקון המעי'],
+      medicalReferences: ['Dr. Siebecker SIBO Guide', 'Monash University Low FODMAP Diet'],
+      riskScore: 1,
+      timestamp: Date.now(),
+    };
+  }
+
+  return null;
+}
+
+/**
  * Find clinical SIBO analysis for any given query or food item
  */
 export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_strict'): FoodAnalysisResult {
   const isPhase1 = phase === 'phase1_strict';
+
+  // 0. Check for conversational queries, questions, salad & meal recommendations
+  const advisoryResult = detectConversationalAdvisoryQuery(query, phase);
+  if (advisoryResult) {
+    return advisoryResult;
+  }
 
   // Clean raw prompt string if coming from barcode
   let cleanName = query.trim();

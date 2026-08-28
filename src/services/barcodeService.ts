@@ -627,7 +627,7 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
           found: true,
         };
         // Auto-cache learned barcode permanently for instant future scans
-        saveCustomBarcode(resolvedProduct);
+        saveCustomBarcode(cleanBarcode, resolvedProduct);
         return resolvedProduct;
       }
     }
