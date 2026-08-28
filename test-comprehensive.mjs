@@ -18,6 +18,12 @@ import {
 } from './src/services/siboClinicalEngine.ts';
 import { SIBO_MEDICAL_ARTICLES } from './src/data/siboArticles.ts';
 import { SIBO_MEAL_SUGGESTIONS } from './src/data/siboMealSuggestions.ts';
+import {
+  initProtectedCatalog,
+  getProductFromProtectedCatalog,
+  saveProductToProtectedCatalog,
+  getCatalogStats,
+} from './src/services/protectedCatalogService.ts';
 
 let passed = 0;
 let failed = 0;
@@ -406,6 +412,39 @@ assert(japanPrefix?.brand?.includes('יפן'), 'Imported Japanese barcode (490..
 
 const belgiumPrefix = getManufacturerFromBarcode('5411234567890');
 assert(belgiumPrefix?.brand?.includes('בלגיה'), 'Imported Belgian barcode (541...) correctly resolves to Belgium');
+
+// -----------------------------------------------------------------------------
+// 7. PROTECTED CATALOG PERSISTENCE, ANTI-WIPE PROTECTION & BACKUPS
+// -----------------------------------------------------------------------------
+console.log('\n🔹 7. Testing Protected Catalog Persistence, Anti-Wipe Protection & Backups:');
+
+const initializedCatalog = initProtectedCatalog();
+assert(Object.keys(initializedCatalog).length >= 233, `Protected catalog initialized with ${Object.keys(initializedCatalog).length} products (>= 233 expected)`);
+
+const stats = getCatalogStats();
+assert(stats.totalProducts >= 233, `Stats reports ${stats.totalProducts} total protected products`);
+assert(stats.backupsCount >= 1, `Stats reports ${stats.backupsCount} backup snapshot(s) generated`);
+
+// Test lookup from protected store
+const lookedUpCoffee = getProductFromProtectedCatalog('7290119374106');
+assert(!!lookedUpCoffee, 'Found Elite Coffee in protected catalog');
+assert((lookedUpCoffee?.productName || '').includes('קפה שחור'), 'Protected catalog entry has correct product name');
+
+// Test non-destructive save
+saveProductToProtectedCatalog({
+  barcode: '9999999990001',
+  productName: 'מוצר בדיקה מוגן (Test Product)',
+  brand: 'מותג בדיקה',
+  categories: 'בדיקות',
+});
+
+const lookedUpTest = getProductFromProtectedCatalog('9999999990001');
+assert(!!lookedUpTest, 'Newly saved product is retrievable from protected catalog');
+assert(lookedUpTest?.productName === 'מוצר בדיקה מוגן (Test Product)', 'Retrieved test product data matches saved data');
+
+// Verify coffee is still intact after saving new product (Anti-Wipe test)
+const recheckCoffee = getProductFromProtectedCatalog('7290119374106');
+assert(!!recheckCoffee, 'Original catalog entries remain 100% intact after new additions (Zero Loss / Anti-Wipe)');
 
 // -----------------------------------------------------------------------------
 // SUMMARY

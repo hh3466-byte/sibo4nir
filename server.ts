@@ -5,6 +5,14 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
 import { analyzeFoodClinically } from './src/services/siboClinicalEngine';
+import {
+  initProtectedCatalog,
+  getProductFromProtectedCatalog,
+  saveProductToProtectedCatalog,
+  getCatalogStats,
+  performWeeklyCatalogSync,
+  startWeeklyCatalogScheduler,
+} from './src/services/protectedCatalogService';
 
 async function startServer() {
   const app = express();
@@ -649,7 +657,11 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
     }
   });
 
-  // API: Global Barcode Lookup (Open Food Facts Israel & Worldwide API + Imported Goods)
+  // Initialize Protected Global Catalog and start weekly auto-sync scheduler
+  initProtectedCatalog();
+  startWeeklyCatalogScheduler();
+
+  // API: Global Barcode Lookup (Protected Cache + Open Food Facts World & Israel + Auto-Persistence)
   app.get('/api/barcode/:barcode', async (req, res) => {
     try {
       const barcode = req.params.barcode.trim().replace(/[^0-9]/g, '');
@@ -657,7 +669,22 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
         return res.status(400).json({ found: false, error: 'ברקוד לא תקין' });
       }
 
-      // Try Open Food Facts World & Israel APIs
+      // Step 1: Check Protected In-Memory Catalog Cache (0ms instant lookup)
+      const cached = getProductFromProtectedCatalog(barcode);
+      if (cached && cached.productName) {
+        return res.json({
+          barcode,
+          productName: cached.productName,
+          brand: cached.brand || '',
+          ingredientsText: cached.ingredientsText || '',
+          allergens: cached.allergens || '',
+          categories: cached.categories || '',
+          imageUrl: cached.imageUrl || '',
+          found: true,
+        });
+      }
+
+      // Step 2: Query Open Food Facts World & Israel APIs
       const urls = [
         `https://il.openfoodfacts.org/api/v2/product/${barcode}.json`,
         `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
@@ -689,7 +716,7 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
               const imageUrl = p.image_url || p.image_front_url || '';
 
               if (productName || ingredientsText) {
-                return res.json({
+                const resolved = {
                   barcode,
                   productName: productName || `מוצר מיובא (${brand})`,
                   brand,
@@ -698,7 +725,10 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
                   categories,
                   imageUrl,
                   found: true,
-                });
+                };
+                // Automatically persist and write-protect in the global catalog!
+                saveProductToProtectedCatalog(resolved);
+                return res.json(resolved);
               }
             }
           }
@@ -714,6 +744,21 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
     } catch (err: any) {
       console.warn('[Barcode API] Error:', err);
       return res.status(500).json({ barcode: req.params.barcode, found: false });
+    }
+  });
+
+  // API: Protected Catalog Health & Stats
+  app.get('/api/catalog/stats', (req, res) => {
+    res.json(getCatalogStats());
+  });
+
+  // API: Trigger Manual / Scheduled Catalog Sync
+  app.post('/api/catalog/sync', async (req, res) => {
+    try {
+      const result = await performWeeklyCatalogSync();
+      res.json(result);
+    } catch (e: any) {
+      res.status(500).json({ error: 'שגיאה בעדכון המאגר', details: e?.message });
     }
   });
 
