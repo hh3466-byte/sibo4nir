@@ -44,6 +44,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   onOpenAllowedForbidden,
   initialMode = 'camera',
 }) => {
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024 && !('ontouchstart' in window);
+  const [isCameraTurnedOnByUser, setIsCameraTurnedOnByUser] = useState<boolean>(() => !isDesktop);
   const [mode, setMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>(initialMode);
   const [cameraActive, setCameraActive] = useState(false);
   const [isInitializingCamera, setIsInitializingCamera] = useState(false);
@@ -266,7 +268,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
 
   // Manage Camera Mode Lifecycle (Food and Barcode modes use the same rock-solid stream)
   useEffect(() => {
-    const isCameraNeeded = mode === 'camera' || mode === 'barcode';
+    const isCameraNeeded = (mode === 'camera' || mode === 'barcode') && isCameraTurnedOnByUser;
 
     if (isCameraNeeded) {
       if (!streamRef.current) {
@@ -278,7 +280,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     } else {
       stopCameraStream();
     }
-  }, [mode, facingMode, startCameraStream, stopCameraStream]);
+  }, [mode, facingMode, isCameraTurnedOnByUser, startCameraStream, stopCameraStream]);
 
   // Stop camera only when unmounting the entire component
   useEffect(() => {
@@ -1046,131 +1048,187 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
                   </div>
                 </div>
               ) : (
-                /* CONTINUOUS LIVE VIDEO STREAM (Fluid 60fps for both Food & Barcode!) */
                 <>
-                  <div className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-center text-xs font-bold text-stone-700">
-                    {mode === 'barcode'
-                      ? '🏷️ סורק ברקודים חי: כווני את הפס האדום למרכז הברקוד לזיהוי מיידי'
-                      : '📸 המצלמה פועלת בשידור חי: כווני למוצר בנחת ולחצי על כפתור הצילום למטה'}
-                  </div>
-
-                  <div
-                    onClick={handleResumeVideo}
-                    className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex items-center justify-center shadow-inner cursor-pointer"
-                  >
-                    {isFlashActive && (
-                      <div className="absolute inset-0 bg-white z-30 animate-fade-out pointer-events-none" />
-                    )}
-
-                    {cameraError ? (
-                      <div className="p-6 text-center space-y-3 text-stone-300 max-w-md pointer-events-auto">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto text-amber-400">
-                          <CameraOff className="w-6 h-6" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-sm font-black text-white">פתיחת מצלמת הטלפון</p>
-                          <p className="text-xs text-stone-400">{cameraError}</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => nativeCameraInputRef.current?.click()}
-                            className="w-full sm:w-auto px-5 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                          >
-                            <Camera className="w-4 h-4" />
-                            <span>צלמי במצלמת הטלפון 📷</span>
-                          </button>
-                        </div>
+                  {!isCameraTurnedOnByUser ? (
+                    <div className="bg-stone-900 rounded-2xl p-8 text-center space-y-4 text-white shadow-inner aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex flex-col items-center justify-center">
+                      <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center text-2xl font-black">
+                        📸
                       </div>
-                    ) : (
-                      <>
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          muted
-                          className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-                        />
+                      <div className="space-y-1 max-w-sm">
+                        <h4 className="text-base font-black text-white">המצלמה במחשב במצב המתנה</h4>
+                        <p className="text-xs text-stone-300 font-medium">
+                          המצלמה כבויה כדי לשמור על פרטיות ושלא תופיע נקודה אדומה בדפדפן.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2.5 flex-wrap justify-center pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCameraTurnedOnByUser(true);
+                            startCameraStream(facingMode);
+                          }}
+                          className="py-3 px-6 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-black text-sm rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer ring-2 ring-emerald-400/30"
+                        >
+                          <Play className="w-4 h-4" />
+                          <span>הפעל מצלמה עכשיו 📸</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-center text-xs font-bold text-stone-700 flex items-center justify-between">
+                        <span>
+                          {mode === 'barcode'
+                            ? '🏷️ סורק ברקודים חי: כווני את הפס האדום למרכז הברקוד לזיהוי מיידי'
+                            : '📸 המצלמה פועלת בשידור חי: כווני למוצר בנחת ולחצי על כפתור הצילום למטה'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCameraTurnedOnByUser(false);
+                            stopCameraStream();
+                          }}
+                          className="px-2.5 py-1 bg-stone-200 hover:bg-rose-100 hover:text-rose-800 text-stone-800 rounded-lg text-[11px] font-black transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          <CameraOff className="w-3 h-3 text-rose-600" />
+                          <span>כבה מצלמה</span>
+                        </button>
+                      </div>
 
-                        {/* If browser paused autoplay, show gentle resume button */}
-                        {isVideoPaused && (
-                          <div className="absolute inset-0 bg-stone-950/75 backdrop-blur-xs flex flex-col items-center justify-center gap-3 text-white z-20 pointer-events-auto">
-                            <button
-                              type="button"
-                              onClick={handleResumeVideo}
-                              className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-sm shadow-xl flex items-center gap-2 animate-bounce"
-                            >
-                              <Play className="w-5 h-5 fill-current" />
-                              <span>לחצי להפעלת שידור המצלמה ▶️</span>
-                            </button>
-                          </div>
+                      <div
+                        onClick={handleResumeVideo}
+                        className="relative bg-stone-950 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/9] min-h-[260px] flex items-center justify-center shadow-inner cursor-pointer"
+                      >
+                        {isFlashActive && (
+                          <div className="absolute inset-0 bg-white z-30 animate-fade-out pointer-events-none" />
                         )}
 
-                        {isInitializingCamera && (
-                          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-stone-300 z-10">
-                            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
-                            <span className="text-xs font-bold">מפעיל מצלמה...</span>
-                          </div>
-                        )}
+                        {/* Turn off camera overlay button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsCameraTurnedOnByUser(false);
+                            stopCameraStream();
+                          }}
+                          className="absolute top-3 left-3 z-30 px-3 py-1.5 rounded-xl bg-stone-950/80 hover:bg-rose-900/90 text-white text-xs font-bold transition-all flex items-center gap-1.5 backdrop-blur-xs border border-white/20 cursor-pointer active:scale-95 shadow-md"
+                          title="כיבוי המצלמה והסרת הנקודה האדומה בדפדפן"
+                        >
+                          <CameraOff className="w-3.5 h-3.5 text-rose-400" />
+                          <span>כבה מצלמה 🛑</span>
+                        </button>
 
-                        {/* Barcode Laser Overlay (When in Barcode Mode) */}
-                        {mode === 'barcode' && cameraActive && !isVideoPaused && (
-                          <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
-                            <div className="w-64 h-36 sm:w-80 sm:h-44 border-2 border-dashed border-indigo-400/90 rounded-2xl flex items-center justify-center relative shadow-lg">
-                              {/* Laser Line */}
-                              <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_14px_#f43f5e] animate-pulse" />
-                              <span className="absolute -top-3 bg-indigo-600 text-white text-[11px] px-3 py-0.5 rounded-full font-bold shadow-xs">
-                                מקמי ברקוד כאן
-                              </span>
+                        {cameraError ? (
+                          <div className="p-6 text-center space-y-3 text-stone-300 max-w-md pointer-events-auto">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto text-amber-400">
+                              <CameraOff className="w-6 h-6" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-black text-white">פתיחת מצלמת הטלפון</p>
+                              <p className="text-xs text-stone-400">{cameraError}</p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => nativeCameraInputRef.current?.click()}
+                                className="w-full sm:w-auto px-5 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                              >
+                                <Camera className="w-4 h-4" />
+                                <span>צלמי במצלמת הטלפון 📷</span>
+                              </button>
                             </div>
                           </div>
-                        )}
+                        ) : (
+                          <>
+                            <video
+                              ref={videoRef}
+                              autoPlay
+                              playsInline
+                              muted
+                              className={`w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                            />
 
-                        {/* Food Frame Target Guide (When in Camera Mode) */}
-                        {mode === 'camera' && cameraActive && !isVideoPaused && (
-                          <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
-                            <div className="w-56 h-56 sm:w-72 sm:h-72 border-2 border-dashed border-white/80 rounded-3xl flex items-center justify-center shadow-lg">
-                              <span className="bg-stone-900/80 text-white text-xs px-3.5 py-1 rounded-full font-bold backdrop-blur-xs shadow-sm">
-                                הציבי את המאכל במרכז
-                              </span>
+                            {/* If browser paused autoplay, show gentle resume button */}
+                            {isVideoPaused && (
+                              <div className="absolute inset-0 bg-stone-950/75 backdrop-blur-xs flex flex-col items-center justify-center gap-3 text-white z-20 pointer-events-auto">
+                                <button
+                                  type="button"
+                                  onClick={handleResumeVideo}
+                                  className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-sm shadow-xl flex items-center gap-2 animate-bounce"
+                                >
+                                  <Play className="w-5 h-5 fill-current" />
+                                  <span>לחצי להפעלת שידור המצלמה ▶️</span>
+                                </button>
+                              </div>
+                            )}
+
+                            {isInitializingCamera && (
+                              <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-stone-300 z-10">
+                                <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                                <span className="text-xs font-bold">מפעיל מצלמה...</span>
+                              </div>
+                            )}
+
+                            {/* Barcode Laser Overlay (When in Barcode Mode) */}
+                            {mode === 'barcode' && cameraActive && !isVideoPaused && (
+                              <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
+                                <div className="w-64 h-36 sm:w-80 sm:h-44 border-2 border-dashed border-indigo-400/90 rounded-2xl flex items-center justify-center relative shadow-lg">
+                                  {/* Laser Line */}
+                                  <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_14px_#f43f5e] animate-pulse" />
+                                  <span className="absolute -top-3 bg-indigo-600 text-white text-[11px] px-3 py-0.5 rounded-full font-bold shadow-xs">
+                                    מקמי ברקוד כאן
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Food Frame Target Guide (When in Camera Mode) */}
+                            {mode === 'camera' && cameraActive && !isVideoPaused && (
+                              <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-6 z-10">
+                                <div className="w-56 h-56 sm:w-72 sm:h-72 border-2 border-dashed border-white/80 rounded-3xl flex items-center justify-center shadow-lg">
+                                  <span className="bg-stone-900/80 text-white text-xs px-3.5 py-1 rounded-full font-bold backdrop-blur-xs shadow-sm">
+                                    הציבי את המאכל במרכז
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Success Badge for Barcode */}
+                            {scannedBarcodeSuccess && (
+                              <div className="absolute top-4 inset-x-4 p-3 rounded-2xl bg-emerald-600 text-white text-xs font-black text-center shadow-lg animate-bounce z-30 flex items-center justify-center gap-2">
+                                <CheckCircle2 className="w-5 h-5" />
+                                <span>ברקוד זוהה בהצלחה ({scannedBarcodeSuccess})! שולף נתונים...</span>
+                              </div>
+                            )}
+
+                            {/* Top Status & Controls */}
+                            <div className="absolute top-3 right-3 flex items-center gap-2 z-20 pointer-events-auto">
+                              {cameraActive && (
+                                <div className="px-2.5 py-1 rounded-full bg-stone-900/80 backdrop-blur-xs border border-white/20 text-emerald-400 text-[11px] font-bold flex items-center gap-1.5 shadow-xs">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                                  <span>מצלמה מוכנה</span>
+                                </div>
+                              )}
+
+                              {cameraActive && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleFacingMode();
+                                  }}
+                                  title="החלפת מצלמה קדמית/אחורית"
+                                  className="p-2 rounded-full bg-stone-900/80 hover:bg-stone-800 backdrop-blur-xs border border-white/20 text-white shadow-md active:scale-95 transition-all cursor-pointer"
+                                >
+                                  <SwitchCamera className="w-4 h-4" />
+                                </button>
+                              )}
                             </div>
-                          </div>
+                          </>
                         )}
-
-                        {/* Success Badge for Barcode */}
-                        {scannedBarcodeSuccess && (
-                          <div className="absolute top-4 inset-x-4 p-3 rounded-2xl bg-emerald-600 text-white text-xs font-black text-center shadow-lg animate-bounce z-30 flex items-center justify-center gap-2">
-                            <CheckCircle2 className="w-5 h-5" />
-                            <span>ברקוד זוהה בהצלחה ({scannedBarcodeSuccess})! שולף נתונים...</span>
-                          </div>
-                        )}
-
-                        {/* Top Status & Controls */}
-                        <div className="absolute top-3 right-3 flex items-center gap-2 z-20 pointer-events-auto">
-                          {cameraActive && (
-                            <div className="px-2.5 py-1 rounded-full bg-stone-900/80 backdrop-blur-xs border border-white/20 text-emerald-400 text-[11px] font-bold flex items-center gap-1.5 shadow-xs">
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                              <span>מצלמה מוכנה</span>
-                            </div>
-                          )}
-
-                          {cameraActive && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleFacingMode();
-                              }}
-                              title="החלפת מצלמה קדמית/אחורית"
-                              className="p-2 rounded-full bg-stone-900/80 hover:bg-stone-800 backdrop-blur-xs border border-white/20 text-white shadow-md active:scale-95 transition-all cursor-pointer"
-                            >
-                              <SwitchCamera className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* Mode-Specific Action Buttons */}
                   {mode === 'camera' ? (
