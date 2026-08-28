@@ -40,6 +40,19 @@ export default function App() {
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
   const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
   const [resetCounter, setResetCounter] = useState<number>(0);
+  const [recipeFilterQuery, setRecipeFilterQuery] = useState<string | null>(null);
+  const [recipeTargetId, setRecipeTargetId] = useState<string | null>(null);
+
+  const handleOpenRecipe = (recipeIdOrQuery: string) => {
+    if (recipeIdOrQuery.startsWith('id:')) {
+      setRecipeTargetId(recipeIdOrQuery.replace('id:', ''));
+      setRecipeFilterQuery(null);
+    } else {
+      setRecipeFilterQuery(recipeIdOrQuery);
+      setRecipeTargetId(null);
+    }
+    setIsMealSuggestionsOpen(true);
+  };
 
   // Diary Entries
   const [diaryEntries, setDiaryEntries] = useState<MealLogEntry[]>(() => {
@@ -310,6 +323,7 @@ export default function App() {
                 }}
                 onSaveToDiary={handleSaveToDiary}
                 onExploreAlternative={handleExploreAlternative}
+                onOpenRecipe={handleOpenRecipe}
                 onScanBarcode={() => {
                   setAnalysisResult(null);
                   setErrorMsg(null);
@@ -385,8 +399,14 @@ export default function App() {
       {/* Meal Suggestions & Recipes Modal */}
       <MealSuggestionsModal
         isOpen={isMealSuggestionsOpen}
-        onClose={() => setIsMealSuggestionsOpen(false)}
+        onClose={() => {
+          setIsMealSuggestionsOpen(false);
+          setRecipeFilterQuery(null);
+          setRecipeTargetId(null);
+        }}
         currentPhase={currentPhase}
+        initialSearchQuery={recipeFilterQuery}
+        initialRecipeId={recipeTargetId}
       />
 
       {/* Medical Principles Modal */}

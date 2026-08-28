@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FoodAnalysisResult, TrafficLightStatus } from '../types';
+import { findMatchingRecipes, SiboRecipe } from '../data/siboMealSuggestions';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
   RotateCcw,
   X,
   Search,
+  Clock,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -23,6 +25,7 @@ interface TrafficLightResultProps {
   onSaveToDiary: (result: FoodAnalysisResult) => void;
   onExploreAlternative: (query: string) => void;
   onScanBarcode?: () => void;
+  onOpenRecipe?: (recipeIdOrQuery: string) => void;
   isSaved?: boolean;
   isModal?: boolean;
 }
@@ -33,6 +36,7 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   onSaveToDiary,
   onExploreAlternative,
   onScanBarcode,
+  onOpenRecipe,
   isSaved = false,
   isModal = true,
 }) => {
@@ -107,6 +111,11 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   };
 
   const currentCfg = isUnidentified ? statusConfig.RED : (statusConfig[result.status] || statusConfig.YELLOW);
+
+  const matchingRecipes = useMemo(() => {
+    const combinedText = `${result.foodName || ''} ${result.shortVerdict || ''} ${result.detailedExplanation || ''} ${(result.safeSubstitutions || []).join(' ')}`;
+    return findMatchingRecipes(combinedText, 3);
+  }, [result]);
 
   const content = (
     <div
@@ -413,6 +422,68 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                     <ArrowRight className="w-4 h-4 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity rtl:rotate-180" />
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* SIBO Tailored Recipes Banner & Direct Cards */}
+          {matchingRecipes.length > 0 && (
+            <div className="pt-5 space-y-3">
+              <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 text-white border-2 border-emerald-400 shadow-xl space-y-3 relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <ChefHat className="w-5 h-5 text-emerald-400" />
+                    <h4 className="text-base sm:text-lg font-black tracking-tight">
+                      מתכונים מותאמים ל-SIBO המכילים את מה שחיפשת! 🍲
+                    </h4>
+                  </div>
+                  {onOpenRecipe && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenRecipe(result.foodName)}
+                      className="px-3.5 py-1.5 rounded-full bg-emerald-400 hover:bg-emerald-300 text-stone-950 text-xs font-black transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm"
+                    >
+                      <span>ספר המתכונים המלא 📖</span>
+                      <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-xs sm:text-sm text-emerald-200">
+                  הנה מתכונים ביתיים מוכנים לניר עם המרכיבים המדויקים, ללא בצל, ללא שום ו-0% תסיסה:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                  {matchingRecipes.map((recipe) => (
+                    <button
+                      key={recipe.id}
+                      type="button"
+                      onClick={() => onOpenRecipe && onOpenRecipe(`id:${recipe.id}`)}
+                      className="p-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-right backdrop-blur-md transition-all cursor-pointer group flex flex-col justify-between space-y-2 hover:border-emerald-300 hover:scale-[1.02] active:scale-95 shadow-inner"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="bg-emerald-400/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold">
+                            {recipe.tag}
+                          </span>
+                          <span className="text-emerald-300/80 flex items-center gap-1 font-mono">
+                            <Clock className="w-3 h-3" />
+                            {recipe.prepTime}
+                          </span>
+                        </div>
+                        <h5 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                          {recipe.title}
+                        </h5>
+                      </div>
+                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs font-bold text-emerald-300">
+                        <span>צפי במתכון המלא</span>
+                        <span className="bg-emerald-400 text-stone-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] group-hover:translate-x-[-2px] transition-all">
+                          ←
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
