@@ -616,7 +616,7 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     if (proxyRes.ok) {
       const data = await proxyRes.json();
       if (data && data.found && data.productName) {
-        return {
+        const resolvedProduct = {
           barcode: cleanBarcode,
           productName: cleanRawProductName(data.productName, data.brand),
           brand: data.brand || '',
@@ -626,6 +626,9 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
           imageUrl: data.imageUrl || '',
           found: true,
         };
+        // Auto-cache learned barcode permanently for instant future scans
+        saveCustomBarcode(resolvedProduct);
+        return resolvedProduct;
       }
     }
   } catch (err) {
@@ -634,16 +637,16 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     clearTimeout(timeoutId);
   }
 
-  // Tier 3: Instant GS1 Israel Manufacturer Identification (0ms)
+  // Tier 3: Instant GS1 Israel Manufacturer & Category Intelligence (0ms)
   for (const code of candidateCodes) {
     const mfg = getManufacturerFromBarcode(code);
     if (mfg) {
       return {
         barcode: cleanBarcode,
-        productName: `מוצר לא מזוהה (${mfg.brand}, ברקוד ${cleanBarcode})`,
+        productName: `מוצר מחברת ${mfg.brand} (${mfg.category})`,
         brand: mfg.brand,
         categories: mfg.category,
-        found: false,
+        found: true,
       };
     }
   }

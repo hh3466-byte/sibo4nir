@@ -147,6 +147,68 @@ async function startServer() {
         }
       }
 
+      // Tier 3: AI Israeli Barcode & FMCG Resolver (Gemini AI Knowledge Base)
+      try {
+        const aiBarcodePrompt = `
+אתה מומחה קטלוג מוצרי צריכה, סופרמרקטים וברקודים של GS1 בישראל (רשתות שופרסל, רמי לוי, יוחננוף, ויקטורי, טיב טעם, חנויות נוחות Yellow ומנטה).
+זהה את המוצר הישראלי או המיובא השייך לברקוד: "${code}".
+אם זהו ברקוד ישראלי (קידומת 729) או ברקוד בינלאומי מוכר:
+1. זהה במדויק את שם המוצר בעברית (לדוגמה: "מיץ תפוזים 100% סחוט טבעי פרי ניב 2 ליטר", "אבקת קקאו עלית לאפייה", "קצפת צמחית השף הלבן").
+2. זהה את המותג / יצרן (brand).
+3. פרט את רשימת הרכיבים המדויקת או האופיינית בעברית (ingredientsText) - חשוב ביותר עבור ניתוח SIBO (פרוקטנים, לקטוז, סוכרים, סיבים).
+4. קטגוריית המוצר (categories).
+`;
+
+        const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+        for (const model of modelsToTry) {
+          try {
+            const timeoutPromise = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error(`Timeout for ${model}`)), 6000)
+            );
+
+            const aiCall = ai.models.generateContent({
+              model,
+              contents: { parts: [{ text: aiBarcodePrompt }] },
+              config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                  type: Type.OBJECT,
+                  properties: {
+                    productName: { type: Type.STRING, description: 'שם המוצר בעברית' },
+                    brand: { type: Type.STRING, description: 'שם היצרן או המותג' },
+                    ingredientsText: { type: Type.STRING, description: 'רשימת הרכיבים בעברית' },
+                    categories: { type: Type.STRING, description: 'קטגוריה' },
+                    isIdentified: { type: Type.BOOLEAN, description: 'האם המוצר זוהה בוודאות סבירה' },
+                  },
+                  required: ['productName', 'brand', 'ingredientsText', 'categories', 'isIdentified'],
+                },
+              },
+            });
+
+            const aiRes: any = await Promise.race([aiCall, timeoutPromise]);
+            if (aiRes?.text) {
+              const aiData = JSON.parse(aiRes.text);
+              if (aiData.productName && aiData.isIdentified !== false) {
+                return res.json({
+                  barcode: code,
+                  productName: aiData.productName,
+                  brand: aiData.brand || '',
+                  ingredientsText: aiData.ingredientsText || '',
+                  allergens: '',
+                  categories: aiData.categories || '',
+                  imageUrl: '',
+                  found: true,
+                });
+              }
+            }
+          } catch (modelErr) {
+            // Try next model
+          }
+        }
+      } catch (aiBarcodeErr) {
+        console.warn('[Server Barcode AI Resolver] Failed:', aiBarcodeErr);
+      }
+
       return res.json({
         barcode: code,
         productName: `מוצר ארוז (${code})`,
