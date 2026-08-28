@@ -492,9 +492,33 @@ function cleanRawProductName(rawName: string, brand?: string): string {
 }
 
 /**
+ * GS1 Global Country Prefixes for instant identification of imported food products worldwide
+ */
+export const GLOBAL_GS1_COUNTRY_PREFIXES: { match: (c: string) => boolean; country: string; defaultCategory: string }[] = [
+  { match: (c) => /^(800|801|802|803|804|805|806|807|808|809|810|811|812|813|814|815|816|817|818|819|820|821|822|823|824|825|826|827|828|829|830|831|832|833|834|835|836|837|838|839)/.test(c), country: 'איטליה (Italy)', defaultCategory: 'מוצר איטלקי מיובא (שמן זית / פסטה / גבינות קשות / שימורי טונה)' },
+  { match: (c) => /^(300|301|302|303|304|305|306|307|308|309|310|311|312|313|314|315|316|317|318|319|320|321|322|323|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352|353|354|355|356|357|358|359|360|361|362|363|364|365|366|367|368|369|370|371|372|373|374|375|376|377|378|379)/.test(c), country: 'צרפת (France)', defaultCategory: 'מוצר צרפתי מיובא (גבינות / חרדל דיז׳ון / שוקולד)' },
+  { match: (c) => /^(400|401|402|403|404|405|406|407|408|409|410|411|412|413|414|415|416|417|418|419|420|421|422|423|424|425|426|427|428|429|430|431|432|433|434|435|436|437|438|439|440)/.test(c), country: 'גרמניה (Germany)', defaultCategory: 'מוצר גרמני מיובא (מוצרים ללא גלוטן / שיבולת שועל / תה צמחים)' },
+  { match: (c) => /^(540|541|542|543|544|545|546|547|548|549)/.test(c), country: 'בלגיה ולוקסמבורג (Belgium)', defaultCategory: 'מוצר בלגי מיובא (משקאות אלפרו Alpro / שוקולד בלגי)' },
+  { match: (c) => /^(760|761|762|763|764|765|766|767|768|769)/.test(c), country: 'שווייץ (Switzerland)', defaultCategory: 'מוצר שווייצרי מיובא (קפה נספרסו Nespresso / שוקולד לינדט Lindt)' },
+  { match: (c) => /^(840|841|842|843|844|845|846|847|848|849)/.test(c), country: 'ספרד (Spain)', defaultCategory: 'מוצר ספרדי מיובא (שמן זית / זיתים / שימורי דגים)' },
+  { match: (c) => /^(500|501|502|503|504|505|506|507|508|509)/.test(c), country: 'בריטניה (UK)', defaultCategory: 'מוצר בריטי מיובא (תה אנגלי / רטבים וממרחים)' },
+  { match: (c) => /^(870|871|872|873|874|875|876|877|878|879)/.test(c), country: 'הולנד (Netherlands)', defaultCategory: 'מוצר הולנדי מיובא (גבינות גאודה / קקאו הולנדי)' },
+  { match: (c) => /^(570|571|572|573|574|575|576|577|578|579)/.test(c), country: 'דנמרק (Denmark)', defaultCategory: 'מוצר דני מיובא (חמאת לורפאק Lurpak / גבינות ארלה Arla)' },
+  { match: (c) => /^(730|731|732|733|734|735|736|737|738|739)/.test(c), country: 'שוודיה (Sweden)', defaultCategory: 'מוצר שוודי מיובא (משקאות שיבולת שועל Oatly)' },
+  { match: (c) => /^(750)/.test(c), country: 'מקסיקו (Mexico)', defaultCategory: 'מוצר מקסיקני מיובא (בירה קורונה Corona)' },
+  { match: (c) => /^(885)/.test(c), country: 'תאילנד (Thailand)', defaultCategory: 'מוצר תאילנדי מיובא (חלב קוקוס Aroy-D / אטריות אורז)' },
+  { match: (c) => /^(890|891)/.test(c), country: 'הודו (India)', defaultCategory: 'מוצר הודי מיובא (אורז בסמטי Tilda / תבלינים)' },
+  { match: (c) => /^(893)/.test(c), country: 'וייטנאם (Vietnam)', defaultCategory: 'מוצר וייטנאמי מיובא (דפי אורז טהורים / אטריות אורז)' },
+  { match: (c) => /^(450|451|452|453|454|455|456|457|458|459|490|491|492|493|494|495|496|497|498|499)/.test(c), country: 'יפן (Japan)', defaultCategory: 'מוצר יפני מיובא (אצות נורי / תה ירוק מאצ׳ה)' },
+  { match: (c) => /^(000|001|002|003|004|005|006|007|008|009|010|011|012|013|014|015|016|017|018|019|020|021|022|023|024|025|026|027|028|029|030|031|032|033|034|035|036|037|038|039|040|041|042|043|044|045|046|047|048|049|050|051|052|053|054|055|056|057|058|059|060|061|062|063|064|065|066|067|068|069|070|071|072|073|074|075|076|077|078|079|080|081|082|083|084|085|086|087|088|089|090|091|092|093|094|095|096|097|098|099|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119|120|121|122|123|124|125|126|127|128|129|130|131|132|133|134|135|136|137|138|139)/.test(c), country: 'ארצות הברית וקנדה (USA / Canada)', defaultCategory: 'מוצר אמריקאי מיובא (UPC)' },
+  { match: (c) => /^(930|931|932|933|934|935|936|937|938|939)/.test(c), country: 'אוסטרליה (Australia)', defaultCategory: 'מוצר אוסטרלי מיובא' },
+];
+
+/**
  * Identify manufacturer brand from GS1 prefix if product is not indexed
  */
 export function getManufacturerFromBarcode(barcode: string): { brand: string; category: string } | null {
+  // 1. Check Specific Israeli Manufacturer Prefixes
   for (const prefix of Object.keys(ISRAELI_MANUFACTURER_PREFIXES)) {
     if (barcode.startsWith(prefix)) {
       return {
@@ -503,12 +527,25 @@ export function getManufacturerFromBarcode(barcode: string): { brand: string; ca
       };
     }
   }
+
+  // 2. Generic Israeli GS1 729
   if (barcode.startsWith('729')) {
     return {
       brand: 'יצרן ישראלי מורשה (GS1 ישראל)',
       category: 'מוצר מזון ישראלי',
     };
   }
+
+  // 3. Global GS1 Country Prefixes for International & Imported Products
+  for (const item of GLOBAL_GS1_COUNTRY_PREFIXES) {
+    if (item.match(barcode)) {
+      return {
+        brand: `יבוא מחו״ל — ${item.country}`,
+        category: item.defaultCategory,
+      };
+    }
+  }
+
   return null;
 }
 
@@ -637,7 +674,41 @@ export async function fetchProductByBarcode(barcode: string): Promise<BarcodePro
     clearTimeout(timeoutId);
   }
 
-  // Tier 3: Instant GS1 Israel Manufacturer & Category Intelligence (0ms)
+  // Tier 2.5: Direct browser fallback to Open Food Facts World (CORS enabled worldwide)
+  try {
+    const directOffRes = await fetch(`https://world.openfoodfacts.org/api/v2/product/${cleanBarcode}.json`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (directOffRes.ok) {
+      const offData = await directOffRes.json();
+      if (offData && offData.status === 1 && offData.product) {
+        const p = offData.product;
+        const productName = p.product_name_he || p.product_name || p.product_name_en || p.generic_name || '';
+        const brand = p.brands || p.brand || '';
+        const ingredientsText = p.ingredients_text_he || p.ingredients_text || p.ingredients_text_en || '';
+        const allergens = p.allergens_he || p.allergens || p.allergens_en || '';
+        const categories = p.categories_he || p.categories || p.categories_en || '';
+        const imageUrl = p.image_url || p.image_front_url || '';
+
+        if (productName || ingredientsText) {
+          const resolvedProduct = {
+            barcode: cleanBarcode,
+            productName: cleanRawProductName(productName, brand),
+            brand,
+            ingredientsText,
+            allergens,
+            categories,
+            imageUrl,
+            found: true,
+          };
+          saveCustomBarcode(cleanBarcode, resolvedProduct);
+          return resolvedProduct;
+        }
+      }
+    }
+  } catch (directErr) {}
+
+  // Tier 3: Instant GS1 Israel & Global Country Origin Intelligence (0ms)
   for (const code of candidateCodes) {
     const mfg = getManufacturerFromBarcode(code);
     if (mfg) {

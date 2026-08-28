@@ -649,6 +649,74 @@ ${imageBase64 ? 'זהה מתוך התמונה את המצרכים הבטוחים
     }
   });
 
+  // API: Global Barcode Lookup (Open Food Facts Israel & Worldwide API + Imported Goods)
+  app.get('/api/barcode/:barcode', async (req, res) => {
+    try {
+      const barcode = req.params.barcode.trim().replace(/[^0-9]/g, '');
+      if (!barcode) {
+        return res.status(400).json({ found: false, error: 'ברקוד לא תקין' });
+      }
+
+      // Try Open Food Facts World & Israel APIs
+      const urls = [
+        `https://il.openfoodfacts.org/api/v2/product/${barcode}.json`,
+        `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
+        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
+      ];
+
+      for (const url of urls) {
+        try {
+          const fetchController = new AbortController();
+          const timeout = setTimeout(() => fetchController.abort(), 3500);
+          const offRes = await fetch(url, {
+            signal: fetchController.signal,
+            headers: {
+              'User-Agent': 'SiboSafeNirApp/1.0 (https://sibo4nir-1.onrender.com; hagai.hilman@gmail.com)',
+              Accept: 'application/json',
+            },
+          });
+          clearTimeout(timeout);
+
+          if (offRes.ok) {
+            const data = await offRes.json();
+            if (data.status === 1 && data.product) {
+              const p = data.product;
+              const productName = p.product_name_he || p.product_name || p.product_name_en || p.generic_name || '';
+              const brand = p.brands || p.brand || '';
+              const ingredientsText = p.ingredients_text_he || p.ingredients_text || p.ingredients_text_en || '';
+              const allergens = p.allergens_he || p.allergens || p.allergens_en || '';
+              const categories = p.categories_he || p.categories || p.categories_en || '';
+              const imageUrl = p.image_url || p.image_front_url || '';
+
+              if (productName || ingredientsText) {
+                return res.json({
+                  barcode,
+                  productName: productName || `מוצר מיובא (${brand})`,
+                  brand,
+                  ingredientsText,
+                  allergens,
+                  categories,
+                  imageUrl,
+                  found: true,
+                });
+              }
+            }
+          }
+        } catch (fetchErr) {
+          // continue to next URL
+        }
+      }
+
+      return res.json({
+        barcode,
+        found: false,
+      });
+    } catch (err: any) {
+      console.warn('[Barcode API] Error:', err);
+      return res.status(500).json({ barcode: req.params.barcode, found: false });
+    }
+  });
+
   // API: SIBO AI Clinical Consultation & Q&A
   app.post('/api/sibo-consult', async (req, res) => {
     try {

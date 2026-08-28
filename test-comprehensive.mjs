@@ -388,6 +388,25 @@ assert(osemPrefix?.brand?.includes('אסם'), 'Unindexed 72900002... correctly r
 const straussPrefix = getManufacturerFromBarcode('7290000477777');
 assert(straussPrefix?.brand?.includes('שטראוס'), 'Unindexed 72900004... correctly resolves to Strauss Elite');
 
+// Test GS1 Global Country Origin Resolution for Imported Products
+const italyPrefix = getManufacturerFromBarcode('8001234567890');
+assert(italyPrefix?.brand?.includes('איטליה'), 'Imported Italian barcode (800...) correctly resolves to Italy');
+
+const francePrefix = getManufacturerFromBarcode('3001234567890');
+assert(francePrefix?.brand?.includes('צרפת'), 'Imported French barcode (300...) correctly resolves to France');
+
+const germanyPrefix = getManufacturerFromBarcode('4001234567890');
+assert(germanyPrefix?.brand?.includes('גרמניה'), 'Imported German barcode (400...) correctly resolves to Germany');
+
+const usaPrefix = getManufacturerFromBarcode('012345678901');
+assert(usaPrefix?.brand?.includes('ארצות הברית'), 'Imported USA barcode (012...) correctly resolves to USA');
+
+const japanPrefix = getManufacturerFromBarcode('4901234567890');
+assert(japanPrefix?.brand?.includes('יפן'), 'Imported Japanese barcode (490...) correctly resolves to Japan');
+
+const belgiumPrefix = getManufacturerFromBarcode('5411234567890');
+assert(belgiumPrefix?.brand?.includes('בלגיה'), 'Imported Belgian barcode (541...) correctly resolves to Belgium');
+
 // -----------------------------------------------------------------------------
 // SUMMARY
 // -----------------------------------------------------------------------------
