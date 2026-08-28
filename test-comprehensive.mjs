@@ -10,6 +10,7 @@ import {
   COMMON_ISRAELI_BARCODES,
   ISRAELI_MANUFACTURER_PREFIXES,
   fetchProductByBarcode,
+  getManufacturerFromBarcode,
 } from './src/services/barcodeService.ts';
 import {
   analyzeFoodClinically,
@@ -336,6 +337,56 @@ assertEqual(eggCheck.status, 'GREEN', 'Hard boiled egg + olive oil is 100% GREEN
 
 const tunaCheck = analyzeFoodClinically('טונה בשמן זית ומלפפון', 'phase1_strict');
 assertEqual(tunaCheck.status, 'GREEN', 'Tuna in olive oil + cucumber is 100% GREEN for quick satiety');
+
+// -----------------------------------------------------------------------------
+// 6. CONSECUTIVE MULTI-PRODUCT SCANNING & BARCODE RESOLUTION PIPELINE
+// -----------------------------------------------------------------------------
+console.log('\n🔹 6. Testing Consecutive Multi-Product Scanning & Barcode Resolution Pipeline:');
+
+// Test consecutive 5-product scans in a row (Zero State Leakage)
+const consecutiveItems = [
+  { input: 'מלפפון טרי', expectedStatus: 'GREEN' },
+  { input: 'חזה עוף בשמן זית', expectedStatus: 'GREEN' },
+  { input: 'שום ובצל מטוגנים', expectedStatus: 'RED' },
+  { input: 'מרק עוף עם גזר וקישוא', expectedStatus: 'GREEN' },
+  { input: 'בירה גולדסטאר', expectedStatus: 'RED' },
+];
+
+for (let i = 0; i < consecutiveItems.length; i++) {
+  const item = consecutiveItems[i];
+  const res = analyzeFoodClinically(item.input, 'phase1_strict');
+  assertEqual(res.status, item.expectedStatus, `Consecutive scan ${i + 1}/5: "${item.input}" returned ${item.expectedStatus}`);
+}
+
+// Test barcode lookups via fetchProductByBarcode logic
+const testBarcodes = [
+  { code: '7290119374106', expectedNameKeyword: 'קפה' },
+  { code: '7293110003693', expectedNameKeyword: 'תה' },
+  { code: '7290000494443', expectedNameKeyword: 'פרי מור' },
+  { code: '7290000045053', expectedNameKeyword: 'חלב' },
+  { code: '7290000185012', expectedNameKeyword: 'גולדסטאר' },
+  { code: '8004030010011', expectedNameKeyword: 'טונה' },
+  { code: '5411188130833', expectedNameKeyword: 'אלפרו' },
+];
+
+for (const tb of testBarcodes) {
+  const product = COMMON_ISRAELI_BARCODES[tb.code] || ISRAELI_SUPERMARKET_CATALOG[tb.code];
+  assert(!!product, `Barcode ${tb.code} is present in supermarket catalog`);
+  assert(
+    (product?.productName || '').includes(tb.expectedNameKeyword) || (product?.brand || '').includes(tb.expectedNameKeyword),
+    `Barcode ${tb.code} matches expected keyword "${tb.expectedNameKeyword}"`
+  );
+}
+
+// Test GS1 Israeli Prefix Resolution for unindexed products
+const tnuvaPrefix = getManufacturerFromBarcode('7290000099999');
+assert(tnuvaPrefix?.brand?.includes('תנובה'), 'Unindexed 72900000... correctly resolves to Tnuva');
+
+const osemPrefix = getManufacturerFromBarcode('7290000288888');
+assert(osemPrefix?.brand?.includes('אסם'), 'Unindexed 72900002... correctly resolves to Osem');
+
+const straussPrefix = getManufacturerFromBarcode('7290000477777');
+assert(straussPrefix?.brand?.includes('שטראוס'), 'Unindexed 72900004... correctly resolves to Strauss Elite');
 
 // -----------------------------------------------------------------------------
 // SUMMARY

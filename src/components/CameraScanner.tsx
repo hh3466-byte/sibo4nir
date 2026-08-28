@@ -619,7 +619,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         barcodeScanLoopRef.current = null;
       }
     };
-  }, [mode, stagedImage, isLoading, getZxingReader, handleBarcodeLookup]);
+  }, [mode, stagedImage, isLoading, getZxingReader, handleBarcodeLookup, resetTrigger]);
 
   // High-Resolution Native Mobile Photo Scan for Barcode
   const handleBarcodeFileCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {

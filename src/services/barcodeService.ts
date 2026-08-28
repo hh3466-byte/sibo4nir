@@ -494,7 +494,7 @@ function cleanRawProductName(rawName: string, brand?: string): string {
 /**
  * Identify manufacturer brand from GS1 prefix if product is not indexed
  */
-function getManufacturerFromBarcode(barcode: string): { brand: string; category: string } | null {
+export function getManufacturerFromBarcode(barcode: string): { brand: string; category: string } | null {
   for (const prefix of Object.keys(ISRAELI_MANUFACTURER_PREFIXES)) {
     if (barcode.startsWith(prefix)) {
       return {
