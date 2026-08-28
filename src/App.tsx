@@ -38,6 +38,8 @@ export default function App() {
   const [isInstallShareOpen, setIsInstallShareOpen] = useState(false);
   const [isHungerWizardOpen, setIsHungerWizardOpen] = useState(false);
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
+  const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
+  const [resetCounter, setResetCounter] = useState<number>(0);
 
   // Diary Entries
   const [diaryEntries, setDiaryEntries] = useState<MealLogEntry[]>(() => {
@@ -79,7 +81,6 @@ export default function App() {
     }
   }, [diaryEntries]);
 
-  const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   // Cancel ongoing analysis
@@ -295,6 +296,7 @@ export default function App() {
               isLoading={isLoading}
               onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
               initialMode={scannerMode}
+              resetTrigger={resetCounter}
             />
 
             {/* Analysis Result Pop-up Modal */}
@@ -304,12 +306,14 @@ export default function App() {
                 onReset={() => {
                   setAnalysisResult(null);
                   setErrorMsg(null);
+                  setResetCounter((c) => c + 1);
                 }}
                 onSaveToDiary={handleSaveToDiary}
                 onExploreAlternative={handleExploreAlternative}
                 onScanBarcode={() => {
                   setAnalysisResult(null);
                   setErrorMsg(null);
+                  setResetCounter((c) => c + 1);
                   setScannerMode('barcode');
                 }}
                 isSaved={isSavedInDiary}

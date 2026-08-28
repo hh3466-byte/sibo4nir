@@ -34,6 +34,7 @@ interface CameraScannerProps {
   isLoading: boolean;
   onOpenAllowedForbidden?: () => void;
   initialMode?: 'camera' | 'barcode' | 'upload' | 'text';
+  resetTrigger?: number;
 }
 
 export const CameraScanner: React.FC<CameraScannerProps> = ({
@@ -43,6 +44,7 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   isLoading,
   onOpenAllowedForbidden,
   initialMode = 'camera',
+  resetTrigger,
 }) => {
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024 && !('ontouchstart' in window);
   const [isCameraTurnedOnByUser, setIsCameraTurnedOnByUser] = useState<boolean>(() => !isDesktop);
@@ -281,6 +283,22 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
       stopCameraStream();
     }
   }, [mode, facingMode, isCameraTurnedOnByUser, startCameraStream, stopCameraStream]);
+
+  // Handle Reset Signal from parent (when user dismisses modal or resets to scan next item)
+  useEffect(() => {
+    if (resetTrigger) {
+      setStagedImage(null);
+      setScannedBarcodeSuccess(null);
+      setBarcodeError(null);
+      isProcessingBarcodeRef.current = false;
+      if (mode === 'barcode' || mode === 'camera') {
+        isBarcodeScanningActiveRef.current = true;
+        if (videoRef.current && videoRef.current.paused) {
+          videoRef.current.play().then(() => setIsVideoPaused(false)).catch(() => {});
+        }
+      }
+    }
+  }, [resetTrigger, mode]);
 
   // Stop camera only when unmounting the entire component
   useEffect(() => {
@@ -752,7 +770,9 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
   // User confirmed the photo -> send for SIBO analysis!
   const handleConfirmStagedImage = () => {
     if (!stagedImage) return;
-    onAnalyze({ imageBase64: stagedImage, mimeType: 'image/jpeg' });
+    const imgToSend = stagedImage;
+    setStagedImage(null);
+    onAnalyze({ imageBase64: imgToSend, mimeType: 'image/jpeg' });
   };
 
   // User discarded the photo -> return back to live camera stream!
@@ -770,14 +790,14 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
     e.target.value = '';
   };
 
-  // Process file to compressed base64 for instant upload
+  // Process file to compressed base64 for instant upload (High-Res 1920px for Hebrew OCR)
   const processImageFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const rawDataUrl = event.target?.result as string;
       const img = new Image();
       img.onload = () => {
-        const MAX_DIM = 1280;
+        const MAX_DIM = 1920; // Full HD for sharp Hebrew text OCR on bottles & packages
         let width = img.width;
         let height = img.height;
 
@@ -796,15 +816,20 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
+          setStagedImage(null);
           // ⚡ 1-TAP DIRECT ANALYSIS FOR CAMERA PHOTO!
           onAnalyze({ imageBase64: compressedDataUrl, mimeType: 'image/jpeg' });
         } else {
+          setStagedImage(null);
           onAnalyze({ imageBase64: rawDataUrl, mimeType: 'image/jpeg' });
         }
       };
       img.onerror = () => {
+        setStagedImage(null);
         onAnalyze({ imageBase64: rawDataUrl, mimeType: 'image/jpeg' });
       };
       img.src = rawDataUrl;

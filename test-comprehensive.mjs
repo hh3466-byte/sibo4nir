@@ -126,10 +126,33 @@ const fuzeTea = COMMON_ISRAELI_BARCODES['7293110003693'];
 assert(!!fuzeTea, 'Found Fuze Tea barcode 7293110003693');
 assert(fuzeTea?.productName?.includes('תה קר') || fuzeTea?.productName?.includes('Fuze'), 'Fuze Tea name is correct');
 
+// Test Pri Mor Orange Juice Barcode
+const priMorBarcode = ISRAELI_SUPERMARKET_CATALOG['7290000494443'];
+assert(!!priMorBarcode, 'Found Pri Mor 2L Orange Juice barcode 7290000494443');
+assert(priMorBarcode?.productName?.includes('פרי מור'), 'Pri Mor Orange Juice name is correct');
+
+// Test Pri Niv Orange Juice Barcode
+const priNivBarcode = ISRAELI_SUPERMARKET_CATALOG['7290013092018'];
+assert(!!priNivBarcode, 'Found Pri Niv 2L Orange Juice barcode 7290013092018');
+assert(priNivBarcode?.productName?.includes('פרי ניב'), 'Pri Niv Orange Juice name is correct');
+
+// Test Elite Cocoa Powder Barcode
+const cocoaBarcode = ISRAELI_SUPERMARKET_CATALOG['7290000062024'];
+assert(!!cocoaBarcode, 'Found Elite Pure Cocoa Powder barcode 7290000062024');
+assert(cocoaBarcode?.productName?.includes('קקאו'), 'Elite Cocoa name is correct');
+
+// Test Rich's Plant Whipping Cream Barcode
+const richsBarcode = ISRAELI_SUPERMARKET_CATALOG['7290000096234'];
+assert(!!richsBarcode, 'Found Richs Plant Whipping Cream barcode 7290000096234');
+assert(richsBarcode?.productName?.includes('ריץ'), 'Richs Whip name is correct');
+
 // Test GS1 Manufacturer recognition
 assert(!!ISRAELI_MANUFACTURER_PREFIXES['72900000'], 'Tnuva prefix 72900000 recognized');
 assert(!!ISRAELI_MANUFACTURER_PREFIXES['72900002'], 'Osem prefix 72900002 recognized');
 assert(!!ISRAELI_MANUFACTURER_PREFIXES['72900004'], 'Strauss Elite prefix 72900004 recognized');
+assert(!!ISRAELI_MANUFACTURER_PREFIXES['729000049'], 'Pri Mor prefix 729000049 recognized');
+assert(!!ISRAELI_MANUFACTURER_PREFIXES['729001309'], 'Pri Niv prefix 729001309 recognized');
+assert(!!ISRAELI_MANUFACTURER_PREFIXES['729000009'], 'Richs Parve prefix 729000009 recognized');
 
 // -----------------------------------------------------------------------------
 // 4. SIBO CLINICAL ALGORITHM ENGINE (Phase 1 & Phase 2)
@@ -208,9 +231,9 @@ const coronaRes = analyzeFoodClinically('בירה קורונה אקסטרה', 'p
 assertEqual(coronaRes.status, 'RED', 'Corona Beer is strictly RED for Nir');
 
 // Test Alpro Almond No Sugars (Safe Dairy Alternative)
-const alpro = ISRAELI_SUPERMARKET_CATALOG['5411188115489'];
-assert(!!alpro, 'Found Alpro Almond No Sugars barcode 5411188115489');
-assert(alpro?.productName?.includes('שקדים ללא סוכר'), 'Alpro Almond name is correct');
+const alpro = ISRAELI_SUPERMARKET_CATALOG['5411188130833'];
+assert(!!alpro, 'Found Alpro Almond No Sugars barcode 5411188130833');
+assert(alpro?.productName?.includes('שקדים') || alpro?.productName?.includes('אלפרו'), 'Alpro Almond name is correct');
 
 // Test Rio Mare Tuna in Olive Oil (Zero FODMAP protein)
 const rioMare = ISRAELI_SUPERMARKET_CATALOG['8004030010011'];
@@ -238,6 +261,22 @@ const ingredientsTest = analyzeFoodClinically(
 );
 assertEqual(ingredientsTest.status, 'RED', 'Ingredient list with Garlic & Apple Juice correctly flags RED');
 assert(ingredientsTest.ingredientsBreakdown?.length > 0, 'Ingredient breakdown contains parsed items');
+
+// Test Fresh Orange Juices, Pure Cocoa, and Plant Whipping Cream clinical classification
+const priMorTest = analyzeFoodClinically('מיץ תפוזים 100% סחוט טרי פרי מור', 'phase1_strict');
+assertEqual(priMorTest.status, 'YELLOW', 'Pri Mor Fresh Orange Juice is YELLOW (limited to 100ml / half cup)');
+
+const priNivTest = analyzeFoodClinically('מיץ תפוזים סחוט טבעי פרי ניב', 'phase1_strict');
+assertEqual(priNivTest.status, 'YELLOW', 'Pri Niv Fresh Orange Juice is YELLOW');
+
+const cocoaTest = analyzeFoodClinically('אבקת קקאו עלית 100% טהור לאפייה', 'phase1_strict');
+assertEqual(cocoaTest.status, 'GREEN', 'Pure Cocoa Powder is GREEN (0 lactose, low FODMAP)');
+
+const whipTest = analyzeFoodClinically('קצפת צמחית להקצפה ריץ פרווה', 'phase1_strict');
+assertEqual(whipTest.status, 'GREEN', 'Plant-based Whipping Cream (Richs) is GREEN (dairy free, 0 lactose)');
+
+const chefLavanWhip = analyzeFoodClinically('קצפת צמחית השף הלבן פרווה', 'phase1_strict');
+assertEqual(chefLavanWhip.status, 'GREEN', 'Chef Lavan Plant-based Whipping Cream is GREEN');
 
 // Test Unidentified product fallback (Strict safety & friendly guidance for Nir)
 const unknownRes = analyzeFoodClinically('מוצר ארוז לא מזוהה 9999999', 'phase1_strict');
