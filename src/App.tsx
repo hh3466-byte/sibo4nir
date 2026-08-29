@@ -16,6 +16,7 @@ import { AllowedForbiddenModal } from './components/AllowedForbiddenModal';
 import { MealSuggestionsModal } from './components/MealSuggestionsModal';
 import { InstallShareModal } from './components/InstallShareModal';
 import { HungerRescueWizard } from './components/HungerRescueWizard';
+import { ChefPassModal } from './components/ChefPassModal';
 import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug, ShoppingCart, ListChecks, ChefHat, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
   const [isMealSuggestionsOpen, setIsMealSuggestionsOpen] = useState(false);
   const [isInstallShareOpen, setIsInstallShareOpen] = useState(false);
   const [isHungerWizardOpen, setIsHungerWizardOpen] = useState(false);
+  const [isChefPassOpen, setIsChefPassOpen] = useState(false);
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
   const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
   const [resetCounter, setResetCounter] = useState<number>(0);
@@ -256,6 +258,7 @@ export default function App() {
         onOpenHelp={() => setIsPrinciplesModalOpen(true)}
         onOpenInstallShare={() => setIsInstallShareOpen(true)}
         onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
+        onOpenChefPass={() => setIsChefPassOpen(true)}
       />
 
       {/* Main App Content Container */}
@@ -456,6 +459,12 @@ export default function App() {
       <InstallShareModal
         isOpen={isInstallShareOpen}
         onClose={() => setIsInstallShareOpen(false)}
+      />
+
+      {/* 👨‍🍳 Chef Pass for Restaurants & Waiters */}
+      <ChefPassModal
+        isOpen={isChefPassOpen}
+        onClose={() => setIsChefPassOpen(false)}
       />
 
       {/* Footer */}

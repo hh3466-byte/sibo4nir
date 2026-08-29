@@ -28,6 +28,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 }) => {
   const [activeScanMode, setActiveScanMode] = useState<'idle' | 'camera' | 'barcode'>('idle');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fridgeShelfInputRef = useRef<HTMLInputElement | null>(null);
 
   const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,6 +46,32 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
       reader.onload = () => {
         onAnalyze({
           imageBase64: reader.result as string,
+          mimeType: file.type || 'image/jpeg',
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+    setActiveScanMode('idle');
+    e.target.value = '';
+  };
+
+  const handleFridgeShelfPhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const optimizedBase64 = await optimizeImageForOcr(file);
+      onAnalyze({
+        imageBase64: optimizedBase64,
+        textPrompt: 'צלמתי את המקרר / המדף שלי. זהה את כל המצרכים הבטוחים ל-SIBO שנראים בתמונה, והצע לי 2-3 רעיונות קלים ומהירים ב-3 דקות של שף דלה פופו להכנה ממה שיש!',
+        mimeType: 'image/jpeg',
+      });
+    } catch (err) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onAnalyze({
+          imageBase64: reader.result as string,
+          textPrompt: 'צלמתי את המקרר / המדף שלי. זהה את כל המצרכים הבטוחים ל-SIBO שנראים בתמונה, והצע לי 2-3 רעיונות קלים ומהירים ב-3 דקות של שף דלה פופו להכנה ממה שיש!',
           mimeType: file.type || 'image/jpeg',
         });
       };
@@ -187,16 +214,50 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
               </span>
             </button>
           </div>
+
+          {/* Option 3: 📸 צילום מקרר / מדף מזווה לקבלת רעיונות מיידיים לארוחה בטוחה */}
+          <button
+            type="button"
+            onClick={() => fridgeShelfInputRef.current?.click()}
+            className="w-full p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 hover:bg-emerald-100 text-stone-900 border border-emerald-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center justify-between gap-2.5 group"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-emerald-800 text-white flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                🧊
+              </div>
+              <div className="text-right min-w-0">
+                <span className="text-xs sm:text-sm font-black text-emerald-950 block truncate">
+                  צילום מקרר / מדף במטבח (רעיון לארוחה מהירה) 📸
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-stone-500 font-bold block truncate">
+                  צלמי את המקרר או המדף וה-AI יציע לך מנות בטוחות ממה שיש
+                </span>
+              </div>
+            </div>
+            <span className="text-xs font-black text-emerald-900 bg-white px-2.5 py-1 rounded-xl border border-emerald-200 shadow-2xs shrink-0">
+              צלמי ➔
+            </span>
+          </button>
         </div>
       )}
 
-      {/* Hidden File Input for Camera Capture */}
+      {/* Hidden File Input for Product Ingredients Capture */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         capture="environment"
         onChange={handlePhotoCapture}
+        className="hidden"
+      />
+
+      {/* Hidden File Input for Fridge/Shelf Capture */}
+      <input
+        ref={fridgeShelfInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFridgeShelfPhotoCapture}
         className="hidden"
       />
 

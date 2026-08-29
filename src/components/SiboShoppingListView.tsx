@@ -79,6 +79,53 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [onlyCheckedFilter, setOnlyCheckedFilter] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isEditingWeeklyBasket, setIsEditingWeeklyBasket] = useState(false);
+  const [basketToast, setBasketToast] = useState<string | null>(null);
+
+  // ⚡ Customizable Weekly Base Basket (Editable by Nir!)
+  const DEFAULT_WEEKLY_BASKET = [
+    'd-1', // חלב שקדים ללא סוכר
+    'o-1', // שמן זית כתית מעולה
+    'e-1', // ביצים טריות
+    'm-1', // חזה עוף טרי
+    'v-1', // מלפפונים
+    'b-1', // פריכיות אורז
+    's-1', // תפוצ'יפס טבעי מלח
+    'b-3', // קורנפלור
+    'b-4', // אינסטנט פודינג וניל סוויטנגו
+  ];
+
+  const [weeklyBasketIds, setWeeklyBasketIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('sibo_nir_weekly_basket');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_WEEKLY_BASKET;
+  });
+
+  const handleLoadWeeklyBasket = () => {
+    const newChecked = { ...checkedIds };
+    weeklyBasketIds.forEach((id) => {
+      newChecked[id] = true;
+    });
+    setCheckedIds(newChecked);
+    try {
+      localStorage.setItem('sibo_shopping_checked_v2', JSON.stringify(newChecked));
+    } catch {}
+    setBasketToast(`נטענו ${weeklyBasketIds.length} מוצרי בסיס קבועים! ✨`);
+    setTimeout(() => setBasketToast(null), 3000);
+  };
+
+  const handleToggleWeeklyBasketItem = (id: string) => {
+    const updated = weeklyBasketIds.includes(id)
+      ? weeklyBasketIds.filter((itemId) => itemId !== id)
+      : [...weeklyBasketIds, id];
+    setWeeklyBasketIds(updated);
+    try {
+      localStorage.setItem('sibo_nir_weekly_basket', JSON.stringify(updated));
+    } catch {}
+  };
+
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -358,24 +405,43 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     <div className="max-w-4xl mx-auto p-1.5 sm:p-3 space-y-3 animate-fadeIn pb-32 text-stone-900" dir="rtl">
       {/* 🌟 Slim, Clean Top Header Bar (No bulky black box!) */}
       <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-stone-100/90 backdrop-blur-sm rounded-2xl border border-stone-200 text-stone-900 shadow-2xs">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           {onBackToScanner && (
             <button
               type="button"
               onClick={onBackToScanner}
-              className="px-2.5 py-1.5 bg-white hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold transition-colors border border-stone-200 flex items-center gap-1 cursor-pointer shadow-2xs"
+              className="px-2.5 py-1.5 bg-white hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold transition-colors border border-stone-200 flex items-center gap-1 cursor-pointer shadow-2xs shrink-0"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>חזרה</span>
             </button>
           )}
-          <h2 className="text-xs sm:text-sm font-black tracking-tight text-stone-900 flex items-center gap-1.5">
+          <h2 className="text-xs sm:text-sm font-black tracking-tight text-stone-900 flex items-center gap-1.5 truncate">
             <span>רשימת קניות 📋</span>
-            <span className="text-[10px] text-stone-500 font-bold hidden sm:inline">(500+ מוצרים ומותגים)</span>
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* ⚡ Weekly Basket 1-Tap Load & Edit Button */}
+          <div className="flex items-center bg-white rounded-xl border border-emerald-300 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={handleLoadWeeklyBasket}
+              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-black text-xs flex items-center gap-1 cursor-pointer transition-colors"
+              title="טען בלחיצה אחת את כל מוצרי הבסיס השבועיים של ניר"
+            >
+              <span>⚡ סל שבועי ({weeklyBasketIds.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditingWeeklyBasket(true)}
+              className="px-1.5 py-1.5 bg-white hover:bg-stone-100 text-stone-600 hover:text-stone-900 border-r border-emerald-200 text-xs font-bold cursor-pointer transition-colors"
+              title="עריכת רשימת מוצרי הבסיס שלי"
+            >
+              ⚙️
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => setOnlyCheckedFilter(!onlyCheckedFilter)}
@@ -385,7 +451,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                 : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            <span>{onlyCheckedFilter ? '✓ מסומנים בלבד' : 'סנן מסומנים:'}</span>
+            <span>{onlyCheckedFilter ? '✓ מסומנים' : 'סנן:'}</span>
             <span className="bg-emerald-100 text-emerald-950 px-1.5 py-0.2 rounded-full text-[10.5px] font-black">
               {selectedCount}
             </span>
@@ -394,14 +460,21 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
           <button
             type="button"
             onClick={() => setIsAddingCustom(true)}
-            className="px-2.5 py-1.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200 shadow-2xs"
+            className="px-2 py-1.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200 shadow-2xs"
             title="הוסיפי מוצר אישי"
           >
             <Plus className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="hidden sm:inline">מוצר אישי</span>
+            <span className="hidden sm:inline">אישי</span>
           </button>
         </div>
       </div>
+
+      {/* Basket Loaded Toast */}
+      {basketToast && (
+        <div className="p-2.5 rounded-2xl bg-emerald-700 text-white text-xs font-black text-center shadow-md animate-fadeIn flex items-center justify-center gap-2">
+          <span>{basketToast}</span>
+        </div>
+      )}
 
       {/* 🔍 Prominent Search Bar with Instant Autocomplete, Voice Dictation & "הוסף להזמנה" */}
       <div className="relative space-y-2.5 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 p-3 sm:p-4 rounded-3xl border-2 border-emerald-600 shadow-md">
@@ -1044,6 +1117,89 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                   <span>נקה סל</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚙️ Weekly Base Basket Edit Modal (עריכה אישית של מוצרי הבסיס הקבועים) */}
+      {isEditingWeeklyBasket && (
+        <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn" dir="rtl">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 sm:p-5 bg-stone-900 text-white flex items-center justify-between gap-3 border-b border-stone-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-xl shrink-0">
+                  ⚡
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white">
+                    עריכת סל הבסיס השבועי של ניר ⚙️
+                  </h3>
+                  <p className="text-[11px] text-stone-300 font-medium">
+                    סמני את מוצרי היסוד הקבועים שתרצי שייטענו תמיד בלחיצה אחת ({weeklyBasketIds.length} נבחרו)
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsEditingWeeklyBasket(false)}
+                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 flex items-center justify-center text-sm font-bold cursor-pointer transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* List of all items for basket inclusion */}
+            <div className="p-4 overflow-y-auto space-y-2 flex-1 text-right text-xs sm:text-sm">
+              {allItems.map((item) => {
+                const isInBasket = weeklyBasketIds.includes(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => handleToggleWeeklyBasketItem(item.id)}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                      isInBasket
+                        ? 'bg-emerald-50 border-emerald-400 font-black text-emerald-950 shadow-2xs'
+                        : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {isInBasket ? (
+                        <CheckSquare className="w-4 h-4 text-emerald-700 shrink-0" />
+                      ) : (
+                        <Square className="w-4 h-4 text-stone-400 shrink-0" />
+                      )}
+                      <span className="truncate block">
+                        {item.name}
+                      </span>
+                    </div>
+
+                    {item.safeBrand && (
+                      <span className="text-[10px] text-stone-500 truncate shrink-0">
+                        🏷️ {item.safeBrand}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="p-3.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-stone-600">
+                סה״כ {weeklyBasketIds.length} מוצרי בסיס שמורים
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditingWeeklyBasket(false);
+                  setBasketToast('סל הבסיס השבועי נשמר בהצלחה! 💾');
+                  setTimeout(() => setBasketToast(null), 3000);
+                }}
+                className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-black text-xs sm:text-sm cursor-pointer shadow-xs transition-colors"
+              >
+                שמור וסגור ✓
+              </button>
             </div>
           </div>
         </div>

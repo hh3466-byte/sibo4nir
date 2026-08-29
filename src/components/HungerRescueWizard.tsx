@@ -28,6 +28,7 @@ import {
   ChefHat,
   Flame,
 } from 'lucide-react';
+import { optimizeImageForOcr } from '../utils/imageUtils';
 
 interface HungerRescueWizardProps {
   currentPhase: SiboPhase;
@@ -1107,13 +1108,12 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
   };
 
   // Handle Photo Capture / Upload
-  const handlePhotoSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
+    try {
+      const base64 = await optimizeImageForOcr(file);
       setStagedPhoto(base64);
       setActiveScenario('camera');
       setChefResult({
@@ -1128,8 +1128,19 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
         imageBase64: base64,
         locationType: 'camera',
       });
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setStagedPhoto(base64);
+        setActiveScenario('camera');
+        fetchChefPlan({
+          imageBase64: base64,
+          locationType: 'camera',
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Handle Scenario Choice (0ms instant display - Always keep full master sets)
