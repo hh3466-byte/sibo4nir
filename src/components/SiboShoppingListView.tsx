@@ -490,37 +490,77 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
         )}
       </div>
 
-      {/* Category Filter Chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-        <button
-          type="button"
-          onClick={() => setSelectedCategory('all')}
-          className={`py-1.5 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border ${
-            selectedCategory === 'all'
-              ? 'bg-stone-900 text-white border-stone-900 shadow-2xs'
-              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
-          }`}
-        >
-          הכל (500+)
-        </button>
-        {SIBO_CATEGORIES.map((cat) => {
-          const isSelected = selectedCategory === cat.id;
-          return (
+      {/* Category Filter Chips - 2 Organized Rows for Easy Navigation */}
+      <div className="bg-stone-50 p-2.5 sm:p-3 rounded-2xl border border-stone-200 space-y-2">
+        {/* Row 1: All + Produce + Sauces + Spices + Sweets */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('all')}
+            className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
+              selectedCategory === 'all'
+                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
+            }`}
+          >
+            <span>📋</span>
+            <span>הכל (500+)</span>
+          </button>
+          {SIBO_CATEGORIES.filter((c) => (c as any).row === 1 || ['veggies_fruits', 'sauces', 'spices', 'sweets'].includes(c.id)).map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
+                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Row 2: Meat/Fish + Dairy/Oils + Grains + Drinks + Pantry + Custom */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          {SIBO_CATEGORIES.filter((c) => (c as any).row === 2 || ['meat_fish', 'dairy_oils', 'grains_starches', 'drinks', 'pantry_baking'].includes(c.id)).map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
+                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+          {customItems.length > 0 && (
             <button
-              key={cat.id}
               type="button"
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`py-1.5 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
-                isSelected
-                  ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs'
-                  : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+              onClick={() => setSelectedCategory('custom')}
+              className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
+                selectedCategory === 'custom'
+                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs'
+                  : 'bg-white text-amber-900 border-amber-200 hover:bg-amber-50'
               }`}
             >
-              <span>{cat.icon}</span>
-              <span>{cat.label}</span>
+              <span>✨</span>
+              <span>מוצרים שלי ({customItems.length})</span>
             </button>
-          );
-        })}
+          )}
+        </div>
       </div>
 
       {/* Items List Grouped by Category */}
