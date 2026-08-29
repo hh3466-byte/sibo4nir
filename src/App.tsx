@@ -260,33 +260,33 @@ export default function App() {
 
       {/* Main App Content Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-28">
-        {/* Prominent SOS Starving Banner for Nir */}
+        {/* Prominent SOS Starving Banner for Nir - Styled in RAL 6019 Pastel Green */}
         <div className="max-w-4xl mx-auto">
           <button
             id="banner-hunger-sos-btn"
             type="button"
             onClick={() => setIsHungerWizardOpen(true)}
-            className="w-full p-4 sm:p-5 rounded-3xl bg-[#0f4743] hover:bg-[#0c3e3a] text-white font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 border border-[#1b625d] active:scale-98 cursor-pointer group"
+            className="w-full p-4 sm:p-5 rounded-3xl bg-[#BDECB6] hover:bg-[#aee4a6] text-[#064e3b] font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 border-2 border-[#a2dba0] active:scale-98 cursor-pointer group"
           >
             <div className="flex items-center gap-3.5 text-right">
-              <div className="w-12 h-12 rounded-2xl bg-teal-600/90 text-white flex items-center justify-center text-2xl shadow-2xs group-hover:scale-105 transition-transform shrink-0 border border-teal-400/40">
+              <div className="w-12 h-12 rounded-2xl bg-white text-[#064e3b] flex items-center justify-center text-2xl shadow-2xs group-hover:scale-105 transition-transform shrink-0 border border-[#a2dba0]">
                 🥑
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-teal-700/60 text-teal-100 border border-teal-500/40 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-white text-[#064e3b] border border-[#a2dba0] rounded-full shadow-2xs">
                     חירום שובע
                   </span>
-                  <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
+                  <h3 className="text-base sm:text-lg font-black tracking-tight text-[#064e3b]">
                     אני רעבה!!! (מה לאכול עכשיו?) ✨
                   </h3>
                 </div>
-                <p className="text-xs text-teal-100/85 font-medium mt-0.5">
+                <p className="text-xs text-[#0f5132] font-semibold mt-0.5">
                   פתרונות מהירים ב-3 דקות • מקרר ומזווה • תחנות דלק • מסעדות סביבך
                 </p>
               </div>
             </div>
-            <div className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-2xs shrink-0 transition-colors">
+            <div className="px-4 py-2 bg-[#064e3b] hover:bg-[#022c22] text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
               פתחי אשף ⚡
             </div>
           </button>
@@ -397,9 +397,9 @@ export default function App() {
       <nav aria-label="ניווט מהיר" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-2xl py-2 px-3 flex items-center justify-around sm:hidden">
         <button
           onClick={() => setIsHungerWizardOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-teal-900 font-black cursor-pointer active:scale-95"
+          className="flex flex-col items-center gap-0.5 text-[#064e3b] font-black cursor-pointer active:scale-95"
         >
-          <div className="w-8 h-8 rounded-full bg-teal-700 text-white flex items-center justify-center text-sm shadow-sm border border-teal-600">
+          <div className="w-8 h-8 rounded-full bg-[#BDECB6] text-[#064e3b] flex items-center justify-center text-sm shadow-sm border border-[#a2dba0]">
             🥑
           </div>
           <span className="text-[10px]">אני רעבה!</span>

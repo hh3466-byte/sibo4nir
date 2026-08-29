@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onOpenHungerWizard}
-                className="px-3 py-1.5 bg-teal-600/90 hover:bg-teal-700 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-2xs cursor-pointer border border-teal-500/40"
+                className="px-3 py-1.5 bg-[#BDECB6] hover:bg-[#aee4a6] text-[#064e3b] rounded-xl text-xs font-black flex items-center gap-1 shadow-2xs cursor-pointer border border-[#a2dba0]"
                 title="אשף אני רעבה! מה לאכול עכשיו?"
               >
                 <span>🥑 אני רעבה!</span>
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="desktop-hunger-sos-btn"
               type="button"
               onClick={onOpenHungerWizard}
-              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-teal-600/90 hover:bg-teal-700 border border-teal-500/40 px-4 py-2 rounded-xl transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 text-xs font-black text-[#064e3b] bg-[#BDECB6] hover:bg-[#aee4a6] border border-[#a2dba0] px-4 py-2 rounded-xl transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
               title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
             >
               <span className="text-sm">🥑</span>
