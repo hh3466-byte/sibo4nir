@@ -297,6 +297,7 @@ export default function App() {
                   setResetCounter((c) => c + 1);
                 }}
                 onOpenShoppingList={() => setIsShoppingListExpanded(true)}
+                onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
               />
             )}
           </div>
