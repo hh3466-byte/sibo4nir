@@ -44,27 +44,31 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 
   return (
     <div className="max-w-3xl mx-auto p-3 sm:p-5 space-y-4 animate-fadeIn text-stone-900" dir="rtl">
-      {/* 1. TOP PROMINENT CARD: לשלוח למישהו לקנות בסופר (placed ABOVE self-shopping as requested) */}
+      {/* 1. TOP PROMINENT CARD: לשלוח למישהו לקנות בסופר (Entire card is a clickable button) */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && (
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-emerald-800/20 shadow-md space-y-3 text-right">
+        <button
+          type="button"
+          onClick={onOpenShoppingList}
+          className="w-full bg-white rounded-3xl p-5 sm:p-6 border-2 border-emerald-800/30 hover:border-emerald-800 shadow-md hover:shadow-xl transition-all text-right space-y-3 cursor-pointer group active:scale-[0.99] block"
+        >
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-black">
                 <span>אפשרות 1: שולחת מישהו אחר</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-black text-stone-950 flex items-center gap-2">
+              <h3 className="text-lg sm:text-xl font-black text-stone-950 flex items-center gap-2 group-hover:text-emerald-900 transition-colors">
                 <span>לשלוח למישהו לקנות בסופר 📋</span>
               </h3>
               <p className="text-xs sm:text-sm text-stone-600 font-medium max-w-lg">
                 סמני מה חסר לך במקרר (מתוך 500+ מוצרים ומותגים בטוחים) ושלחי ישירות לוואטסאפ של הקונה!
               </p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center text-2xl shrink-0 border border-emerald-200 shadow-2xs">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl shrink-0 border border-emerald-200 shadow-2xs group-hover:scale-105 transition-transform">
               📱
             </div>
           </div>
 
-          <div className="pt-1 flex items-center justify-between gap-3 flex-wrap">
+          <div className="pt-2 flex items-center justify-between gap-3 flex-wrap border-t border-stone-100">
             <div className="text-xs text-stone-500 font-medium">
               {selectedShoppingCount > 0 ? (
                 <span className="font-bold text-emerald-800">
@@ -75,16 +79,12 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={onOpenShoppingList}
-              className="px-5 py-3 bg-emerald-800 hover:bg-emerald-900 text-white rounded-2xl font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center gap-2 active:scale-98"
-            >
+            <div className="px-5 py-2.5 bg-emerald-800 group-hover:bg-emerald-900 text-white rounded-2xl font-black text-xs sm:text-sm shadow-sm transition-colors flex items-center gap-2">
               <ListChecks className="w-4 h-4" />
               <span>פתחי רשימת קניות לשליחה 📋</span>
-            </button>
+            </div>
           </div>
-        </div>
+        </button>
       )}
 
       {/* 2. SECOND SECTION: קניות בעצמי בסופר (צלם / סרוק) */}
