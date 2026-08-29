@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Send,
   CheckSquare,
@@ -18,6 +18,9 @@ import {
   ChevronLeft,
   Filter,
   CheckCircle2,
+  Mic,
+  MicOff,
+  Volume2,
 } from 'lucide-react';
 import { SiboPhase } from '../types';
 import {
@@ -74,6 +77,69 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [onlyCheckedFilter, setOnlyCheckedFilter] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleSpeechRecognition = () => {
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      setSpeechError('הדפדפן שלך אינו תומך בדיבור (נסי ב-Chrome)');
+      setTimeout(() => setSpeechError(null), 3500);
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+
+      const recognition = new SpeechRec();
+      recognition.lang = 'he-IL';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        if (transcript) {
+          setSearchQuery(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('[SpeechRec] Error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.warn('[SpeechRec] Start failed:', err);
+      setIsListening(false);
+    }
+  };
 
   // Form for custom item
   const [isAddingCustom, setIsAddingCustom] = useState(false);
@@ -427,31 +493,77 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
         </div>
       </div>
 
-      {/* Interactive Search Bar Across 500+ Items with Instant Autocomplete & "הוסף להזמנה" */}
-      <div className="relative space-y-2">
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="🔍 חפשי מוצר (טחינה, חלב שקדים, פסטה, תותים, קציצות)..."
-            className="w-full py-3 pr-10 pl-9 rounded-2xl bg-white border-2 border-emerald-700/60 focus:border-emerald-700 text-xs sm:text-sm font-bold placeholder:text-stone-400 focus:outline-none shadow-sm text-right"
-          />
-          <Search className="w-4 h-4 text-emerald-700 absolute right-3.5 top-1/2 -translate-y-1/2" />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 hover:bg-stone-300 flex items-center justify-center text-xs absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"
-            >
-              ✕
-            </button>
+      {/* 🔍 Prominent Search Bar with Instant Autocomplete, Voice Dictation & "הוסף להזמנה" */}
+      <div className="relative space-y-2.5 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 p-3 sm:p-4 rounded-3xl border-2 border-emerald-600 shadow-md">
+        <div className="flex items-center justify-between gap-2 px-1 text-xs">
+          <span className="font-black text-emerald-950 flex items-center gap-1.5 text-xs sm:text-sm">
+            <Search className="w-4 h-4 text-emerald-700" />
+            <span>חיפוש מוצר מהיר להזמנה (מתוך 500+ מוצרים):</span>
+          </span>
+          {isListening && (
+            <span className="text-[11px] font-black text-rose-600 animate-pulse flex items-center gap-1 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-300 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+              <span>🎙️ מקשיב... דברי עכשיו!</span>
+            </span>
           )}
         </div>
 
+        <div className="relative flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="🔍 הקלידי או אמרי שם מוצר (חלב שקדים, קורנפלור, פסטה, תותים)..."
+              className="w-full py-3.5 pr-11 pl-10 rounded-2xl bg-white border-2 border-emerald-600/80 focus:border-emerald-700 text-xs sm:text-sm font-black placeholder:text-stone-400 focus:outline-none shadow-xs text-right"
+            />
+            <Search className="w-5 h-5 text-emerald-700 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="w-6 h-6 rounded-full bg-stone-200 text-stone-700 hover:bg-stone-300 flex items-center justify-center text-xs absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer transition-colors"
+                title="נקה חיפוש"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* 🎙️ Voice Dictation Button */}
+          <button
+            type="button"
+            onClick={toggleSpeechRecognition}
+            className={`py-3.5 px-4 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0 ${
+              isListening
+                ? 'bg-rose-500 text-white animate-pulse ring-4 ring-rose-200 shadow-md'
+                : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+            }`}
+            title="חפשי בדיבור קולי 🎙️"
+          >
+            {isListening ? (
+              <>
+                <MicOff className="w-5 h-5 animate-bounce" />
+                <span className="hidden sm:inline">עצור</span>
+              </>
+            ) : (
+              <>
+                <Mic className="w-5 h-5" />
+                <span className="hidden sm:inline">דיבור 🎙️</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {speechError && (
+          <div className="text-[11px] text-rose-700 font-bold px-2 pt-0.5">
+            ⚠️ {speechError}
+          </div>
+        )}
+
         {/* Live Search Suggestions Dropdown with "הוסף להזמנה" */}
         {searchQuery.trim().length > 0 && (
-          <div className="bg-white rounded-2xl border-2 border-emerald-600 shadow-xl p-3 space-y-2 animate-fadeIn z-20 text-right">
+          <div className="bg-white rounded-2xl border-2 border-emerald-600 shadow-xl p-3 space-y-2 animate-fadeIn z-20 text-right mt-2">
             <div className="flex items-center justify-between border-b border-stone-100 pb-1.5 text-xs text-stone-600">
               <span className="font-bold text-emerald-900">
                 תוצאות חיפוש מהירות ({searchSuggestions.length} מוצרים נמצאו):
@@ -531,20 +643,21 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
         )}
       </div>
 
-      {/* Multi-Row Category Filter Chips - Wraps into multiple rows on mobile and desktop */}
-      <div className="bg-white p-3 rounded-2xl border border-stone-200 space-y-2 text-right">
-        <div className="text-[11px] font-bold text-stone-500">
-          סינון לפי קטגוריות (לחצי למעבר ישיר למוצרים):
+      {/* 🏷️ Ultra-Compact Single-Line Category Scroll Bar (דק, חסכוני במקום ולא מסתיר את המסך) */}
+      <div className="bg-stone-100/80 p-2 sm:p-2.5 rounded-2xl border border-stone-200 space-y-1 text-right">
+        <div className="flex items-center justify-between px-1 text-[11px] font-black text-stone-600">
+          <span>סינון קטגוריות (גללי ימינה/שמאלה ↔️):</span>
+          <span className="text-[10px] text-stone-400 font-bold">15 קטגוריות</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5 scroll-smooth">
           <button
             type="button"
             onClick={() => setSelectedCategory('all')}
-            className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+            className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
               selectedCategory === 'all'
-                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-                : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                ? 'bg-stone-900 text-white border-stone-900 shadow-xs scale-102'
+                : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
             }`}
           >
             <span>📋</span>
@@ -558,10 +671,10 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+                className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
                   isSelected
-                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
-                    : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs scale-102'
+                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
                 }`}
               >
                 <span>{cat.icon}</span>
@@ -574,9 +687,9 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
             <button
               type="button"
               onClick={() => setSelectedCategory('custom')}
-              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
                 selectedCategory === 'custom'
-                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs'
+                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs scale-102'
                   : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
               }`}
             >

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { FoodAnalysisResult, TrafficLightStatus } from '../types';
 import { findMatchingRecipes, SiboRecipe } from '../data/siboMealSuggestions';
 import {
@@ -17,6 +17,8 @@ import {
   X,
   Search,
   Clock,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 
 interface TrafficLightResultProps {
@@ -43,6 +45,72 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   const [showPackagedPrompt, setShowPackagedPrompt] = useState<boolean>(
     Boolean(result.isPackagedProduct)
   );
+
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  const handleStartVoice = () => {
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      setSpeechError('הדפדפן שלך אינו תומך בדיבור ישיר (נסי ב-Chrome)');
+      setTimeout(() => setSpeechError(null), 3500);
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+
+      const recognition = new SpeechRec();
+      recognition.lang = 'he-IL';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('')
+          .trim();
+        if (transcript) {
+          setIsListening(false);
+          onExploreAlternative(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('[VoiceRec] Error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.warn('[VoiceRec] Start failed:', err);
+      setIsListening(false);
+    }
+  };
 
   const isUnidentified = Boolean(
     result.isPackagedProduct ||
@@ -247,22 +315,54 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                   <button
                     type="button"
                     onClick={onScanBarcode}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-95 ring-4 ring-amber-300/50"
+                    className="w-full py-3.5 px-5 bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 ring-2 ring-amber-300/50"
                   >
-                    <Barcode className="w-6 h-6 text-white" />
+                    <Barcode className="w-5 h-5 text-white" />
                     <span>📸 סרקי שוב את הברקוד או את רשימת הרכיבים</span>
                   </button>
                 )}
-                <div className="pt-1">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {/* 🎙️ Voice button */}
+                  <button
+                    type="button"
+                    onClick={handleStartVoice}
+                    className={`py-3 px-3.5 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm border ${
+                      isListening
+                        ? 'bg-rose-500 text-white border-rose-400 animate-pulse ring-4 ring-rose-200'
+                        : 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-600'
+                    }`}
+                    title="דברי עכשיו ואזהה את המאכל"
+                  >
+                    {isListening ? (
+                      <>
+                        <MicOff className="w-4 h-4 animate-bounce" />
+                        <span>🎙️ מקשיב... דברי עכשיו!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4" />
+                        <span>🎙️ דברי ואני אזהה (דיבור)</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* ✏️ Type button */}
                   <button
                     type="button"
                     onClick={onReset}
-                    className="w-full py-3.5 px-4 bg-white hover:bg-amber-50 text-stone-900 font-extrabold text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+                    className="py-3 px-3.5 bg-white hover:bg-amber-50 text-stone-900 font-black text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
                   >
                     <Search className="w-4 h-4 text-amber-600" />
-                    <span>✏️ הקלידי במה מדובר (חיפוש מהיר לפי שם מוצר או מנה)</span>
+                    <span>✏️ הקלידי שם מוצר / מנה</span>
                   </button>
                 </div>
+
+                {speechError && (
+                  <div className="text-xs text-rose-700 font-bold text-center pt-1">
+                    ⚠️ {speechError}
+                  </div>
+                )}
               </div>
             </div>
           )}
