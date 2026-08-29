@@ -253,21 +253,14 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                     <span>📸 סרקי שוב את הברקוד או את רשימת הרכיבים</span>
                   </button>
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="pt-1">
                   <button
                     type="button"
                     onClick={onReset}
-                    className="py-3.5 px-4 bg-white hover:bg-amber-50 text-stone-900 font-extrabold text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+                    className="w-full py-3.5 px-4 bg-white hover:bg-amber-50 text-stone-900 font-extrabold text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
                   >
                     <Search className="w-4 h-4 text-amber-600" />
-                    <span>✏️ הקלידי במה מדובר (מנה ביתית / מסעדה)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onExploreAlternative('קפה שחור')}
-                    className="py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-xl border border-emerald-500/40 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
-                  >
-                    <span>☕ זה קפה שחור? לחצי כאן</span>
+                    <span>✏️ הקלידי במה מדובר (חיפוש מהיר לפי שם מוצר או מנה)</span>
                   </button>
                 </div>
               </div>
