@@ -17,6 +17,7 @@ import {
   Smartphone,
   ChevronLeft,
   Filter,
+  CheckCircle2,
 } from 'lucide-react';
 import { SiboPhase } from '../types';
 import {
@@ -43,7 +44,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   currentPhase,
   onBackToScanner,
 }) => {
-  // Empty by default as requested: "שכל הצ'ק בוקס יהיו ריקים, מסמנים רק את מה שחסר"
+  // Empty by default: "שכל הצ'ק בוקס יהיו ריקים, מסמנים רק את מה שחסר"
   const [checkedIds, setCheckedIds] = useState<Record<string, boolean>>(() => {
     try {
       const saved = localStorage.getItem('sibo_shopping_checked_v2');
@@ -81,6 +82,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   const [newCustomWarning, setNewCustomWarning] = useState('');
 
   const [copiedSuccess, setCopiedSuccess] = useState(false);
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null);
 
   // Saved contact phone for direct WhatsApp sending
   const [directPhone, setDirectPhone] = useState<string>(() => {
@@ -130,6 +132,14 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     });
   };
 
+  const handleAddToOrder = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setCheckedIds((prev) => ({ ...prev, [id]: true }));
+    setQuantities((prev) => ({ ...prev, [id]: prev[id] || 1 }));
+    setLastAddedId(id);
+    setTimeout(() => setLastAddedId(null), 1800);
+  };
+
   const updateQuantity = (id: string, delta: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setQuantities((prev) => {
@@ -173,7 +183,19 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     });
   };
 
-  // Filter items by category & search query
+  // Instant Search Suggestions across ALL 500+ items
+  const searchSuggestions = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.trim().toLowerCase();
+    return allItems.filter((item) => {
+      const matchName = item.name.toLowerCase().includes(q);
+      const matchBrand = item.safeBrand?.toLowerCase().includes(q);
+      const matchWarn = item.warningNote?.toLowerCase().includes(q);
+      return matchName || matchBrand || matchWarn;
+    }).slice(0, 12); // top 12 matches for fast clean display
+  }, [allItems, searchQuery]);
+
+  // Filter items by category & search query for main grid
   const filteredItems = useMemo(() => {
     return allItems.filter((item) => {
       // Category filter
@@ -205,10 +227,10 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     const selected = allItems.filter((i) => checkedIds[i.id]);
 
     if (selected.length === 0) {
-      return 'היי! רשימת הקניות ל-SIBO ריקה כרגע. אנא סמני את הפריטים שחסרים לך באפליקציה.';
+      return 'היי! רשימת הקניות ריקה כרגע. אנא סמני את הפריטים שחסרים לך באפליקציה.';
     }
 
-    let msg = `🛒 *רשימת קניות מותאמת ובטוחה ל-SIBO עבור ניר* 🌿\n`;
+    let msg = `🛒 *רשימת קניות מותאמת ובטוחה עבור ניר* 🌿\n`;
     msg += `------------------------------------\n`;
     msg += `⚠️ *דגש קריטי לקונה:* ללא שום, ללא בצל, ללא גלוטן! נא לקנות אך ורק את המותגים וההנחיות הרשומות.\n\n`;
 
@@ -265,50 +287,48 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-3 sm:p-5 space-y-4 animate-fadeIn pb-28 text-stone-900" dir="rtl">
-      {/* Calm & Soothing Header Card */}
-      <div className="bg-stone-900 text-white p-5 rounded-3xl shadow-md relative overflow-hidden text-right border border-stone-800">
-        <div className="flex items-center justify-between gap-3">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-800 text-emerald-100 text-[11px] font-black tracking-wide">
-              <span>מאגר 500+ מוצרים ומותגים מדויקים ל-SIBO</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              <span>רשימת קניות לסופר (לשלוח למישהו) 📋</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-300 font-medium max-w-xl">
-              <strong className="text-amber-300">ניר, סמני רק את מה שחסר לך במקרר או במזווה.</strong> ליד כל מוצר מופיע המותג המאושר ודגשי זהירות לקונה.
-            </p>
+    <div className="max-w-4xl mx-auto p-2.5 sm:p-5 space-y-4 animate-fadeIn pb-28 text-stone-900" dir="rtl">
+      {/* Calm Header Card */}
+      <div className="bg-stone-900 text-white p-4 sm:p-5 rounded-3xl shadow-md text-right border border-stone-800 flex items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-800 text-emerald-100 text-[10px] sm:text-xs font-black">
+            <span>מאגר 500+ מוצרים ומותגים מאושרים</span>
           </div>
-
-          {onBackToScanner && (
-            <button
-              type="button"
-              onClick={onBackToScanner}
-              className="px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-2xl text-xs font-bold shrink-0 transition-colors border border-stone-700 flex items-center gap-1"
-            >
-              <span>קניות בעצמי</span>
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-          )}
+          <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+            <span>הכנת רשימת קניות לשליחה 📋</span>
+          </h2>
+          <p className="text-xs text-stone-300 font-medium">
+            סמני או חפשי מוצרים שחסרים לך במקרר/מזווה – ושלחי ישירות לוואטסאפ של הקונה!
+          </p>
         </div>
+
+        {onBackToScanner && (
+          <button
+            type="button"
+            onClick={onBackToScanner}
+            className="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-xs font-bold shrink-0 transition-colors border border-stone-700 flex items-center gap-1 cursor-pointer"
+          >
+            <span>קניות בעצמי</span>
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Sticky Bottom/Top WhatsApp Action Bar */}
-      <div className="sticky top-2 z-30 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl border border-stone-300 shadow-xl space-y-3">
+      <div className="sticky top-14 z-30 bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-stone-300 shadow-md space-y-2.5">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2.5">
-            <span className={`w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm shadow-xs ${
+          <div className="flex items-center gap-2">
+            <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm shadow-xs ${
               selectedCount > 0 ? 'bg-emerald-700 text-white' : 'bg-stone-100 text-stone-600'
             }`}>
               {selectedCount}
             </span>
             <div>
-              <span className="text-xs sm:text-sm font-black text-stone-900 block">
-                {selectedCount > 0 ? `${selectedCount} מוצרים נבחרו לקנייה` : 'כל המוצרים ריקים כרגע'}
+              <span className="text-xs sm:text-sm font-black text-stone-900 block leading-tight">
+                {selectedCount > 0 ? `${selectedCount} מוצרים נבחרו להזמנה` : 'הרשימה ריקה כרגע'}
               </span>
-              <span className="text-[11px] text-stone-500 font-medium">
-                {selectedCount > 0 ? 'מוכן לשליחה מהירה בוואטסאפ' : 'סמני את הפריטים שחסרים לך'}
+              <span className="text-[10.5px] text-stone-500 font-medium">
+                {selectedCount > 0 ? 'מוכן לשליחה מהירה בוואטסאפ' : 'סמני מה חסר לך או השתמשי בחיפוש למטה'}
               </span>
             </div>
           </div>
@@ -317,7 +337,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
             <button
               type="button"
               onClick={handleCopyList}
-              className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-stone-200"
+              className="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200"
               title="העתק טקסט"
             >
               {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
@@ -327,17 +347,17 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingCustom(true)}
-              className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-stone-200"
+              className="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200"
             >
               <Plus className="w-3.5 h-3.5 text-emerald-700" />
-              <span>הוסף מוצר</span>
+              <span>הוסף אישי</span>
             </button>
 
             {selectedCount > 0 && (
               <button
                 type="button"
                 onClick={handleClearAll}
-                className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-rose-200"
+                className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-rose-200"
                 title="נקה את כל הסימונים"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -352,27 +372,25 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
           type="button"
           onClick={handleSendWhatsApp}
           disabled={selectedCount === 0}
-          className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-30 disabled:hover:bg-emerald-700 text-white rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-98"
+          className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-35 disabled:hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
         >
-          <Send className="w-5 h-5 rtl:rotate-180" />
+          <Send className="w-4 h-4 rtl:rotate-180" />
           <span>שלחי בוואטסאפ למי שקונה 📱 ({selectedCount} מוצרים)</span>
         </button>
 
-        {/* Set Shopper Phone Helper */}
+        {/* Filters and Shopper Phone */}
         <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1 border-t border-stone-100">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setOnlyCheckedFilter(!onlyCheckedFilter)}
-              className={`font-bold px-2 py-0.5 rounded-lg border transition-all ${
-                onlyCheckedFilter
-                  ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
-                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              {onlyCheckedFilter ? '✓ מציג רק מסומנים' : 'הצג רק מה שסומן'}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setOnlyCheckedFilter(!onlyCheckedFilter)}
+            className={`font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+              onlyCheckedFilter
+                ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
+                : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+            }`}
+          >
+            {onlyCheckedFilter ? '✓ מציג רק מסומנים' : 'הצג רק מה שסומן'}
+          </button>
 
           <div>
             {isEditingPhone ? (
@@ -390,7 +408,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                     localStorage.setItem('sibo_shopper_phone', directPhone);
                     setIsEditingPhone(false);
                   }}
-                  className="font-black text-emerald-700 px-1"
+                  className="font-black text-emerald-700 px-1 cursor-pointer"
                 >
                   שמור
                 </button>
@@ -409,18 +427,178 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
         </div>
       </div>
 
+      {/* Interactive Search Bar Across 500+ Items with Instant Autocomplete & "הוסף להזמנה" */}
+      <div className="relative space-y-2">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="🔍 חפשי מוצר (טחינה, חלב שקדים, פסטה, תותים, קציצות)..."
+            className="w-full py-3 pr-10 pl-9 rounded-2xl bg-white border-2 border-emerald-700/60 focus:border-emerald-700 text-xs sm:text-sm font-bold placeholder:text-stone-400 focus:outline-none shadow-sm text-right"
+          />
+          <Search className="w-4 h-4 text-emerald-700 absolute right-3.5 top-1/2 -translate-y-1/2" />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 hover:bg-stone-300 flex items-center justify-center text-xs absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Live Search Suggestions Dropdown with "הוסף להזמנה" */}
+        {searchQuery.trim().length > 0 && (
+          <div className="bg-white rounded-2xl border-2 border-emerald-600 shadow-xl p-3 space-y-2 animate-fadeIn z-20 text-right">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-1.5 text-xs text-stone-600">
+              <span className="font-bold text-emerald-900">
+                תוצאות חיפוש מהירות ({searchSuggestions.length} מוצרים נמצאו):
+              </span>
+              <span className="text-[11px] text-stone-400">לחצי &quot;הוסף להזמנה&quot; להוספה מיידית</span>
+            </div>
+
+            {searchSuggestions.length === 0 ? (
+              <div className="p-3 text-center text-xs text-stone-500">
+                לא נמצא מוצר תואם ל-&quot;{searchQuery}&quot;. תוכלי להוסיף אותו ב-&quot;הוסף אישי&quot; למעלה!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+                {searchSuggestions.map((item) => {
+                  const isChecked = !!checkedIds[item.id];
+                  const isJustAdded = lastAddedId === item.id;
+
+                  return (
+                    <div
+                      key={`search-${item.id}`}
+                      className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                        isChecked
+                          ? 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-200'
+                          : 'bg-stone-50 hover:bg-stone-100/80 border-stone-200'
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className="text-xs sm:text-sm font-black text-stone-900 block truncate">
+                          {item.name}
+                        </span>
+                        {item.safeBrand && (
+                          <span className="text-[10.5px] text-emerald-800 font-semibold block truncate">
+                            🏷️ {item.safeBrand}
+                          </span>
+                        )}
+                        {item.warningNote && (
+                          <span className="text-[10px] text-amber-900 font-medium block truncate">
+                            ⚠️ {item.warningNote}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* "הוסף להזמנה" Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          if (isChecked) {
+                            toggleItem(item.id);
+                          } else {
+                            handleAddToOrder(item.id, e);
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1 shrink-0 transition-all cursor-pointer shadow-xs active:scale-95 ${
+                          isChecked
+                            ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                            : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border border-emerald-300'
+                        }`}
+                      >
+                        {isChecked ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                            <span>נוסף להזמנה ✓</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-3.5 h-3.5 text-emerald-800" />
+                            <span>הוסף להזמנה</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Multi-Row Category Filter Chips - Wraps into multiple rows on mobile and desktop */}
+      <div className="bg-white p-3 rounded-2xl border border-stone-200 space-y-2 text-right">
+        <div className="text-[11px] font-bold text-stone-500">
+          סינון לפי קטגוריות (לחצי למעבר ישיר למוצרים):
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('all')}
+            className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+              selectedCategory === 'all'
+                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+            }`}
+          >
+            <span>📋</span>
+            <span>הכל (500+)</span>
+          </button>
+
+          {SIBO_CATEGORIES.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
+                    : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+
+          {customItems.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('custom')}
+              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+                selectedCategory === 'custom'
+                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs'
+                  : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+              }`}
+            >
+              <span>✨</span>
+              <span>מוצרים שלי ({customItems.length})</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Inline Form to Add Custom Item */}
       {isAddingCustom && (
-        <div className="p-4 bg-stone-50 rounded-3xl border border-stone-300 space-y-3 text-right animate-fadeIn shadow-sm">
+        <div className="p-4 bg-stone-50 rounded-2xl border border-stone-300 space-y-3 text-right animate-fadeIn shadow-sm">
           <div className="flex items-center justify-between border-b border-stone-200 pb-2">
             <h4 className="text-xs sm:text-sm font-black text-stone-900 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-emerald-700" />
-              <span>הוספת מוצר מותאם אישית לרשימה:</span>
+              <span>הוספת מוצר אישי לרשימה:</span>
             </h4>
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="text-stone-400 hover:text-stone-700 text-xs"
+              className="text-stone-400 hover:text-stone-700 text-xs cursor-pointer"
             >
               ✕
             </button>
@@ -454,117 +632,23 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="px-3.5 py-1.5 bg-stone-200 text-stone-700 font-bold text-xs rounded-xl"
+              className="px-3.5 py-1.5 bg-stone-200 text-stone-700 font-bold text-xs rounded-xl cursor-pointer"
             >
               ביטול
             </button>
             <button
               type="button"
               onClick={handleAddCustomItem}
-              className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-xs"
+              className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-xs cursor-pointer"
             >
-              הוסף וסמן לרשימה
+              הוסף להזמנה
             </button>
           </div>
         </div>
       )}
 
-      {/* Search Bar Across 500+ Items */}
-      <div className="relative">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="חפשי כל מוצר, ירק, מותג או תבלין מתוך 500 מוצרים..."
-          className="w-full py-3 pr-10 pl-9 rounded-2xl bg-white border border-stone-300 text-xs sm:text-sm font-semibold placeholder:text-stone-400 focus:outline-none focus:border-emerald-600 shadow-2xs text-right"
-        />
-        <Search className="w-4 h-4 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery('')}
-            className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 hover:bg-stone-300 flex items-center justify-center text-xs absolute left-3 top-1/2 -translate-y-1/2"
-          >
-            ✕
-          </button>
-        )}
-      </div>
-
-      {/* Category Filter Chips - 2 Organized Rows for Easy Navigation */}
-      <div className="bg-stone-50 p-2.5 sm:p-3 rounded-2xl border border-stone-200 space-y-2">
-        {/* Row 1: All + Produce + Sauces + Spices + Sweets */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('all')}
-            className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
-              selectedCategory === 'all'
-                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-                : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
-            }`}
-          >
-            <span>📋</span>
-            <span>הכל (500+)</span>
-          </button>
-          {SIBO_CATEGORIES.filter((c) => (c as any).row === 1 || ['veggies_fruits', 'sauces', 'spices', 'sweets'].includes(c.id)).map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
-                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
-                }`}
-              >
-                <span>{cat.icon}</span>
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Row 2: Meat/Fish + Dairy/Oils + Grains + Drinks + Pantry + Custom */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-          {SIBO_CATEGORIES.filter((c) => (c as any).row === 2 || ['meat_fish', 'dairy_oils', 'grains_starches', 'drinks', 'pantry_baking'].includes(c.id)).map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
-                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
-                }`}
-              >
-                <span>{cat.icon}</span>
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-          {customItems.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setSelectedCategory('custom')}
-              className={`py-2 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
-                selectedCategory === 'custom'
-                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs'
-                  : 'bg-white text-amber-900 border-amber-200 hover:bg-amber-50'
-              }`}
-            >
-              <span>✨</span>
-              <span>מוצרים שלי ({customItems.length})</span>
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* Items List Grouped by Category */}
-      <div className="space-y-5">
+      <div className="space-y-4">
         {SIBO_CATEGORIES.map((cat) => {
           const inCat = filteredItems.filter((i) => i.category === cat.id);
           if (inCat.length === 0) return null;
@@ -574,23 +658,23 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
           return (
             <div
               key={cat.id}
-              className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right"
+              className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right"
             >
               {/* Category Header */}
-              <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{cat.icon}</span>
+                  <span className="text-lg sm:text-xl">{cat.icon}</span>
                   <h3 className="text-sm sm:text-base font-black text-stone-900">
                     {cat.label}
                   </h3>
                 </div>
-                <span className="text-xs font-bold text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200">
+                <span className="text-[11px] sm:text-xs font-bold text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200">
                   {checkedInCat} מתוך {inCat.length}
                 </span>
               </div>
 
               {/* Items Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
                 {inCat.map((item) => {
                   const isChecked = !!checkedIds[item.id];
                   const qty = quantities[item.id] || 1;
@@ -602,10 +686,10 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                       className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                         isChecked
                           ? 'bg-emerald-50/90 border-emerald-400 shadow-xs ring-1 ring-emerald-300'
-                          : 'bg-stone-50/40 hover:bg-stone-50 border-stone-200/80 text-stone-700'
+                          : 'bg-stone-50/50 hover:bg-stone-50 border-stone-200/80 text-stone-700'
                       }`}
                     >
-                      {/* Top row: Checkbox, Name, and Quantity Counter */}
+                      {/* Top row: Checkbox, Name, Quantity Counter, and "הוסף להזמנה" */}
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-start gap-2.5 flex-1 min-w-0">
                           <div className="pt-0.5 shrink-0">
@@ -671,6 +755,31 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                           )}
                         </div>
                       )}
+
+                      {/* Action Bar on Card */}
+                      <div className="flex items-center justify-between pt-1 border-t border-stone-100/60">
+                        <span className="text-[10px] text-stone-400 font-medium">
+                          {isChecked ? '✓ נבחר להזמנה' : 'לחצי לסימון'}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            if (isChecked) {
+                              toggleItem(item.id);
+                            } else {
+                              handleAddToOrder(item.id, e);
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-black transition-all cursor-pointer ${
+                            isChecked
+                              ? 'bg-emerald-700 text-white'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200'
+                          }`}
+                        >
+                          {isChecked ? 'נוסף ✓' : 'הוסף להזמנה ➕'}
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -681,15 +790,15 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
 
         {/* Custom Items Section if any */}
         {customItems.length > 0 && (
-          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-2">
               <h3 className="text-sm sm:text-base font-black text-stone-900 flex items-center gap-2">
                 <span>✨</span>
                 <span>מוצרים נוספים שהוספת אישית ({customItems.length})</span>
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
               {customItems.map((item) => {
                 const isChecked = !!checkedIds[item.id];
                 const qty = quantities[item.id] || 1;
@@ -733,7 +842,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                           <button
                             type="button"
                             onClick={(e) => updateQuantity(item.id, -1, e)}
-                            className="w-6 h-6 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold flex items-center justify-center text-xs"
+                            className="w-6 h-6 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold flex items-center justify-center text-xs cursor-pointer"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -743,7 +852,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                           <button
                             type="button"
                             onClick={(e) => updateQuantity(item.id, 1, e)}
-                            className="w-6 h-6 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center text-xs"
+                            className="w-6 h-6 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center text-xs cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -752,7 +861,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                         <button
                           type="button"
                           onClick={(e) => handleRemoveCustomItem(item.id, e)}
-                          className="p-1.5 text-rose-500 hover:text-rose-700"
+                          className="p-1.5 text-rose-500 hover:text-rose-700 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

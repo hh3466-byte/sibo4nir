@@ -370,8 +370,8 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
             </div>
           )}
 
-          {/* Quick Ingredient & Dish Filters */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+          {/* Quick Ingredient & Dish Filters - Multi-row wrap */}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
             <span className="text-stone-400 font-bold text-[11px] shrink-0">חיפוש מהיר:</span>
             {quickPills.map((pill) => {
               const cleanWord = pill.replace(/^[^\s]+\s*/, '');
@@ -397,17 +397,17 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           </div>
         </div>
 
-        {/* Meal Segment Switcher (All, Favorites, Quick, Breakfast, Lunch, Dinner, Dessert) */}
-        <div className="flex items-center justify-center gap-1.5 p-1 bg-stone-100 rounded-2xl border border-stone-200 shrink-0 overflow-x-auto">
+        {/* Meal Segment Switcher - Multi-Row Wrap for Full Visibility on Mobile */}
+        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1.5 bg-stone-100 rounded-2xl border border-stone-200 shrink-0">
           <button
             onClick={() => {
               setSelectedMealType('all');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[65px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
               selectedMealType === 'all'
                 ? 'bg-emerald-800 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
             }`}
           >
             <span>הכל ({mealCounts.all})</span>
@@ -418,12 +418,12 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('favorites');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'favorites'
                 ? 'bg-rose-700 text-white shadow-xs'
                 : favoritesCount > 0
                 ? 'text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200'
-                : 'text-stone-700 hover:text-rose-700 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-rose-700 hover:bg-white'
             }`}
           >
             <span>❤️ אהבתי ({favoritesCount})</span>
@@ -434,10 +434,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('quick');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[80px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'quick'
                 ? 'bg-emerald-800 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
             }`}
           >
             <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -449,10 +449,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('breakfast');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'breakfast'
                 ? 'bg-emerald-800 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
             }`}
           >
             <Coffee className="w-3.5 h-3.5" />
@@ -464,10 +464,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('lunch');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'lunch'
                 ? 'bg-emerald-800 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
             }`}
           >
             <Sun className="w-3.5 h-3.5" />
@@ -479,10 +479,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('dinner');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'dinner'
                 ? 'bg-emerald-800 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
             }`}
           >
             <Moon className="w-3.5 h-3.5" />
@@ -494,10 +494,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('dessert');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[85px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'dessert'
                 ? 'bg-amber-700 text-white shadow-xs'
-                : 'text-stone-700 hover:text-amber-900 hover:bg-stone-200/60'
+                : 'bg-white/80 text-stone-700 hover:text-amber-900 hover:bg-white'
             }`}
           >
             <span>🍫 מתוקים ({mealCounts.dessert})</span>
