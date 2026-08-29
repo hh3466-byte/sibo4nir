@@ -16,7 +16,6 @@ import { AllowedForbiddenModal } from './components/AllowedForbiddenModal';
 import { MealSuggestionsModal } from './components/MealSuggestionsModal';
 import { InstallShareModal } from './components/InstallShareModal';
 import { HungerRescueWizard } from './components/HungerRescueWizard';
-import { FloatingActionButtons } from './components/FloatingActionButtons';
 import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug, ShoppingCart, ListChecks, ChefHat, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -229,20 +228,27 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100/70 text-stone-900 font-sans antialiased flex flex-col selection:bg-emerald-200 selection:text-emerald-900">
+    <div className="min-h-screen bg-stone-50 text-stone-900 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900" dir="rtl">
       {/* Top Main Navigation Header */}
       <Header
         currentPhase={currentPhase}
         onPhaseChange={(phase) => {
           setCurrentPhase(phase);
           if (analysisResult) {
-            setAnalysisResult(null);
+            handleAnalyze({
+              imageBase64: analysisResult.foodName,
+              textPrompt: analysisResult.foodName,
+            });
           }
         }}
         activeTab={activeTab}
         onTabChange={(tab) => {
-          setActiveTab(tab);
           setErrorMsg(null);
+          if (tab === 'recipe') {
+            setIsMealSuggestionsOpen(true);
+            return;
+          }
+          setActiveTab(tab);
           if (tab === 'scanner') {
             setAnalysisResult(null);
           }
@@ -387,12 +393,6 @@ export default function App() {
         {activeTab === 'consult' && <SIBOAssistantModal currentPhase={currentPhase} />}
       </main>
 
-      {/* Floating Action Buttons: אני רעבה + הצעות לארוחות (Desktop) */}
-      <FloatingActionButtons
-        onOpenMealSuggestions={() => setIsMealSuggestionsOpen(true)}
-        onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
-      />
-
       {/* Mobile Minimalist Bottom Navigation Bar */}
       <nav aria-label="ניווט מהיר" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-2xl py-2 px-3 flex items-center justify-around sm:hidden">
         <button
@@ -410,9 +410,10 @@ export default function App() {
             setActiveTab('scanner');
             setIsShoppingListExpanded(false);
             setAnalysisResult(null);
+            setIsMealSuggestionsOpen(false);
           }}
           className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
-            activeTab === 'scanner' ? 'text-emerald-800 font-black' : 'text-stone-500'
+            activeTab === 'scanner' && !isMealSuggestionsOpen ? 'text-emerald-800 font-black' : 'text-stone-500'
           }`}
         >
           <ShoppingCart className="w-5 h-5" />
@@ -421,16 +422,21 @@ export default function App() {
 
         <button
           onClick={() => setIsMealSuggestionsOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-stone-700 font-bold cursor-pointer active:scale-95"
+          className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
+            isMealSuggestionsOpen ? 'text-emerald-800 font-black' : 'text-stone-700'
+          }`}
         >
           <ChefHat className="w-5 h-5 text-emerald-800" />
           <span className="text-[10px]">מתכונים</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('database')}
+          onClick={() => {
+            setActiveTab('database');
+            setIsMealSuggestionsOpen(false);
+          }}
           className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
-            activeTab === 'database' ? 'text-emerald-800 font-black' : 'text-stone-500'
+            activeTab === 'database' && !isMealSuggestionsOpen ? 'text-emerald-800 font-black' : 'text-stone-500'
           }`}
         >
           <Sparkles className="w-5 h-5" />
