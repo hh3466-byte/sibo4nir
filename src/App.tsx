@@ -39,6 +39,7 @@ export default function App() {
   const [isMealSuggestionsOpen, setIsMealSuggestionsOpen] = useState(false);
   const [isInstallShareOpen, setIsInstallShareOpen] = useState(false);
   const [isHungerWizardOpen, setIsHungerWizardOpen] = useState(false);
+  const [initialFridgePhoto, setInitialFridgePhoto] = useState<string | null>(null);
   const [isChefPassOpen, setIsChefPassOpen] = useState(false);
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
   const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
@@ -300,7 +301,14 @@ export default function App() {
                   setResetCounter((c) => c + 1);
                 }}
                 onOpenShoppingList={() => setIsShoppingListExpanded(true)}
-                onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
+                onOpenHungerWizard={() => {
+                  setInitialFridgePhoto(null);
+                  setIsHungerWizardOpen(true);
+                }}
+                onOpenHungerWizardWithPhoto={(photo) => {
+                  setInitialFridgePhoto(photo);
+                  setIsHungerWizardOpen(true);
+                }}
               />
             )}
           </div>
@@ -421,10 +429,15 @@ export default function App() {
       <HungerRescueWizard
         currentPhase={currentPhase}
         isOpen={isHungerWizardOpen}
-        onClose={() => setIsHungerWizardOpen(false)}
+        initialPhoto={initialFridgePhoto}
+        onClose={() => {
+          setIsHungerWizardOpen(false);
+          setInitialFridgePhoto(null);
+        }}
         onSelectFoodToAnalyze={handleExploreAlternative}
         onOpenMealSuggestions={() => {
           setIsHungerWizardOpen(false);
+          setInitialFridgePhoto(null);
           setIsMealSuggestionsOpen(true);
         }}
       />

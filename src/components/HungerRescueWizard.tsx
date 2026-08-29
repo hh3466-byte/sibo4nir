@@ -36,6 +36,7 @@ interface HungerRescueWizardProps {
   onClose: () => void;
   onSelectFoodToAnalyze?: (foodName: string) => void;
   onOpenMealSuggestions?: () => void;
+  initialPhoto?: string | null;
 }
 
 type ScenarioType = 'home' | 'driving' | 'restaurant' | 'supermarket' | 'gps' | 'camera' | 'custom' | null;
@@ -845,6 +846,7 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
   onClose,
   onSelectFoodToAnalyze,
   onOpenMealSuggestions,
+  initialPhoto,
 }) => {
   const [activeScenario, setActiveScenario] = useState<ScenarioType>(null);
   const [customText, setCustomText] = useState('');
@@ -892,17 +894,34 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
   // Reset and load full 35+ scrollable buffet when opening
   useEffect(() => {
     if (isOpen) {
-      setActiveScenario('home');
-      setChefResult({
-        scenarioTitle: 'בופה שובע עשיר ומגוון (35+ אופציות ברשימה מתגלגלת) 🏠',
-        calmMessage: 'ניר, הנה כל 35+ ארוחות הבזק המגוונות ברשימה מתגלגלת: בשרים, שיפודים, דגי ים, זודלס, דפי אורז, פנקייקים וקינוחי צ׳יה.',
-        prepTimeMinutes: 3,
-        suggestedMeals: HOME_RESCUE_MEALS,
-        safeIngredientsIdentified: ['פרגית', 'בקר', 'דניס', 'לברק', 'תפו"א', 'קישוא', 'דפי אורז', 'קמח שקדים', 'שוקולד 85%', 'צ׳יה', 'פרמזן'],
-        cautionWarnings: [],
-        quickTip: 'גללי חופשי ברשימה המתגלגלת, סנני לפי קטגוריות או דברי במיקרופון!',
-      });
-      setStagedPhoto(null);
+      if (initialPhoto) {
+        setStagedPhoto(initialPhoto);
+        setActiveScenario('camera');
+        setChefResult({
+          scenarioTitle: 'ניתוח תמונת מקרר / מזווה 📸',
+          calmMessage: 'סורק את התמונה ומזהה את כל המצרכים הבטוחים להרכבת ארוחת בזק...',
+          prepTimeMinutes: 3,
+          suggestedMeals: HOME_RESCUE_MEALS,
+          safeIngredientsIdentified: ['מזהה רכיבים מתוך התמונה...'],
+          quickTip: 'זיהוי מצרכים דלי FODMAP מתוך המקרר מאפשר הרכבת ארוחה משביעה תוך 3 דקות.',
+        });
+        fetchChefPlan({
+          imageBase64: initialPhoto,
+          locationType: 'camera',
+        });
+      } else {
+        setActiveScenario('home');
+        setChefResult({
+          scenarioTitle: 'בופה שובע עשיר ומגוון (35+ אופציות ברשימה מתגלגלת) 🏠',
+          calmMessage: 'ניר, הנה כל 35+ ארוחות הבזק המגוונות ברשימה מתגלגלת: בשרים, שיפודים, דגי ים, זודלס, דפי אורז, פנקייקים וקינוחי צ׳יה.',
+          prepTimeMinutes: 3,
+          suggestedMeals: HOME_RESCUE_MEALS,
+          safeIngredientsIdentified: ['פרגית', 'בקר', 'דניס', 'לברק', 'תפו"א', 'קישוא', 'דפי אורז', 'קמח שקדים', 'שוקולד 85%', 'צ׳יה', 'פרמזן'],
+          cautionWarnings: [],
+          quickTip: 'גללי חופשי ברשימה המתגלגלת, סנני לפי קטגוריות או דברי במיקרופון!',
+        });
+        setStagedPhoto(null);
+      }
       setCustomText('');
       setGpsError(null);
       setSelectedCategory('all');
@@ -911,7 +930,7 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
       setIsListening(false);
       setSpeechError(null);
     }
-  }, [isOpen]);
+  }, [isOpen, initialPhoto]);
 
   // Speech Recognition Cleanup
   useEffect(() => {

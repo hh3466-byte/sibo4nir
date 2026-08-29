@@ -327,7 +327,7 @@ const systemInstruction = `
       parts.push({ text: promptText });
 
       // Helper to generate content with model fallback
-      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
       let response: any = null;
 
       for (const model of modelsToTry) {
@@ -515,7 +515,7 @@ ${imageBase64 ? 'זהה מתוך התמונה את כל המצרכים הבטו�
 `;
       parts.push({ text: promptText });
 
-      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
       let response: any = null;
 
       for (const model of modelsToTry) {

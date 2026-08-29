@@ -1580,12 +1580,6 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
   // =========================================================================
   // 20. TAPUCHIPS & SALTY SNACKS (תפוצ'יפס, במבה, פופקורן וחטיפים מלוחים)
   // =========================================================================
-  '7290000060032': {
-    productName: 'תפוצ׳יפס קלאסי טבעי מלח 50/70 גרם (עלית שטראוס)',
-    brand: 'עלית / שטראוס (Tapuchips Classic)',
-    ingredientsText: 'תפוחי אדמה (64%), שמנים צמחיים, מלח (ללא שום, ללא בצל, ללא גלוטן - אור ירוק ל-SIBO! 🟢)',
-    categories: 'חטיפים מלוחים וצ׳יפס',
-  },
   '7290104724886': {
     productName: 'תפוצ׳יפס גלים טבעי מלח (עלית שטראוס)',
     brand: 'עלית / שטראוס',
@@ -1822,12 +1816,6 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     ingredientsText: '100% עמילן תירס טהור (ללא גלוטן, ללא שום, ללא לקטוז, דל FODMAP - אור ירוק ל-SIBO ולצליאק! 🟢)',
     categories: 'אפייה, קורנפלור ועמילנים',
   },
-  '7290000060018': {
-    productName: 'קורנפלור סוגת 500 גרם (Sugat Pure Cornstarch)',
-    brand: 'סוגת Sugat',
-    ingredientsText: '100% עמילן תירס טהור למאכל (אור ירוק 🟢)',
-    categories: 'אפייה וקורנפלור',
-  },
   '7290108350012': {
     productName: 'קורנפלור מיה 500 גרם (Maya Cornstarch)',
     brand: 'מיה תעשיות מזון Maya',
@@ -1857,6 +1845,56 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     brand: 'תבואות Tevuot',
     ingredientsText: '100% עמילן טפיוקה טהור (אור ירוק 🟢)',
     categories: 'קמחים ללא גלוטן ועמילנים',
+  },
+
+  // =========================================================================
+  // 24. PROCESSED & HARD CHEESES (גבינות מותכות, משולשים, פרמזן וגאודה)
+  // =========================================================================
+  '3073781190595': {
+    productName: 'גבינה מותכת לה ואש קירי 18.5% שומן משולשים (La Vache Qui Rit / The Laughing Cow)',
+    brand: 'לה ואש קירי / בל (La Vache Qui Rit / Bel)',
+    ingredientsText: 'חלב פרה מפוסטר, גבינות (מכיל חלב), חמאה, אבקת מי גבינה, חלבוני חלב, מלחי התכה (פוליפוספטים E452, נתרן פוספטים, חומצת לימון), מלח שולחן (עשיר בלקטוז ומלחי התכה - אסור ל-SIBO בשלב 1 קפדני! 🔴)',
+    allergens: 'מכיל חלב, לקטוז, מוצקי מי גבינה',
+    categories: 'גבינות מותכות וממרחי גבינה',
+  },
+  '3073780965033': {
+    productName: 'גבינה מותכת לה ואש קירי 8 משולשים 128 גרם (La Vache Qui Rit)',
+    brand: 'לה ואש קירי / בל (Bel)',
+    ingredientsText: 'חלב, גבינות, חמאה, אבקת מי גבינה, מלחי התכה (פוספטים) (אסור ל-SIBO 🔴)',
+    allergens: 'מכיל לקטוז ומוצקי חלב',
+    categories: 'גבינות מותכות',
+  },
+  '3073781115338': {
+    productName: 'גבינה מותכת לה ואש קירי 16 משולשים (The Laughing Cow 16 Portions)',
+    brand: 'לה ואש קירי / בל (Bel)',
+    ingredientsText: 'חלב פרה, גבינות, אבקת מי גבינה, מלחי התכה (אסור ל-SIBO 🔴)',
+    allergens: 'מכיל לקטוז',
+    categories: 'גבינות מותכות',
+  },
+  '7290000065006': {
+    productName: 'גבינה מותכת עמק תנובה משולשים (Tnuva Emek Melted Cheese)',
+    brand: 'תנובה Tnuva',
+    ingredientsText: 'גבינה צהובה עמק (40%), מים, חמאה, אבקת חלב, אבקת מי גבינה, מלחי התכה (E452, E339), מלח (עשיר בלקטוז - אסור ל-SIBO 🔴)',
+    allergens: 'מכיל חלב ולקטוז',
+    categories: 'גבינות מותכות',
+  },
+  '7290004123011': {
+    productName: 'גבינה מותכת פרזידנט 8 משולשים (President Processed Cheese)',
+    brand: 'פרזידנט President',
+    ingredientsText: 'גבינות, חמאה, אבקת מי גבינה, מלחי התכה (אסור ל-SIBO 🔴)',
+    categories: 'גבינות מותכות',
+  },
+  '7290000065501': {
+    productName: 'גבינת פרמזן גרנה פדנו מיושנת 0% לקטוז (Grana Padano / Parmesan)',
+    brand: 'תנובה Collection / מחלבות גד',
+    ingredientsText: 'חלב פרה, מלח, אנזים הגבנה (מיושנת 16+ חודשים, 0% לקטוז טבעי - אור ירוק בטוח ל-SIBO! 🟢)',
+    categories: 'גבינות קשות מיושנות',
+  },
+  '7290000065518': {
+    productName: 'גבינת גאודה הולנדית קשה (Gouda Cheese)',
+    brand: 'תנובה Collection / גד',
+    ingredientsText: 'חלב פרה מפוסטר, מלח, אנזים, חומצה לקטית (דלה מאוד בלקטוז - אור ירוק 🟢)',
+    categories: 'גבינות קשות',
   },
 
 };

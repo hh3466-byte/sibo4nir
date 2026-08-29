@@ -11,8 +11,9 @@ interface SupermarketSelfScanViewProps {
   isLoading: boolean;
   analysisResult: FoodAnalysisResult | null;
   onClearResult: () => void;
-  onOpenShoppingList: () => void;
+  onOpenShoppingList?: () => void;
   onOpenHungerWizard?: () => void;
+  onOpenHungerWizardWithPhoto?: (photo: string) => void;
   selectedShoppingCount?: number;
 }
 
@@ -24,6 +25,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   onClearResult,
   onOpenShoppingList,
   onOpenHungerWizard,
+  onOpenHungerWizardWithPhoto,
   selectedShoppingCount = 0,
 }) => {
   const [activeScanMode, setActiveScanMode] = useState<'idle' | 'camera' | 'barcode'>('idle');
@@ -61,19 +63,20 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 
     try {
       const optimizedBase64 = await optimizeImageForOcr(file);
-      onAnalyze({
-        imageBase64: optimizedBase64,
-        textPrompt: 'צלמתי את המקרר / המדף שלי. זהה את כל המצרכים הבטוחים ל-SIBO שנראים בתמונה, והצע לי 2-3 רעיונות קלים ומהירים ב-3 דקות של שף דלה פופו להכנה ממה שיש!',
-        mimeType: 'image/jpeg',
-      });
+      if (onOpenHungerWizardWithPhoto) {
+        onOpenHungerWizardWithPhoto(optimizedBase64);
+      } else if (onOpenHungerWizard) {
+        onOpenHungerWizard();
+      }
     } catch (err) {
       const reader = new FileReader();
       reader.onload = () => {
-        onAnalyze({
-          imageBase64: reader.result as string,
-          textPrompt: 'צלמתי את המקרר / המדף שלי. זהה את כל המצרכים הבטוחים ל-SIBO שנראים בתמונה, והצע לי 2-3 רעיונות קלים ומהירים ב-3 דקות של שף דלה פופו להכנה ממה שיש!',
-          mimeType: file.type || 'image/jpeg',
-        });
+        const base64 = reader.result as string;
+        if (onOpenHungerWizardWithPhoto) {
+          onOpenHungerWizardWithPhoto(base64);
+        } else if (onOpenHungerWizard) {
+          onOpenHungerWizard();
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -313,7 +316,13 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
               setActiveScanMode('idle');
             }}
             onSaveToDiary={() => {}}
-            onExploreAlternative={() => {}}
+            onExploreAlternative={(query) => {
+              onAnalyze({ textPrompt: query });
+            }}
+            onScanBarcode={() => {
+              onClearResult();
+              setActiveScanMode('barcode');
+            }}
             isSaved={false}
           />
 

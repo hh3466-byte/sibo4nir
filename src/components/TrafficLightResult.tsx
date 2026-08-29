@@ -46,9 +46,18 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
     Boolean(result.isPackagedProduct)
   );
 
+  const [manualQuery, setManualQuery] = useState('');
+  const [isTypingOpen, setIsTypingOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
+
+  const handleManualSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const q = manualQuery.trim();
+    if (!q) return;
+    onExploreAlternative(q);
+  };
 
   const handleStartVoice = () => {
     if (isListening) {
@@ -318,40 +327,75 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
                   </button>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {/* 🎙️ Voice button */}
-                  <button
-                    type="button"
-                    onClick={handleStartVoice}
-                    className={`py-3 px-3.5 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm border ${
-                      isListening
-                        ? 'bg-rose-500 text-white border-rose-400 animate-pulse ring-4 ring-rose-200'
-                        : 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-600'
-                    }`}
-                    title="דברי עכשיו ואזהה את המאכל"
-                  >
-                    {isListening ? (
-                      <>
-                        <MicOff className="w-4 h-4 animate-bounce" />
-                        <span>🎙️ מקשיב... דברי עכשיו!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="w-4 h-4" />
-                        <span>🎙️ דברי ואני אזהה (דיבור)</span>
-                      </>
-                    )}
-                  </button>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {/* 🎙️ Voice button */}
+                    <button
+                      type="button"
+                      onClick={handleStartVoice}
+                      className={`py-3 px-3.5 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm border ${
+                        isListening
+                          ? 'bg-rose-500 text-white border-rose-400 animate-pulse ring-4 ring-rose-200'
+                          : 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-600'
+                      }`}
+                      title="דברי עכשיו ואזהה את המאכל"
+                    >
+                      {isListening ? (
+                        <>
+                          <MicOff className="w-4 h-4 animate-bounce" />
+                          <span>🎙️ מקשיב... דברי עכשיו!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="w-4 h-4" />
+                          <span>🎙️ דברי ואני אזהה (דיבור)</span>
+                        </>
+                      )}
+                    </button>
 
-                  {/* ✏️ Type button */}
-                  <button
-                    type="button"
-                    onClick={onReset}
-                    className="py-3 px-3.5 bg-white hover:bg-amber-50 text-stone-900 font-black text-xs sm:text-sm rounded-xl border-2 border-amber-300 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
-                  >
-                    <Search className="w-4 h-4 text-amber-600" />
-                    <span>✏️ הקלידי שם מוצר / מנה</span>
-                  </button>
+                    {/* ✏️ Toggle typing button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsTypingOpen(!isTypingOpen)}
+                      className={`py-3 px-3.5 font-black text-xs sm:text-sm rounded-xl border-2 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm ${
+                        isTypingOpen
+                          ? 'bg-amber-100 border-amber-500 text-amber-950'
+                          : 'bg-white hover:bg-amber-50 border-amber-300 text-stone-900'
+                      }`}
+                    >
+                      <Search className="w-4 h-4 text-amber-600" />
+                      <span>✏️ {isTypingOpen ? 'סגור הקלדה' : 'הקלידי שם מוצר / מנה'}</span>
+                    </button>
+                  </div>
+
+                  {/* 📝 Direct Inline Typing & Search Form */}
+                  {isTypingOpen && (
+                    <form
+                      onSubmit={handleManualSubmit}
+                      className="p-3 bg-white rounded-2xl border-2 border-amber-400 shadow-md space-y-2 animate-fadeIn"
+                    >
+                      <span className="text-xs font-black text-stone-800 block">
+                        הקלידי מה שתרצי לבדוק ברמזור:
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={manualQuery}
+                          onChange={(e) => setManualQuery(e.target.value)}
+                          placeholder="למשל: גבינה מותכת, קורנפלור, מרק עוף, פנקייק..."
+                          className="flex-1 p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm font-bold text-stone-900 outline-none focus:border-amber-500 focus:bg-white"
+                          autoFocus
+                        />
+                        <button
+                          type="submit"
+                          disabled={!manualQuery.trim()}
+                          className="py-2.5 px-4 bg-emerald-800 hover:bg-emerald-900 disabled:opacity-40 text-white font-black text-xs sm:text-sm rounded-xl shadow-sm cursor-pointer transition-all active:scale-95 shrink-0"
+                        >
+                          בדקי ➔
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
 
                 {speechError && (

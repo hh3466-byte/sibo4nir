@@ -65,7 +65,6 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
   '72901104': { brand: 'החברה המרכזית למשקאות / פיוז תה / קוקה קולה', defaultCategory: 'תה קר / משקאות קלים' },
   '72901101': { brand: 'החברה המרכזית למשקאות / פיוז תה / קוקה קולה', defaultCategory: 'תה קר / משקאות קלים' },
   '72901102': { brand: 'החברה המרכזית למשקאות / קוקה קולה', defaultCategory: 'משקאות קלים' },
-  '72901193': { brand: 'עלית / שטראוס קפה וממתקים', defaultCategory: 'קפה שחור וטורקי / ממתקים' },
   '7290119': { brand: 'עלית / שטראוס קפה וממתקים', defaultCategory: 'קפה שחור וטורקי / ממתקים' },
   '7290118': { brand: 'עלית / שטראוס', defaultCategory: 'מוצרי מזון ומשקאות' },
   '72901103': { brand: 'פריגת (Prigat)', defaultCategory: 'מיצים ומשקאות פרי' },
@@ -81,6 +80,10 @@ export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defa
   '72900096': { brand: 'עוף טוב (Of Tov)', defaultCategory: 'מוצרי עוף והודו' },
   '72900132': { brand: 'שופרסל (Shufersal Private Label)', defaultCategory: 'מותג פרטי שופרסל' },
   '72900143': { brand: 'רמי לוי (Rami Levy Private Label)', defaultCategory: 'מותג פרטי רמי לוי' },
+  '3073781': { brand: 'לה ואש קירי / בל (La Vache Qui Rit / Bel)', defaultCategory: 'גבינות מותכות ומשולשים' },
+  '307378': { brand: 'לה ואש קירי / בל (La Vache Qui Rit / Bel France)', defaultCategory: 'גבינות מותכות ומשולשים' },
+  '301762': { brand: 'פררו / נוטלה (Ferrero / Nutella)', defaultCategory: 'ממרחים וממתקים' },
+  '762221': { brand: 'מונדלז / מילקה / אוריאו (Mondelez / Milka)', defaultCategory: 'שוקולד ועוגיות' },
 };
 
 /**
