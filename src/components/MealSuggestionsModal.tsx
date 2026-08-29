@@ -38,9 +38,52 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   initialSearchQuery = null,
   initialRecipeId = null,
 }) => {
-  const [selectedMealType, setSelectedMealType] = useState<'all' | 'quick' | 'breakfast' | 'lunch' | 'dinner'>('all');
+  const [selectedMealType, setSelectedMealType] = useState<'all' | 'favorites' | 'quick' | 'breakfast' | 'lunch' | 'dinner'>('all');
   const [selectedRecipe, setSelectedRecipe] = useState<SiboRecipe | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Favorites & 5-Star Ratings State with LocalStorage Persistence
+  const [favorites, setFavorites] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('sibo_recipe_favorites');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const [ratings, setRatings] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('sibo_recipe_ratings');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleToggleFavorite = (recipeId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setFavorites((prev) => {
+      const next = { ...prev, [recipeId]: !prev[recipeId] };
+      try {
+        localStorage.setItem('sibo_recipe_favorites', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleSetRating = (recipeId: string, rating: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setRatings((prev) => {
+      const current = prev[recipeId] || 0;
+      const nextVal = current === rating ? 0 : rating; // toggle if clicking same rating
+      const next = { ...prev, [recipeId]: nextVal };
+      try {
+        localStorage.setItem('sibo_recipe_ratings', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Speech Recognition state
   const [isListening, setIsListening] = useState(false);
@@ -167,45 +210,60 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   const quickPills = ['⚡ קלות ומהירות', '🍗 שיפודים ופרגית', '🥩 בקר וקציצות', '🐟 דגים וסלמון', '🥔 קומפיר', '🌯 דפי אורז', '🥞 פנקייק', '🍫 סניקרס וצ׳יה', '🍲 מרק'];
 
   // Counts by meal type
+  const favoritesCount = useMemo(() => {
+    return Object.values(favorites).filter(Boolean).length;
+  }, [favorites]);
+
   const mealCounts = useMemo(() => {
     return {
       all: SIBO_MEAL_SUGGESTIONS.length,
+      favorites: favoritesCount,
       quick: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'quick').length,
       breakfast: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'breakfast').length,
       lunch: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'lunch').length,
       dinner: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dinner').length,
     };
-  }, []);
+  }, [favoritesCount]);
 
-  // Filter meals based on active tab and search query
+  // Filter and sort meals: rated/favorite meals ALWAYS float to the top of the category!
   const filteredMeals = useMemo(() => {
     let list = SIBO_MEAL_SUGGESTIONS;
 
-    if (selectedMealType !== 'all') {
+    if (selectedMealType === 'favorites') {
+      list = list.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
+    } else if (selectedMealType !== 'all') {
       list = list.filter((m) => m.mealType === selectedMealType);
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
-      const matched = findMatchingRecipes(q, 50);
+      const matched = findMatchingRecipes(q, 185);
       if (matched.length > 0) {
-        if (selectedMealType === 'all') {
-          return matched;
+        if (selectedMealType === 'favorites') {
+          list = matched.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
+        } else if (selectedMealType === 'all') {
+          list = matched;
         } else {
-          return matched.filter((m) => m.mealType === selectedMealType);
+          list = matched.filter((m) => m.mealType === selectedMealType);
         }
+      } else {
+        list = list.filter(
+          (m) =>
+            m.title.toLowerCase().includes(q) ||
+            m.description.toLowerCase().includes(q) ||
+            m.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
+            m.tag.toLowerCase().includes(q)
+        );
       }
-      return list.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.description.toLowerCase().includes(q) ||
-          m.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
-          m.tag.toLowerCase().includes(q)
-      );
     }
 
-    return list;
-  }, [selectedMealType, searchQuery]);
+    // Sort by Favorites (❤️) and Highest Star Ratings (⭐⭐⭐⭐⭐) to the TOP of the category!
+    return [...list].sort((a, b) => {
+      const scoreA = (ratings[a.id] || 0) + (favorites[a.id] ? 10 : 0);
+      const scoreB = (ratings[b.id] || 0) + (favorites[b.id] ? 10 : 0);
+      return scoreB - scoreA;
+    });
+  }, [selectedMealType, searchQuery, favorites, ratings]);
 
   if (!isOpen) return null;
 
@@ -338,17 +396,17 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           </div>
         </div>
 
-        {/* Meal Segment Switcher (All, Quick, Breakfast, Lunch, Dinner) */}
+        {/* Meal Segment Switcher (All, Favorites, Quick, Breakfast, Lunch, Dinner) */}
         <div className="flex items-center justify-center gap-1.5 p-1 bg-stone-100 rounded-2xl border border-stone-200 shrink-0 overflow-x-auto">
           <button
             onClick={() => {
               setSelectedMealType('all');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
+            className={`flex-1 min-w-[65px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
               selectedMealType === 'all'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
             }`}
           >
             <span>הכל ({mealCounts.all})</span>
@@ -356,16 +414,32 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
 
           <button
             onClick={() => {
+              setSelectedMealType('favorites');
+              setSelectedRecipe(null);
+            }}
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              selectedMealType === 'favorites'
+                ? 'bg-rose-700 text-white shadow-xs'
+                : favoritesCount > 0
+                ? 'text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200'
+                : 'text-stone-700 hover:text-rose-700 hover:bg-stone-200/60'
+            }`}
+          >
+            <span>❤️ אהבתי ({favoritesCount})</span>
+          </button>
+
+          <button
+            onClick={() => {
               setSelectedMealType('quick');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 min-w-[80px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'quick'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
             }`}
           >
-            <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
             <span>קלות ({mealCounts.quick})</span>
           </button>
 
@@ -374,10 +448,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('breakfast');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[80px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'breakfast'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
             }`}
           >
             <Coffee className="w-3.5 h-3.5" />
@@ -389,10 +463,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('lunch');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[80px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'lunch'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
             }`}
           >
             <Sun className="w-3.5 h-3.5" />
@@ -404,10 +478,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               setSelectedMealType('dinner');
               setSelectedRecipe(null);
             }}
-            className={`flex-1 min-w-[80px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`flex-1 min-w-[75px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               selectedMealType === 'dinner'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-900 hover:bg-stone-200/60'
             }`}
           >
             <Moon className="w-3.5 h-3.5" />
@@ -420,40 +494,84 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           {selectedRecipe ? (
             /* EXPANDED FULL RECIPE VIEW */
             <div className="bg-stone-50 rounded-3xl p-5 sm:p-7 border border-stone-200 space-y-5 animate-fadeIn">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedRecipe(null)}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-100 hover:bg-emerald-200 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900 hover:text-stone-950 bg-emerald-100 hover:bg-emerald-200 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
                 >
                   <ArrowRight className="w-4 h-4" />
                   <span>חזרה לכל המתכונים</span>
                 </button>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                {/* Top Actions: Favorite Toggle & Rating */}
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleFavorite(selectedRecipe.id, e)}
+                    className={`px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer border ${
+                      favorites[selectedRecipe.id]
+                        ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                        : 'bg-white text-stone-700 hover:bg-rose-50 border-stone-300'
+                    }`}
+                  >
+                    <span>{favorites[selectedRecipe.id] ? '❤️ שמור במועדפים' : '🤍 הוספי למועדפים'}</span>
+                  </button>
+
+                  <span className="text-xs font-bold px-3 py-1 bg-emerald-100 text-emerald-900 rounded-full">
                     {selectedRecipe.tag}
                   </span>
                   <span className="text-xs text-stone-500 font-medium">
-                    {selectedRecipe.difficulty} • {selectedRecipe.prepTime}
+                    {selectedRecipe.prepTime} • ~{selectedRecipe.caloriesApprox} קלוריות
                   </span>
                 </div>
               </div>
 
-              <div className="border-b border-stone-200 pb-3">
-                <h3 className="text-xl sm:text-2xl font-extrabold text-stone-900">
-                  {selectedRecipe.title}
-                </h3>
-                <p className="text-sm text-stone-600 mt-1">
+              <div className="border-b border-stone-200 pb-3 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-xl sm:text-2xl font-black text-stone-900">
+                    {selectedRecipe.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-stone-600 font-medium">
                   {selectedRecipe.description}
                 </p>
+
+                {/* Rating Bar inside Recipe */}
+                <div className="pt-2 flex items-center gap-3 bg-white p-3 rounded-2xl border border-stone-200">
+                  <span className="text-xs font-bold text-stone-700">דרגי מתכון זה (יופיע בראש הרשימה):</span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={(e) => handleSetRating(selectedRecipe.id, star, e)}
+                        className={`text-lg transition-transform hover:scale-125 cursor-pointer ${
+                          (ratings[selectedRecipe.id] || 0) >= star ? 'text-amber-400' : 'text-stone-300 hover:text-amber-300'
+                        }`}
+                        title={`דרג ${star} כוכבים`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  {ratings[selectedRecipe.id] ? (
+                    <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      דירוג שלך: {ratings[selectedRecipe.id]}/5 ⭐
+                    </span>
+                  ) : null}
+                </div>
               </div>
 
               {/* SIBO Safety Notes Banner */}
-              <div className="p-3.5 bg-emerald-50/80 rounded-2xl border border-emerald-200 flex items-start gap-2.5 text-xs sm:text-sm text-emerald-950">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 flex items-start gap-2.5 text-xs sm:text-sm text-emerald-950">
+                <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-extrabold block">למה המתכון בטוח ב-100% ל-SIBO?</span>
-                  <span className="text-emerald-800">{selectedRecipe.siboNotes}</span>
+                  <span className="font-extrabold block">יתרונות קליניים ובטיחות ל-SIBO:</span>
+                  <span className="text-emerald-900 font-medium">
+                    {selectedRecipe.benefits && selectedRecipe.benefits.length > 0
+                      ? selectedRecipe.benefits.join(' • ')
+                      : '0% שום, 0% בצל, 0% גלוטן ולקטוז — בטוח לחלוטין ל-SIBO שלב 1'}
+                  </span>
                 </div>
               </div>
 
@@ -493,66 +611,126 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
               </div>
             </div>
           ) : (
-            /* LIST / GRID OF MEALS */
+            /* LIST / GRID OF MEALS WITH TOP-SORTED RATINGS & FAVORITES */
             <div className="space-y-3">
               {filteredMeals.length === 0 ? (
                 <div className="text-center py-12 bg-stone-50 rounded-3xl border border-stone-200 space-y-3">
                   <div className="text-4xl">🍲</div>
                   <h4 className="text-base font-extrabold text-stone-800">
-                    לא נמצאו מתכונים תואמים לחיפוש
+                    לא נמצאו מתכונים תואמים
                   </h4>
                   <p className="text-xs text-stone-500 max-w-md mx-auto">
-                    נסי לחפש מילה אחרת (למשל: עוף, פרגית, סלמון, קישוא, ביצה, שוקולד, מרק) או לחצי על אחד מכפתורי החיפוש המהיר.
+                    {selectedMealType === 'favorites'
+                      ? 'עדיין לא סימנת מתכונים במועדפים. לחצי על הלב ❤️ או דרגי בכוכבים ⭐ בכל מתכון כדי שהוא יופיע כאן ובראש הרשימה!'
+                      : 'נסי לחפש מילה אחרת או לחצי על אחד מכפתורי החיפוש המהיר.'}
                   </p>
                   <button
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedMealType('all');
                     }}
-                    className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-emerald-800 text-white text-xs font-bold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
                   >
                     הצג את כל המתכונים
                   </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                  {filteredMeals.map((recipe) => (
-                    <div
-                      key={recipe.id}
-                      onClick={() => setSelectedRecipe(recipe)}
-                      className="bg-white border border-stone-200 hover:border-emerald-400 p-4 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200/60">
-                            ⭐ המלצת שֵׁף דַּלָּה פּוּפוּ
-                          </span>
-                          <span className="text-[10px] text-stone-400 font-medium flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{recipe.prepTime}</span>
-                          </span>
+                  {filteredMeals.map((recipe) => {
+                    const isFav = !!favorites[recipe.id];
+                    const currentRating = ratings[recipe.id] || 0;
+
+                    return (
+                      <div
+                        key={recipe.id}
+                        onClick={() => setSelectedRecipe(recipe)}
+                        className={`bg-white border p-4 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-3 group relative ${
+                          isFav || currentRating > 0
+                            ? 'border-amber-300 ring-1 ring-amber-200 bg-amber-50/20'
+                            : 'border-stone-200 hover:border-emerald-700'
+                        }`}
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {isFav && (
+                                <span className="text-[10px] font-black px-2 py-0.5 bg-rose-100 text-rose-800 rounded-full border border-rose-200 flex items-center gap-1">
+                                  <span>❤️ אהבתי</span>
+                                </span>
+                              )}
+                              {currentRating > 0 && (
+                                <span className="text-[10px] font-black px-2 py-0.5 bg-amber-100 text-amber-900 rounded-full border border-amber-300 flex items-center gap-0.5">
+                                  <span>{currentRating}</span>
+                                  <span>★</span>
+                                </span>
+                              )}
+                              <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-900 rounded-full border border-emerald-200/60">
+                                {recipe.tag}
+                              </span>
+                            </div>
+
+                            {/* Favorite Heart Button on Card */}
+                            <button
+                              type="button"
+                              onClick={(e) => handleToggleFavorite(recipe.id, e)}
+                              className={`p-1.5 rounded-full transition-transform hover:scale-125 cursor-pointer ${
+                                isFav
+                                  ? 'text-rose-600 bg-rose-50'
+                                  : 'text-stone-400 hover:text-rose-500 hover:bg-stone-100'
+                              }`}
+                              title={isFav ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+                            >
+                              <span className="text-sm">{isFav ? '❤️' : '🤍'}</span>
+                            </button>
+                          </div>
+
+                          <h4 className="text-sm font-black text-stone-900 group-hover:text-emerald-900 transition-colors line-clamp-2">
+                            {recipe.title}
+                          </h4>
+
+                          <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed font-medium">
+                            {recipe.description}
+                          </p>
                         </div>
 
-                        <h4 className="text-sm font-extrabold text-stone-900 group-hover:text-emerald-800 transition-colors line-clamp-2">
-                          {recipe.title}
-                        </h4>
+                        <div className="pt-2 border-t border-stone-100 space-y-2">
+                          {/* 5-Star Interactive Rating on Card */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={(e) => handleSetRating(recipe.id, star, e)}
+                                  className={`text-sm transition-colors hover:scale-125 cursor-pointer ${
+                                    currentRating >= star ? 'text-amber-400' : 'text-stone-300 hover:text-amber-300'
+                                  }`}
+                                  title={`דרגי ${star} כוכבים`}
+                                >
+                                  ★
+                                </button>
+                              ))}
+                            </div>
 
-                        <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
-                          {recipe.description}
-                        </p>
-                      </div>
+                            <span className="text-[10px] text-stone-400 font-bold flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              <span>{recipe.prepTime}</span>
+                            </span>
+                          </div>
 
-                      <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-900">
-                        <span className="flex items-center gap-1">
-                          <span>צפי במתכון של שף דלה פופו</span>
-                          <BookOpen className="w-3.5 h-3.5" />
-                        </span>
-                        <div className="w-6 h-6 rounded-full bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
-                          <ArrowRight className="w-3 h-3 rotate-180" />
+                          <div className="flex items-center justify-between text-xs font-bold text-emerald-800 group-hover:text-emerald-950">
+                            <span className="flex items-center gap-1">
+                              <span>למתכון המלא</span>
+                              <BookOpen className="w-3.5 h-3.5" />
+                            </span>
+                            <div className="w-6 h-6 rounded-full bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                              <ArrowRight className="w-3 h-3 rotate-180" />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -562,7 +740,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
         {/* Modal Footer */}
         <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500 shrink-0">
           <div className="flex items-center gap-1.5">
-            <span>🍽️ כל המתכונים בהמלצת שֵׁף דַּלָּה פּוּפוּ מכילים 0% שום רגיל, 0% בצל ו-0% לקטוז.</span>
+            <span>🍽️ 185 מתכוני שֵׁף מדורגים ל-SIBO • מתכונים שדירגת כוכבים או סימנת ב-❤️ מופיעים תמיד בראש הרשימה!</span>
           </div>
           <button
             onClick={onClose}

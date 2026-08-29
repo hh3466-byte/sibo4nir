@@ -33,8 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       id: 'recipe',
-      label: 'מתכונים וארוחות (60+) 🍲',
-      desc: 'ספר שף דלה פופו המלא',
+      label: 'מתכונים וארוחות (180+) 🍲',
+      desc: 'ספר שף דלה פופו המלא (185 מנות)',
       activeColor: 'bg-emerald-800 text-white shadow-sm font-black',
       inactiveColor: 'bg-stone-100 text-stone-800 hover:bg-stone-200 font-bold border border-stone-200',
     },
@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onOpenHungerWizard}
-                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-sm cursor-pointer"
+                className="px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-sm cursor-pointer border border-teal-600"
                 title="אשף אני רעבה! מה לאכול עכשיו?"
               >
                 <span>🥑 אני רעבה!</span>
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="desktop-hunger-sos-btn"
               type="button"
               onClick={onOpenHungerWizard}
-              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-teal-700 hover:bg-teal-800 border border-teal-600 px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer active:scale-95"
               title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
             >
               <span className="text-sm">🥑</span>

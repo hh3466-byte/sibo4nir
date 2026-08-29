@@ -20,7 +20,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         id="btn-floating-hunger-sos"
         type="button"
         onClick={onOpenHungerWizard}
-        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg hover:shadow-xl active:scale-95 group cursor-pointer"
+        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-teal-700 hover:bg-teal-800 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95 group cursor-pointer border border-teal-600"
         title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
       >
         <span className="text-base sm:text-lg group-hover:scale-110 transition-transform">🥑</span>
@@ -32,11 +32,11 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         id="btn-floating-meal-suggestions"
         type="button"
         onClick={onOpenMealSuggestions}
-        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-lg hover:shadow-xl active:scale-95 group cursor-pointer"
+        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-md hover:shadow-lg active:scale-95 group cursor-pointer"
         title="המלצת שֵׁף דַּלָּה פּוּפוּ — מתכונים מותאמים ל-SIBO"
       >
         <ChefHat className="w-4 h-4 text-emerald-100 group-hover:rotate-12 transition-transform" />
-        <span className="tracking-wide">מתכוני שֵׁף (60+) 🍲</span>
+        <span className="tracking-wide">מתכוני שֵׁף (180+) 🍲</span>
       </button>
     </div>
   );

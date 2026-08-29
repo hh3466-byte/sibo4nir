@@ -260,27 +260,27 @@ export default function App() {
             id="banner-hunger-sos-btn"
             type="button"
             onClick={() => setIsHungerWizardOpen(true)}
-            className="w-full p-4 sm:p-5 rounded-3xl bg-stone-900 hover:bg-stone-950 text-white font-black text-sm sm:text-base shadow-lg transition-all flex items-center justify-between gap-3 border border-stone-800 active:scale-98 cursor-pointer group"
+            className="w-full p-4 sm:p-5 rounded-3xl bg-teal-950/90 hover:bg-teal-950 text-white font-black text-sm sm:text-base shadow-md transition-all flex items-center justify-between gap-3 border border-teal-800/80 active:scale-98 cursor-pointer group"
           >
             <div className="flex items-center gap-3.5 text-right">
-              <div className="w-12 h-12 rounded-2xl bg-amber-600/90 text-white flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform shrink-0 border border-teal-600">
                 🥑
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-teal-800/60 text-teal-200 border border-teal-600/40 rounded-full">
                     חירום שובע
                   </span>
                   <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
                     אני רעבה!!! (מה לאכול עכשיו?) ✨
                   </h3>
                 </div>
-                <p className="text-xs text-stone-400 font-medium mt-0.5">
+                <p className="text-xs text-teal-200/80 font-medium mt-0.5">
                   פתרונות מהירים ב-3 דקות • מקרר ומזווה • תחנות דלק • מסעדות סביבך
                 </p>
               </div>
             </div>
-            <div className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
+            <div className="px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
               פתחי אשף ⚡
             </div>
           </button>
@@ -339,7 +339,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 60+ RECIPE BOOK */}
+        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 180+ RECIPE BOOK */}
         {activeTab === 'recipe' && (
           <div className="space-y-4">
             <div className="p-4 sm:p-5 bg-stone-900 text-white rounded-3xl shadow-sm border border-stone-800 flex items-center justify-between gap-3">
@@ -348,8 +348,8 @@ export default function App() {
                   🍲
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white">ספר המתכונים של שף דלה פופו (60+ מנות)</h3>
-                  <p className="text-xs text-stone-300 font-medium">ארוחות קלות ומהירות • בוקר • צהריים • ערב</p>
+                  <h3 className="text-base font-black text-white">ספר המתכונים של שף דלה פופו (180+ מנות)</h3>
+                  <p className="text-xs text-stone-300 font-medium">50 קלות ומהירות • 45 בוקר • 45 צהריים • 45 ערב</p>
                 </div>
               </div>
               <button
@@ -397,9 +397,9 @@ export default function App() {
       <nav aria-label="ניווט מהיר" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-2xl py-2 px-3 flex items-center justify-around sm:hidden">
         <button
           onClick={() => setIsHungerWizardOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-amber-700 font-black cursor-pointer active:scale-95"
+          className="flex flex-col items-center gap-0.5 text-teal-900 font-black cursor-pointer active:scale-95"
         >
-          <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-teal-700 text-white flex items-center justify-center text-sm shadow-sm border border-teal-600">
             🥑
           </div>
           <span className="text-[10px]">אני רעבה!</span>
