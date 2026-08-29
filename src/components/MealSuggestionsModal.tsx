@@ -38,7 +38,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   initialSearchQuery = null,
   initialRecipeId = null,
 }) => {
-  const [selectedMealType, setSelectedMealType] = useState<'all' | 'favorites' | 'quick' | 'breakfast' | 'lunch' | 'dinner'>('all');
+  const [selectedMealType, setSelectedMealType] = useState<'all' | 'favorites' | 'quick' | 'breakfast' | 'lunch' | 'dinner' | 'dessert'>('all');
   const [selectedRecipe, setSelectedRecipe] = useState<SiboRecipe | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -207,7 +207,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
     }
   };
 
-  const quickPills = ['⚡ קלות ומהירות', '🍗 שיפודים ופרגית', '🥩 בקר וקציצות', '🐟 דגים וסלמון', '🥔 קומפיר', '🌯 דפי אורז', '🥞 פנקייק', '🍫 סניקרס וצ׳יה', '🍲 מרק'];
+  const quickPills = ['⚡ קלות ומהירות', '🍫 מתוקים וקינוחים', '🍓 ארטיק תות', '🍮 פודינג צ׳יה', '🥞 פנקייק', '🍗 שיפודים ופרגית', '🥩 קציצות בקר', '🐟 סלמון', '🥔 קומפיר', '🍲 מרק'];
 
   // Counts by meal type
   const favoritesCount = useMemo(() => {
@@ -222,6 +222,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
       breakfast: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'breakfast').length,
       lunch: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'lunch').length,
       dinner: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dinner').length,
+      dessert: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dessert').length,
     };
   }, [favoritesCount]);
 
@@ -237,7 +238,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
 
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
-      const matched = findMatchingRecipes(q, 185);
+      const matched = findMatchingRecipes(q, 200);
       if (matched.length > 0) {
         if (selectedMealType === 'favorites') {
           list = matched.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
@@ -304,7 +305,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
                 setSearchQuery(e.target.value);
                 if (selectedRecipe) setSelectedRecipe(null);
               }}
-              placeholder="דברי במיקרופון או הקלידי (למשל: שיפודי פרגית, קציצות בקר, סלמון, קומפיר, פנקייק, סניקרס)..."
+              placeholder="דברי במיקרופון או הקלידי (למשל: שיפודי פרגית, קציצות בקר, סלמון, קומפיר, פנקייק, ארטיק תות, פודינג)..."
               className="w-full pl-10 pr-12 py-2.5 sm:py-3 bg-stone-50 border-2 border-stone-200 focus:border-emerald-500 focus:bg-white rounded-2xl text-xs sm:text-sm font-semibold outline-none transition-all shadow-2xs"
             />
 
@@ -396,7 +397,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           </div>
         </div>
 
-        {/* Meal Segment Switcher (All, Favorites, Quick, Breakfast, Lunch, Dinner) */}
+        {/* Meal Segment Switcher (All, Favorites, Quick, Breakfast, Lunch, Dinner, Dessert) */}
         <div className="flex items-center justify-center gap-1.5 p-1 bg-stone-100 rounded-2xl border border-stone-200 shrink-0 overflow-x-auto">
           <button
             onClick={() => {
@@ -486,6 +487,20 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           >
             <Moon className="w-3.5 h-3.5" />
             <span>ערב ({mealCounts.dinner})</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedMealType('dessert');
+              setSelectedRecipe(null);
+            }}
+            className={`flex-1 min-w-[85px] py-2 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              selectedMealType === 'dessert'
+                ? 'bg-amber-700 text-white shadow-xs'
+                : 'text-stone-700 hover:text-amber-900 hover:bg-stone-200/60'
+            }`}
+          >
+            <span>🍫 מתוקים ({mealCounts.dessert})</span>
           </button>
         </div>
 

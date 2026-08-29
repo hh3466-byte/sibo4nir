@@ -1,4 +1,4 @@
-// Auto-generated 500+ SIBO shopping database with dedicated tabs: Veggies & Fruits, 50+ Sauces, 50+ Spices, and dedicated Sweets (מתוקים)
+// Auto-generated 500+ Pure Supermarket SIBO shopping database (0 homemade items, 100% store products)
 export interface SiboShopping500Item {
   id: string;
   category: 'meat_fish' | 'veggies_fruits' | 'dairy_oils' | 'grains_starches' | 'sauces' | 'spices' | 'sweets' | 'drinks' | 'pantry_baking' | 'custom';
@@ -80,13 +80,21 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
   {
     "id": "sibo_shop_8",
     "category": "sauces",
+    "name": "חרדל צרפתי בטחינה מסורתית",
+    "safeBrand": "Edmond Fallot Dijon Mustard",
+    "warningNote": "איכות מסעדות צרפתיות",
+    "unit": "צנצנת"
+  },
+  {
+    "id": "sibo_shop_9",
+    "category": "sauces",
     "name": "טחינה גולמית טהורה 100% שומשום",
     "safeBrand": "אל ארז / הר ברכה / היונה / ירושלים",
     "warningNote": "לוודא: 100% שומשום טהור ללא תוספים",
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_9",
+    "id": "sibo_shop_10",
     "category": "sauces",
     "name": "טחינה גולמית משומשום אתיופי מלא",
     "safeBrand": "הר ברכה משומשום מלא / אל ארז מלא",
@@ -94,7 +102,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_10",
+    "id": "sibo_shop_11",
     "category": "sauces",
     "name": "טחינה גולמית אורגנית",
     "safeBrand": "הרדוף אורגני טחינה",
@@ -102,7 +110,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_11",
+    "id": "sibo_shop_12",
     "category": "sauces",
     "name": "טחינה גולמית בטחינה מסורתית בריחיים של אבן",
     "safeBrand": "הר ברכה פרימיום",
@@ -110,7 +118,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_12",
+    "id": "sibo_shop_13",
     "category": "sauces",
     "name": "טחינה שחורה משומשום שחור טהור 100%",
     "safeBrand": "חוות דרך התבלינים / שוק לוינסקי",
@@ -118,7 +126,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_13",
+    "id": "sibo_shop_14",
     "category": "sauces",
     "name": "חמאת בוטנים 100% טבעית ללא סוכר",
     "safeBrand": "B&D / ראסטיס 100% בוטנים",
@@ -126,7 +134,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_14",
+    "id": "sibo_shop_15",
     "category": "sauces",
     "name": "חמאת בוטנים טבעית עם שברי בוטנים (Crunchy)",
     "safeBrand": "B&D קראנץ׳ טבעי",
@@ -134,7 +142,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_15",
+    "id": "sibo_shop_16",
     "category": "sauces",
     "name": "חמאת בוטנים אורגנית 100%",
     "safeBrand": "הרדוף / שופרסל גרין",
@@ -142,7 +150,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_16",
+    "id": "sibo_shop_17",
     "category": "sauces",
     "name": "חמאת שקדים טבעית 100%",
     "safeBrand": "שקדיה / B&D / ראסטיס",
@@ -150,7 +158,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_17",
+    "id": "sibo_shop_18",
     "category": "sauces",
     "name": "חמאת שקדים טבעית עם שברי שקדים קראנץ׳",
     "safeBrand": "שקדיה קראנץ׳",
@@ -158,7 +166,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_18",
+    "id": "sibo_shop_19",
     "category": "sauces",
     "name": "חמאת שקדים אורגנית",
     "safeBrand": "הרדוף / תבואות",
@@ -166,15 +174,15 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_19",
+    "id": "sibo_shop_20",
     "category": "sauces",
     "name": "חמאת אגוזי לוז 100% טבעית",
     "safeBrand": "ראסטיס / שקדיה לוז",
-    "warningNote": "מעולה למריחה ולשוקולד ביתי",
+    "warningNote": "מעולה למריחה ולשוקולד",
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_20",
+    "id": "sibo_shop_21",
     "category": "sauces",
     "name": "חמאת גרעיני חמנייה טבעית 100%",
     "safeBrand": "שקדיה חמנייה טבעית",
@@ -182,7 +190,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_21",
+    "id": "sibo_shop_22",
     "category": "sauces",
     "name": "חמאת זרעי דלעת טבעית 100%",
     "safeBrand": "שקדיה דלעת",
@@ -190,7 +198,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_22",
+    "id": "sibo_shop_23",
     "category": "sauces",
     "name": "חומץ תפוחים אורגני לא מסונן (עם \"אם החומץ\")",
     "safeBrand": "Bragg Organic Apple Cider Vinegar",
@@ -198,7 +206,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_23",
+    "id": "sibo_shop_24",
     "category": "sauces",
     "name": "חומץ תפוחים טבעי 5% חומציות",
     "safeBrand": "סנטיאגו / שופרסל גרין",
@@ -206,7 +214,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_24",
+    "id": "sibo_shop_25",
     "category": "sauces",
     "name": "חומץ תפוחים איטלקי אורגני",
     "safeBrand": "Biona Organic Apple Cider",
@@ -214,15 +222,15 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_25",
+    "id": "sibo_shop_26",
     "category": "sauces",
     "name": "שמן זית כתית מעולה מושרה שום (Garlic Infused Oil)",
-    "safeBrand": "Garlic Gold / Farchioni Garlic Oil / שמן שום ביתי",
+    "safeBrand": "Garlic Gold / Farchioni Garlic Oil / שמן שום מבוקבק",
     "warningNote": "הערה קלינית: שמן שום מותר ב-SIBO כי פרוקטנים אינם מסיסים בשמן!",
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_26",
+    "id": "sibo_shop_27",
     "category": "sauces",
     "name": "שמן שומשום קלוי טהור 100%",
     "safeBrand": "Blue Dragon / Taste of Asia / San-J",
@@ -230,7 +238,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_27",
+    "id": "sibo_shop_28",
     "category": "sauces",
     "name": "שמן שומשום בהיר בכבישה קרה",
     "safeBrand": "שופרסל גרין / תבואות",
@@ -238,7 +246,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_28",
+    "id": "sibo_shop_29",
     "category": "sauces",
     "name": "רוטב קוקוס אמינוס (Coconut Aminos)",
     "safeBrand": "Coconut Secret Coconut Aminos",
@@ -246,7 +254,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_29",
+    "id": "sibo_shop_30",
     "category": "sauces",
     "name": "קרם קוקוס לבישול 100% טבעי ללא E412",
     "safeBrand": "Aroy-D (קרטון ירוק) / Chaokoh 100%",
@@ -254,7 +262,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קרטון"
   },
   {
-    "id": "sibo_shop_30",
+    "id": "sibo_shop_31",
     "category": "sauces",
     "name": "חלב קוקוס לבישול ללא חומרים מתחלבים",
     "safeBrand": "Aroy-D קרטון 250 מ\"ל",
@@ -262,7 +270,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_31",
+    "id": "sibo_shop_32",
     "category": "sauces",
     "name": "חומץ בלסמי איטלקי איכותי ממודנה",
     "safeBrand": "Ponti / Monini Aceto Balsamico",
@@ -270,7 +278,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_32",
+    "id": "sibo_shop_33",
     "category": "sauces",
     "name": "חומץ בן יין אדום טהור",
     "safeBrand": "Maille / De Nigris Red Wine Vinegar",
@@ -278,7 +286,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_33",
+    "id": "sibo_shop_34",
     "category": "sauces",
     "name": "חומץ בן יין לבן טהור",
     "safeBrand": "Maille White Wine Vinegar",
@@ -286,7 +294,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_34",
+    "id": "sibo_shop_35",
     "category": "sauces",
     "name": "חומץ אורז טבעי (ללא תוספת סוכר)",
     "safeBrand": "Marukan / Mizkan Pure Rice Vinegar",
@@ -294,7 +302,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_35",
+    "id": "sibo_shop_36",
     "category": "sauces",
     "name": "חומץ שרי ספרדי מיושן (Sherry Vinegar)",
     "safeBrand": "La Sevillana Jerez Sherry Vinegar",
@@ -302,7 +310,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_36",
+    "id": "sibo_shop_37",
     "category": "sauces",
     "name": "חומץ שזיפי אוּמֶבּוֹשִׁי יפני (Umeboshi)",
     "safeBrand": "Clearspring Umeboshi Plum Vinegar",
@@ -310,7 +318,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_37",
+    "id": "sibo_shop_38",
     "category": "sauces",
     "name": "רוטב חריף טבסקו קלאסי (אדום)",
     "safeBrand": "Tabasco Original Red Pepper Sauce",
@@ -318,7 +326,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_38",
+    "id": "sibo_shop_39",
     "category": "sauces",
     "name": "רוטב חריף טבסקו ירוק (חלפניו)",
     "safeBrand": "Tabasco Green Pepper Sauce",
@@ -326,7 +334,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_39",
+    "id": "sibo_shop_40",
     "category": "sauces",
     "name": "רוטב חריף פרנקס רדהוט מקורי",
     "safeBrand": "Frank's RedHot Original Sauce",
@@ -334,7 +342,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_40",
+    "id": "sibo_shop_41",
     "category": "sauces",
     "name": "רוטב דגים תאילנדי טהור (Fish Sauce)",
     "safeBrand": "Tiparos / Squid Brand / Megachef",
@@ -342,7 +350,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_41",
+    "id": "sibo_shop_42",
     "category": "sauces",
     "name": "מחית עגבניות פסאטה חלקה 100% עגבניות",
     "safeBrand": "Mutti Passata (בקבוק זכוכית)",
@@ -350,7 +358,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_42",
+    "id": "sibo_shop_43",
     "category": "sauces",
     "name": "מחית עגבניות פסאטה מרוכזת בבקבוק",
     "safeBrand": "Cirio Passata",
@@ -358,7 +366,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_43",
+    "id": "sibo_shop_44",
     "category": "sauces",
     "name": "עגבניות מרוסקות 100% איטלקיות",
     "safeBrand": "Mutti Polpa 100% איטלקי",
@@ -366,7 +374,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_44",
+    "id": "sibo_shop_45",
     "category": "sauces",
     "name": "רסק עגבניות מרוכז כפול טהור",
     "safeBrand": "Mutti Doppio Concentrato",
@@ -374,7 +382,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שפופרת"
   },
   {
-    "id": "sibo_shop_45",
+    "id": "sibo_shop_46",
     "category": "sauces",
     "name": "עגבניות שלמות מקולפות במיץ עגבניות",
     "safeBrand": "Mutti Pelati / Cirio",
@@ -382,7 +390,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_46",
+    "id": "sibo_shop_47",
     "category": "sauces",
     "name": "שמן אבוקדו מכבישה קרה 100% טהור",
     "safeBrand": "Chosen Foods 100% Pure Avocado Oil",
@@ -390,7 +398,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_47",
+    "id": "sibo_shop_48",
     "category": "sauces",
     "name": "שמן אגוזי מלך טהור לתיבול סלטים",
     "safeBrand": "La Tourangelle Walnut Oil",
@@ -398,7 +406,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_48",
+    "id": "sibo_shop_49",
     "category": "sauces",
     "name": "שמן כמהין לבן איכותי על בסיס שמן זית",
     "safeBrand": "Urbani Tartufi White Truffle Oil",
@@ -406,7 +414,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_49",
+    "id": "sibo_shop_50",
     "category": "sauces",
     "name": "שמן כמהין שחור פרימיום",
     "safeBrand": "Tartufi Morra Black Truffle Oil",
@@ -414,7 +422,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_50",
+    "id": "sibo_shop_51",
     "category": "sauces",
     "name": "שמן זרעי ענבים טהור",
     "safeBrand": "Borges / שופרסל גרין",
@@ -422,7 +430,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_51",
+    "id": "sibo_shop_52",
     "category": "sauces",
     "name": "שמן קוקוס אורגני בכבישה קרה",
     "safeBrand": "Jarrow Formulas / B&D / שופרסל גרין",
@@ -430,7 +438,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_52",
+    "id": "sibo_shop_53",
     "category": "sauces",
     "name": "שמן שקדים טהור בכבישה קרה",
     "safeBrand": "La Tourangelle Almond Oil",
@@ -438,7 +446,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_53",
+    "id": "sibo_shop_54",
     "category": "sauces",
     "name": "מיץ לימון טבעי 100% סחוט ללא משמרים",
     "safeBrand": "לימונצ׳לו טבעי / סחוט טרי מהירקן",
@@ -446,7 +454,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_54",
+    "id": "sibo_shop_55",
     "category": "sauces",
     "name": "מיץ ליים טבעי 100%",
     "safeBrand": "Santa Cruz Organic Lime Juice",
@@ -454,7 +462,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_55",
+    "id": "sibo_shop_56",
     "category": "sauces",
     "name": "רוטב חרדל צהוב קלאסי",
     "safeBrand": "French's Classic Yellow Mustard",
@@ -462,7 +470,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_56",
+    "id": "sibo_shop_57",
     "category": "sauces",
     "name": "מיונז הולנדי איכותי ללא שום ובצל",
     "safeBrand": "Hellmann's Real (הולנדי) / Calve",
@@ -470,7 +478,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_57",
+    "id": "sibo_shop_58",
     "category": "sauces",
     "name": "מיונז שמן אבוקדו בריאותי",
     "safeBrand": "Primal Kitchen Mayo with Avocado Oil",
@@ -478,7 +486,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_58",
+    "id": "sibo_shop_59",
     "category": "sauces",
     "name": "ממרח טפנד זיתי קלמטה טהור",
     "safeBrand": "משק לין / אנשי הזית טפנד קלמטה",
@@ -486,7 +494,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_59",
+    "id": "sibo_shop_60",
     "category": "sauces",
     "name": "ממרח טפנד זיתים ירוקים טהור ללא שום",
     "safeBrand": "אנשי הזית",
@@ -494,7 +502,15 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_60",
+    "id": "sibo_shop_61",
+    "category": "sauces",
+    "name": "ממרח עגבניות מיובשות ללא שום",
+    "safeBrand": "משק לין טפנד עגבניות",
+    "warningNote": "עגבניות מיובשות ושמן זית בלבד",
+    "unit": "צנצנת"
+  },
+  {
+    "id": "sibo_shop_62",
     "category": "sauces",
     "name": "עגבניות מיובשות בשמן זית ללא שום",
     "safeBrand": "שופרסל פרימיום / זיתא",
@@ -502,7 +518,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_61",
+    "id": "sibo_shop_63",
     "category": "sauces",
     "name": "רכז רימונים 100% טבעי ללא סוכר",
     "safeBrand": "Cortas / Al-Rabih 100% Pomegranate Molasses",
@@ -510,7 +526,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_62",
+    "id": "sibo_shop_64",
     "category": "sauces",
     "name": "רוטב ווסטרשייר ללא גלוטן וללא שום",
     "safeBrand": "The Wizard's Organic GF Worcestershire",
@@ -518,36 +534,20 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_63",
-    "category": "sauces",
-    "name": "רוטב צ׳ימיצ׳ורי ביתי בטוח (שמן, פטרוזיליה, אורגנו, חומץ)",
-    "safeBrand": "הכנה ביתית לפי מתכון שף דלה פופו",
-    "warningNote": "בטוח 100% — ללא שום",
-    "unit": "צנצנת"
-  },
-  {
-    "id": "sibo_shop_64",
-    "category": "sauces",
-    "name": "רוטב פסטו בזיליקום ביתי (בזיליקום, שמן זית, פרמזן, צנוברים)",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "ללא שום תעשייתי",
-    "unit": "צנצנת"
-  },
-  {
     "id": "sibo_shop_65",
     "category": "sauces",
-    "name": "רוטב ויניגרט דיז׳ון קלאסי (שמן זית, חרדל Maille, לימון, מלח)",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "רוטב הדגל לסלטים ירוקים",
+    "name": "רוטב ברביקיו ללא שום ובצל",
+    "safeBrand": "Fody Low FODMAP BBQ Sauce / Primal Kitchen",
+    "warningNote": "רוטב ברביקיו מאושר ל-SIBO",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_66",
     "category": "sauces",
-    "name": "רוטב טחינה ירוקה (טחינה אל ארז, שמיר, פטרוזיליה, מים, מלח)",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "0% שום",
-    "unit": "קופסה"
+    "name": "קטשופ ללא שום ובצל",
+    "safeBrand": "Fody Low FODMAP Ketchup / True Made Foods",
+    "warningNote": "ללא סירופ תירס, ללא שום ובצל",
+    "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_67",
@@ -560,57 +560,57 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
   {
     "id": "sibo_shop_68",
     "category": "sauces",
-    "name": "רוטב ברביקיו ביתי ללא בצל ושום",
-    "safeBrand": "הכנה ביתית (עגבניות Mutti, מייפל, פפריקה מעושנת, חומץ)",
-    "warningNote": "בטוח לחלוטין",
+    "name": "רוטב טריאקי ללא גלוטן וללא שום",
+    "safeBrand": "San-J Gluten Free Teriyaki Garlic Free",
+    "warningNote": "מתאים למוקפצים ולסלמון",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_69",
     "category": "sauces",
-    "name": "רוטב קטשופ ביתי דל סוכר ללא בצל ושום",
-    "safeBrand": "הכנה ביתית מפסאטה Mutti, מייפל ומלח",
-    "warningNote": "0% סירופ תירס עתיר פרוקטוז",
+    "name": "רוטב ג׳ינג׳ר וסויה תמרי מרוכז",
+    "safeBrand": "San-J Gluten Free Ginger Tamari",
+    "warningNote": "ללא גלוטן 0% שום",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_70",
     "category": "sauces",
-    "name": "רוטב ג׳ינג׳ר וסויה תמרי מרוכז",
-    "safeBrand": "San-J Gluten Free Ginger Tamari",
-    "warningNote": "מתאים למוקפצים ולסלמון",
+    "name": "שמן זית בטעם בזיליקום",
+    "safeBrand": "Farchioni Basil Infused Olive Oil",
+    "warningNote": "ארומת בזיליקום טבעית",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_71",
     "category": "sauces",
-    "name": "רוטב שמן שומשום וסויה לסלט אסייתי",
-    "safeBrand": "הכנה ביתית (תמרי, שמן שומשום, ג׳ינג׳ר ומייפל)",
-    "warningNote": "מרענן ודל פודמאפ",
+    "name": "שמן זית בטעם אורגנו",
+    "safeBrand": "אנשי הזית שמן אורגנו",
+    "warningNote": "לתיבול סלטים",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_72",
     "category": "sauces",
-    "name": "שמן בצל ירוק ביתי (חלקים ירוקים בלבד מושרים בשמן)",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "טעם בצל עמוק 0% פרוקטנים",
+    "name": "שמן צ׳ילי חריף טהור",
+    "safeBrand": "La Tourangelle Chili Oil",
+    "warningNote": "100% שמן ושבבי צ׳ילי",
     "unit": "בקבוק"
   },
   {
     "id": "sibo_shop_73",
     "category": "sauces",
-    "name": "רוטב ויניגרט פטל ביתי (שמן זית, חומץ תפוחים, פטל מעוך, מייפל)",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "ויניגרט פירותי מרענן",
-    "unit": "בקבוק"
+    "name": "רוטב פסטו בזיליקום קנוי ללא שום",
+    "safeBrand": "Filippo Berio Vegan Garlic-Free Pesto",
+    "warningNote": "לוודא גרסה ללא שום",
+    "unit": "צנצנת"
   },
   {
     "id": "sibo_shop_74",
     "category": "sauces",
     "name": "רוטב צ׳ילי מתוק ללא שום (Sweet Chili Garlic-Free)",
-    "safeBrand": "Thai Kitchen / הכנה ביתית",
-    "warningNote": "מייפל, צ׳ילי, חומץ ומלח",
+    "safeBrand": "Thai Kitchen Sweet Chili Sauce",
+    "warningNote": "ללא שום",
     "unit": "בקבוק"
   },
   {
@@ -1216,13 +1216,21 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
   {
     "id": "sibo_shop_150",
     "category": "sweets",
+    "name": "שוקולד מריר עם פולי קקאו גרוסים 85%",
+    "safeBrand": "Lindt Cocoa Nibs Dark 85%",
+    "warningNote": "מרקם קראנצ׳י עשיר",
+    "unit": "חפיסה"
+  },
+  {
+    "id": "sibo_shop_151",
+    "category": "sweets",
     "name": "פתיתי שוקולד מריר 85% לאפייה",
     "safeBrand": "Callebaut GF Dark Drops",
     "warningNote": "0% חלב וגלוטן",
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_151",
+    "id": "sibo_shop_152",
     "category": "sweets",
     "name": "פולי קקאו גרוסים נא (Cacao Nibs)",
     "safeBrand": "Navitas Organics / תבואות",
@@ -1230,7 +1238,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_152",
+    "id": "sibo_shop_153",
     "category": "sweets",
     "name": "אבקת קקאו הולנדי טהורה 100% ללא סוכר",
     "safeBrand": "Callebaut / שופרסל גרין קקאו",
@@ -1238,7 +1246,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_153",
+    "id": "sibo_shop_154",
     "category": "sweets",
     "name": "אבקת חרוב טהורה 100% ללא סוכר",
     "safeBrand": "תבואות",
@@ -1246,23 +1254,23 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_154",
+    "id": "sibo_shop_155",
     "category": "sweets",
     "name": "חמאת קקאו טבעית למאפים",
     "safeBrand": "תבואות אורגני",
-    "warningNote": "שומן טהור להכנת שוקולד ביתי",
+    "warningNote": "שומן טהור להכנת קינוחים",
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_155",
+    "id": "sibo_shop_156",
     "category": "sweets",
-    "name": "סירופ מייפל טהור 100% דרגת Grade A",
+    "name": "סירופ מייפל טהור 100% דרגת Grade A Amber",
     "safeBrand": "Maple Joe / Kirkland 100% Pure Maple",
     "warningNote": "זהירות: לא לקנות \"רוטב בטעם מייפל\" המכיל סירופ גלוקוז!",
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_156",
+    "id": "sibo_shop_157",
     "category": "sweets",
     "name": "סירופ מייפל כהה עשיר (Grade A Dark)",
     "safeBrand": "Maple Joe Dark Amber",
@@ -1270,7 +1278,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_157",
+    "id": "sibo_shop_158",
     "category": "sweets",
     "name": "סירופ מייפל אורגני טהור מקנדה",
     "safeBrand": "הרדוף / שופרסל גרין",
@@ -1278,7 +1286,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_158",
+    "id": "sibo_shop_159",
     "category": "sweets",
     "name": "סוכר קוקוס אורגני טבעי (במידה מדודה)",
     "safeBrand": "תבואות אורגני",
@@ -1286,7 +1294,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_159",
+    "id": "sibo_shop_160",
     "category": "sweets",
     "name": "שבבי קוקוס קלויים ללא סוכר",
     "safeBrand": "שקדיה / B&D",
@@ -1294,7 +1302,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_160",
+    "id": "sibo_shop_161",
     "category": "sweets",
     "name": "שבבי קוקוס לבנים טבעיים (Coconut Flakes)",
     "safeBrand": "שופרסל גרין",
@@ -1302,95 +1310,135 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_161",
-    "category": "sweets",
-    "name": "ארטיק תות ביתי 100% טבעי (תותים ומייפל)",
-    "safeBrand": "הכנה ביתית בתבניות סיליקון",
-    "warningNote": "מרענן, דל סוכר וללא חומרים משמרים",
-    "unit": "מארז"
-  },
-  {
     "id": "sibo_shop_162",
     "category": "sweets",
-    "name": "סורבה אננס-ליים ביתי טבעי",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "100% פרי ומייפל טהור",
-    "unit": "קופסה"
+    "name": "מחית וניל טהורה 100% (Vanilla Bean Paste)",
+    "safeBrand": "Nielsen-Massey Vanilla Paste",
+    "warningNote": "גרגרי וניל טהורים לקינוחים",
+    "unit": "שפופרת"
   },
   {
     "id": "sibo_shop_163",
     "category": "sweets",
-    "name": "סוכריות גומי ג׳לטין ביתיות (מיץ פטל ומייפל)",
-    "safeBrand": "הכנה ביתית מג׳לטין Great Lakes",
-    "warningNote": "משקם רירית מעיים וטעים להפליא",
+    "name": "אבקת וניל בורבון טהורה 100% ללא סוכר",
+    "safeBrand": "חוות דרך התבלינים / תבליני טעם וריח",
+    "warningNote": "ארומה משובחת",
     "unit": "צנצנת"
   },
   {
     "id": "sibo_shop_164",
     "category": "sweets",
-    "name": "ריבת פטל וצ׳יה ביתית ללא סוכר (Chia Jam)",
-    "safeBrand": "הכנה ביתית (פטל מעוך, זרעי צ׳יה ומייפל)",
-    "warningNote": "למריחה על פריכיות אורז",
+    "name": "ממרח אגוזי לוז וקקאו טבעי ללא סוכר",
+    "safeBrand": "ראסטיס 100% לוז וקקאו",
+    "warningNote": "0% שמן דקלים וסוכר לבן",
     "unit": "צנצנת"
   },
   {
     "id": "sibo_shop_165",
     "category": "sweets",
-    "name": "ריבת תותים ומייפל ביתית ללא פקטין תעשייתי",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "0% סוכר לבן וחומרים משמרים",
+    "name": "ממרח שקדים וקקאו טבעי ללא סוכר",
+    "safeBrand": "ראסטיס 100% שקדים וקקאו",
+    "warningNote": "עשיר בחלבון ושומן בריא",
     "unit": "צנצנת"
   },
   {
     "id": "sibo_shop_166",
     "category": "sweets",
-    "name": "חטיף פצפוצי אורז ושוקולד מריר 85%",
-    "safeBrand": "הכנה ביתית ב-5 דקות",
-    "warningNote": "קראנצ׳י ומשביע",
-    "unit": "קופסה"
+    "name": "תות שדה קפוא 100% טבעי לשייקים וארטיקים",
+    "safeBrand": "סנפרוסט תות שדה",
+    "warningNote": "ללא תוספת סוכר",
+    "unit": "שקית"
   },
   {
     "id": "sibo_shop_167",
     "category": "sweets",
-    "name": "מאפינס בננה ירוקה וקמח שקדים ביתי",
-    "safeBrand": "אפייה ביתית ללא סוכר",
-    "warningNote": "דל פודמאפ ובטוח",
-    "unit": "מארז"
+    "name": "פטל אדום קפוא 100% טבעי לריבות וקינוחים",
+    "safeBrand": "סנפרוסט פטל אדום",
+    "warningNote": "דל סוכר ועשיר בנוגדי חמצון",
+    "unit": "שקית"
   },
   {
     "id": "sibo_shop_168",
     "category": "sweets",
-    "name": "פנקייק קמח שקדים עם סירופ מייפל טהור",
-    "safeBrand": "הכנה ביתית מהירה",
-    "warningNote": "ארוחת בוקר מפנקת ובטוחה",
-    "unit": "מארז"
+    "name": "אוכמניות כחולות קפואות 100% טבעי",
+    "safeBrand": "סנפרוסט אוכמניות",
+    "warningNote": "לשייקים ופודינג",
+    "unit": "שקית"
   },
   {
     "id": "sibo_shop_169",
     "category": "sweets",
-    "name": "חטיף שוקולד מריר עם אגוזי לוז וקוקוס",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "פינוק עשיר בשומן בריא",
-    "unit": "קופסה"
+    "name": "אננס קפוא 100% טבעי לסורבה",
+    "safeBrand": "סנפרוסט אננס",
+    "warningNote": "ללא סוכר מוסף",
+    "unit": "שקית"
   },
   {
     "id": "sibo_shop_170",
     "category": "sweets",
-    "name": "כדורי אנרגיה מחמאת שקדים, קקאו ומייפל",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "ללא תמרים (0% פרוקטוז גבוה)",
-    "unit": "מארז"
+    "name": "קמח שקדים דק מנופה לעוגות ופנקייקים",
+    "safeBrand": "שקדיה פרימיום",
+    "warningNote": "בסיס לכל אפייה בריאה ל-SIBO",
+    "unit": "שקית"
   },
   {
     "id": "sibo_shop_171",
     "category": "sweets",
-    "name": "תותים טריים טבולים בשוקולד מריר 85%",
-    "safeBrand": "הכנה ביתית",
-    "warningNote": "הקינוח המושלם לאירוח",
-    "unit": "מארז"
+    "name": "שקיקי ג׳לטין טהור 100% בקר מאושר לקינוחים",
+    "safeBrand": "Great Lakes Pure Gelatin / תבואות",
+    "warningNote": "להכנת גומי וג׳לי בריאותי",
+    "unit": "קופסה"
   },
   {
     "id": "sibo_shop_172",
+    "category": "sweets",
+    "name": "תבניות סיליקון לארטיקים ביתיים (ארבעה שקעים)",
+    "safeBrand": "ארקוסטיל / Fox Home",
+    "warningNote": "תבניות נוחות להכנת ארטיק תות",
+    "unit": "מארז"
+  },
+  {
+    "id": "sibo_shop_173",
+    "category": "sweets",
+    "name": "תבניות סיליקון לסוכריות גומי קטנות",
+    "safeBrand": "ארקוסטיל סיליקון",
+    "warningNote": "להכנת גומי ג׳לטין ביתי",
+    "unit": "יח׳"
+  },
+  {
+    "id": "sibo_shop_174",
+    "category": "sweets",
+    "name": "אבקת חלבון קולגן פפטידים ללא טעם",
+    "safeBrand": "Vital Proteins Collagen Peptides",
+    "warningNote": "נמס מיד בשוקו חם ומשקאות",
+    "unit": "מכל"
+  },
+  {
+    "id": "sibo_shop_175",
+    "category": "sweets",
+    "name": "חטיף שוקולד מריר 85% אישי",
+    "safeBrand": "Lindt Sticks Dark 85%",
+    "warningNote": "מנה מדודה לנסיעות",
+    "unit": "מארז"
+  },
+  {
+    "id": "sibo_shop_176",
+    "category": "sweets",
+    "name": "סוכריות מנטה טבעיות ללא סוכר וללא פוליאולים",
+    "safeBrand": "Simply Peppermint Mints",
+    "warningNote": "לבדוק רכיבים: ללא סורביטול ומלטיטול",
+    "unit": "פחית"
+  },
+  {
+    "id": "sibo_shop_177",
+    "category": "sweets",
+    "name": "פולי קפה ירוק לא קלוי",
+    "safeBrand": "שופרסל גרין",
+    "warningNote": "עשיר בחומצה כלורוגנית",
+    "unit": "שקית"
+  },
+  {
+    "id": "sibo_shop_178",
     "category": "veggies_fruits",
     "name": "מלפפונים ישראליים פריכים",
     "safeBrand": "טרי מהשוק / שופרסל גרין",
@@ -1398,7 +1446,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_173",
+    "id": "sibo_shop_179",
     "category": "veggies_fruits",
     "name": "מלפפוני בייבי קראנצ׳יים",
     "safeBrand": "משק חקלאי",
@@ -1406,7 +1454,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_174",
+    "id": "sibo_shop_180",
     "category": "veggies_fruits",
     "name": "מלפפונים הולנדים ארוכים",
     "safeBrand": "שופרסל גרין",
@@ -1414,7 +1462,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_175",
+    "id": "sibo_shop_181",
     "category": "veggies_fruits",
     "name": "מלפפוני חממה דקים",
     "safeBrand": "משק חממות",
@@ -1422,7 +1470,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_176",
+    "id": "sibo_shop_182",
     "category": "veggies_fruits",
     "name": "קישואים ירוקים בהירים",
     "safeBrand": "טרי מהשוק",
@@ -1430,7 +1478,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_177",
+    "id": "sibo_shop_183",
     "category": "veggies_fruits",
     "name": "זוקיני ירוק כהה פרימיום",
     "safeBrand": "שופרסל גרין",
@@ -1438,7 +1486,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_178",
+    "id": "sibo_shop_184",
     "category": "veggies_fruits",
     "name": "זוקיני צהוב",
     "safeBrand": "משק בוטיק",
@@ -1446,7 +1494,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_179",
+    "id": "sibo_shop_185",
     "category": "veggies_fruits",
     "name": "קישואים עגולים למילוי",
     "safeBrand": "שוק טרי",
@@ -1454,7 +1502,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_180",
+    "id": "sibo_shop_186",
     "category": "veggies_fruits",
     "name": "קישואי בייבי עדינים",
     "safeBrand": "שוק איכרים",
@@ -1462,7 +1510,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_181",
+    "id": "sibo_shop_187",
     "category": "veggies_fruits",
     "name": "עלי בייבי תרד שטופים",
     "safeBrand": "אחלה / שופרסל גרין / שטראוס",
@@ -1470,7 +1518,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_182",
+    "id": "sibo_shop_188",
     "category": "veggies_fruits",
     "name": "עלי תרד ניו-זילנדי טרי",
     "safeBrand": "טרי מחקלאי",
@@ -1478,7 +1526,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_183",
+    "id": "sibo_shop_189",
     "category": "veggies_fruits",
     "name": "תרד תורכי טרי עבה",
     "safeBrand": "שוק טרי",
@@ -1486,7 +1534,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_184",
+    "id": "sibo_shop_190",
     "category": "veggies_fruits",
     "name": "תרד קפוא שלם עדין",
     "safeBrand": "סנפרוסט עדין",
@@ -1494,7 +1542,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_185",
+    "id": "sibo_shop_191",
     "category": "veggies_fruits",
     "name": "פלפל אדום מתוק (גמבה)",
     "safeBrand": "שופרסל טרי",
@@ -1502,7 +1550,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_186",
+    "id": "sibo_shop_192",
     "category": "veggies_fruits",
     "name": "פלפל צהוב מתוק",
     "safeBrand": "טרי מהשוק",
@@ -1510,7 +1558,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_187",
+    "id": "sibo_shop_193",
     "category": "veggies_fruits",
     "name": "פלפל כתום מתוק",
     "safeBrand": "שופרסל גרין",
@@ -1518,7 +1566,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_188",
+    "id": "sibo_shop_194",
     "category": "veggies_fruits",
     "name": "פלפל חריף ירוק (חלפניו / שיפקה טרי)",
     "safeBrand": "שוק טרי",
@@ -1526,7 +1574,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_189",
+    "id": "sibo_shop_195",
     "category": "veggies_fruits",
     "name": "פלפל צ׳ילי אדום טרי",
     "safeBrand": "שוק טרי",
@@ -1534,7 +1582,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_190",
+    "id": "sibo_shop_196",
     "category": "veggies_fruits",
     "name": "פלפל שושקה אדום מתוק",
     "safeBrand": "שופרסל פרימיום",
@@ -1542,7 +1590,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_191",
+    "id": "sibo_shop_197",
     "category": "veggies_fruits",
     "name": "פלפלוני טינקרבל מתוקים",
     "safeBrand": "משק שרי",
@@ -1550,7 +1598,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_192",
+    "id": "sibo_shop_198",
     "category": "veggies_fruits",
     "name": "פלפל חריף הבנרו (בזהירות טיפה)",
     "safeBrand": "שוק איכרים",
@@ -1558,7 +1606,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_193",
+    "id": "sibo_shop_199",
     "category": "veggies_fruits",
     "name": "גזרים כתומים טריים ומוצקים",
     "safeBrand": "שופרסל גרין",
@@ -1566,7 +1614,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_194",
+    "id": "sibo_shop_200",
     "category": "veggies_fruits",
     "name": "גזרי בייבי שטופים וקלופים",
     "safeBrand": "מארז סגור",
@@ -1574,7 +1622,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_195",
+    "id": "sibo_shop_201",
     "category": "veggies_fruits",
     "name": "גזר צבעוני (סגול/צהוב)",
     "safeBrand": "משק איכרים",
@@ -1582,7 +1630,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_196",
+    "id": "sibo_shop_202",
     "category": "veggies_fruits",
     "name": "גזר ננסי טרי עם עלים",
     "safeBrand": "שוק איכרים",
@@ -1590,7 +1638,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_197",
+    "id": "sibo_shop_203",
     "category": "veggies_fruits",
     "name": "גזר גמדי קפוא",
     "safeBrand": "סנפרוסט",
@@ -1598,7 +1646,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_198",
+    "id": "sibo_shop_204",
     "category": "veggies_fruits",
     "name": "דלעת יפנית (קבוצ׳ה)",
     "safeBrand": "שוק איכרים / שופרסל גרין",
@@ -1606,7 +1654,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_199",
+    "id": "sibo_shop_205",
     "category": "veggies_fruits",
     "name": "דלורית טרייה",
     "safeBrand": "טרי מהשוק",
@@ -1614,7 +1662,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_200",
+    "id": "sibo_shop_206",
     "category": "veggies_fruits",
     "name": "דלעת ערמונים",
     "safeBrand": "משק חקלאי",
@@ -1622,7 +1670,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_201",
+    "id": "sibo_shop_207",
     "category": "veggies_fruits",
     "name": "דלעת טריפוליטאית כתומה",
     "safeBrand": "שוק טרי",
@@ -1630,7 +1678,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_202",
+    "id": "sibo_shop_208",
     "category": "veggies_fruits",
     "name": "קוביות דלעת טרייה קלופה",
     "safeBrand": "שופרסל חתוך",
@@ -1638,7 +1686,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_203",
+    "id": "sibo_shop_209",
     "category": "veggies_fruits",
     "name": "לבבות חסה קיסר פריכים (רומיין)",
     "safeBrand": "שטראוס / מרינה / חסלט",
@@ -1646,7 +1694,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_204",
+    "id": "sibo_shop_210",
     "category": "veggies_fruits",
     "name": "חסה רומית מיני (Little Gem)",
     "safeBrand": "חסלט",
@@ -1654,7 +1702,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_205",
+    "id": "sibo_shop_211",
     "category": "veggies_fruits",
     "name": "חסה עגולה (אייסברג)",
     "safeBrand": "חסלט / שופרסל",
@@ -1662,7 +1710,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_206",
+    "id": "sibo_shop_212",
     "category": "veggies_fruits",
     "name": "חסה סלנובה ירוקה / אדומה",
     "safeBrand": "משק חקלאי",
@@ -1670,7 +1718,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_207",
+    "id": "sibo_shop_213",
     "category": "veggies_fruits",
     "name": "חסה ערבית מסורתית",
     "safeBrand": "שוק טרי",
@@ -1678,7 +1726,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ראש"
   },
   {
-    "id": "sibo_shop_208",
+    "id": "sibo_shop_214",
     "category": "veggies_fruits",
     "name": "חסה מסולסלת אדומה (לולו רוסו)",
     "safeBrand": "חסלט",
@@ -1686,7 +1734,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_209",
+    "id": "sibo_shop_215",
     "category": "veggies_fruits",
     "name": "חסה משי (חמאה)",
     "safeBrand": "משק חקלאי",
@@ -1694,7 +1742,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ראש"
   },
   {
-    "id": "sibo_shop_210",
+    "id": "sibo_shop_216",
     "category": "veggies_fruits",
     "name": "עלי רוקט (ארוגולה) טריים",
     "safeBrand": "שופרסל גרין / חסלט",
@@ -1702,7 +1750,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_211",
+    "id": "sibo_shop_217",
     "category": "veggies_fruits",
     "name": "עלי מנגולד (סלק עלים)",
     "safeBrand": "טרי מהשוק",
@@ -1710,7 +1758,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_212",
+    "id": "sibo_shop_218",
     "category": "veggies_fruits",
     "name": "עלי קייל טריים",
     "safeBrand": "שופרסל גרין",
@@ -1718,7 +1766,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_213",
+    "id": "sibo_shop_219",
     "category": "veggies_fruits",
     "name": "קייל סגול (Lacinato/Dinosaur)",
     "safeBrand": "משק אורגני",
@@ -1726,7 +1774,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_214",
+    "id": "sibo_shop_220",
     "category": "veggies_fruits",
     "name": "עלי אנדיב (עולש) לבן/סגול",
     "safeBrand": "חוות תקוע",
@@ -1734,7 +1782,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_215",
+    "id": "sibo_shop_221",
     "category": "veggies_fruits",
     "name": "עלי טטסוי (Tatsoi)",
     "safeBrand": "משק חקלאי",
@@ -1742,7 +1790,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_216",
+    "id": "sibo_shop_222",
     "category": "veggies_fruits",
     "name": "עלי בוק צ׳וי ירוקים (עד 75 גרם למנה)",
     "safeBrand": "שופרסל גרין / חוות תקוע",
@@ -1750,7 +1798,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_217",
+    "id": "sibo_shop_223",
     "category": "veggies_fruits",
     "name": "צנוניות אדומות פריכות",
     "safeBrand": "שוק טרי / חסלט",
@@ -1758,7 +1806,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_218",
+    "id": "sibo_shop_224",
     "category": "veggies_fruits",
     "name": "צנון לבן (דייקון)",
     "safeBrand": "שוק איכרים",
@@ -1766,7 +1814,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_219",
+    "id": "sibo_shop_225",
     "category": "veggies_fruits",
     "name": "צנונית שחורה רפואית",
     "safeBrand": "שוק איכרים",
@@ -1774,7 +1822,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_220",
+    "id": "sibo_shop_226",
     "category": "veggies_fruits",
     "name": "צנונית אבטיח (Watermelon Radish)",
     "safeBrand": "משק בוטיק",
@@ -1782,7 +1830,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_221",
+    "id": "sibo_shop_227",
     "category": "veggies_fruits",
     "name": "עגבניות שרי אדומות",
     "safeBrand": "משק שרי / שופרסל גרין",
@@ -1790,7 +1838,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_222",
+    "id": "sibo_shop_228",
     "category": "veggies_fruits",
     "name": "עגבניות שרי תמר מתוקות",
     "safeBrand": "שופרסל גרין",
@@ -1798,7 +1846,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_223",
+    "id": "sibo_shop_229",
     "category": "veggies_fruits",
     "name": "עגבניות מגי טריות ומוצקות",
     "safeBrand": "שופרסל פרימיום",
@@ -1806,7 +1854,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_224",
+    "id": "sibo_shop_230",
     "category": "veggies_fruits",
     "name": "עגבניות שרי צהובות",
     "safeBrand": "שופרסל גרין",
@@ -1814,7 +1862,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_225",
+    "id": "sibo_shop_231",
     "category": "veggies_fruits",
     "name": "עגבניות שוקולד חומות",
     "safeBrand": "משק שרי",
@@ -1822,7 +1870,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_226",
+    "id": "sibo_shop_232",
     "category": "veggies_fruits",
     "name": "עגבניות שרי מנומרות (זברה)",
     "safeBrand": "משק איכרים",
@@ -1830,7 +1878,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_227",
+    "id": "sibo_shop_233",
     "category": "veggies_fruits",
     "name": "חצילים בלאדי קטנים וקלים",
     "safeBrand": "שוק טרי",
@@ -1838,7 +1886,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_228",
+    "id": "sibo_shop_234",
     "category": "veggies_fruits",
     "name": "חציל יפני ארוך ודק",
     "safeBrand": "שוק איכרים",
@@ -1846,7 +1894,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_229",
+    "id": "sibo_shop_235",
     "category": "veggies_fruits",
     "name": "חצילונים ננסיים",
     "safeBrand": "משק בוטיק",
@@ -1854,7 +1902,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "סלסילה"
   },
   {
-    "id": "sibo_shop_230",
+    "id": "sibo_shop_236",
     "category": "veggies_fruits",
     "name": "בצל ירוק (החלק הירוק בלבד!)",
     "safeBrand": "חסלט / שופרסל",
@@ -1862,7 +1910,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_231",
+    "id": "sibo_shop_237",
     "category": "veggies_fruits",
     "name": "עירית טרייה דקה (Chives)",
     "safeBrand": "עשבי תיבול טריים",
@@ -1870,7 +1918,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_232",
+    "id": "sibo_shop_238",
     "category": "veggies_fruits",
     "name": "עירית שום (Garlic Chives עלי עירית ירוקים)",
     "safeBrand": "עשבי תיבול שוק",
@@ -1878,7 +1926,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_233",
+    "id": "sibo_shop_239",
     "category": "veggies_fruits",
     "name": "פטרוזיליה טרייה",
     "safeBrand": "חסלט שטוף",
@@ -1886,7 +1934,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_234",
+    "id": "sibo_shop_240",
     "category": "veggies_fruits",
     "name": "פטרוזיליה מסולסלת",
     "safeBrand": "חסלט",
@@ -1894,7 +1942,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_235",
+    "id": "sibo_shop_241",
     "category": "veggies_fruits",
     "name": "פטרוזיליה שורש טרי",
     "safeBrand": "שוק טרי",
@@ -1902,7 +1950,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_236",
+    "id": "sibo_shop_242",
     "category": "veggies_fruits",
     "name": "שמיר טרי",
     "safeBrand": "חסלט",
@@ -1910,7 +1958,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_237",
+    "id": "sibo_shop_243",
     "category": "veggies_fruits",
     "name": "כוסברה טרייה",
     "safeBrand": "חסלט",
@@ -1918,7 +1966,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_238",
+    "id": "sibo_shop_244",
     "category": "veggies_fruits",
     "name": "בזיליקום טרי ריחני",
     "safeBrand": "עשבי תיבול",
@@ -1926,7 +1974,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_239",
+    "id": "sibo_shop_245",
     "category": "veggies_fruits",
     "name": "בזיליקום תאילנדי (סגול)",
     "safeBrand": "משק אסייתי",
@@ -1934,7 +1982,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_240",
+    "id": "sibo_shop_246",
     "category": "veggies_fruits",
     "name": "בזיליקום לימוני",
     "safeBrand": "משק בוטיק",
@@ -1942,7 +1990,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_241",
+    "id": "sibo_shop_247",
     "category": "veggies_fruits",
     "name": "נענע טרייה",
     "safeBrand": "חסלט",
@@ -1950,7 +1998,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_242",
+    "id": "sibo_shop_248",
     "category": "veggies_fruits",
     "name": "עלי מנטה חריפה טרייה (Peppermint)",
     "safeBrand": "משק תבלינים",
@@ -1958,7 +2006,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_243",
+    "id": "sibo_shop_249",
     "category": "veggies_fruits",
     "name": "עלי טרגון טריים",
     "safeBrand": "עשבי תיבול מיוחדים",
@@ -1966,7 +2014,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_244",
+    "id": "sibo_shop_250",
     "category": "veggies_fruits",
     "name": "עלי אורגנו טריים",
     "safeBrand": "עשבי תיבול",
@@ -1974,7 +2022,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_245",
+    "id": "sibo_shop_251",
     "category": "veggies_fruits",
     "name": "עלי מרווה טריים",
     "safeBrand": "עשבי תיבול",
@@ -1982,7 +2030,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_246",
+    "id": "sibo_shop_252",
     "category": "veggies_fruits",
     "name": "עלי לואיזה (לימון ורבנה) טריים",
     "safeBrand": "משק תבלינים",
@@ -1990,7 +2038,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צרור"
   },
   {
-    "id": "sibo_shop_247",
+    "id": "sibo_shop_253",
     "category": "veggies_fruits",
     "name": "שורש ג׳ינג׳ר טרי ומוצק",
     "safeBrand": "שופרסל גרין",
@@ -1998,7 +2046,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_248",
+    "id": "sibo_shop_254",
     "category": "veggies_fruits",
     "name": "שורש גלנגל טרי (Galangal)",
     "safeBrand": "מזרח ומערב / משק אסייתי",
@@ -2006,7 +2054,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_249",
+    "id": "sibo_shop_255",
     "category": "veggies_fruits",
     "name": "נבטי אלפלפה טריים",
     "safeBrand": "שופרסל גרין / משק",
@@ -2014,7 +2062,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_250",
+    "id": "sibo_shop_256",
     "category": "veggies_fruits",
     "name": "נבטי חמנייה עבים",
     "safeBrand": "משק",
@@ -2022,7 +2070,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_251",
+    "id": "sibo_shop_257",
     "category": "veggies_fruits",
     "name": "נבטי ברוקולי (Sulforaphane)",
     "safeBrand": "משק בריאות",
@@ -2030,7 +2078,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_252",
+    "id": "sibo_shop_258",
     "category": "veggies_fruits",
     "name": "נבטי צנונית חריפים",
     "safeBrand": "משק",
@@ -2038,7 +2086,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_253",
+    "id": "sibo_shop_259",
     "category": "veggies_fruits",
     "name": "נבטי חרדל ירוקים",
     "safeBrand": "משק בוטיק",
@@ -2046,7 +2094,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_254",
+    "id": "sibo_shop_260",
     "category": "veggies_fruits",
     "name": "מיקרו-ירוקים כוסברה טרייה",
     "safeBrand": "משק עלים",
@@ -2054,7 +2102,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_255",
+    "id": "sibo_shop_261",
     "category": "veggies_fruits",
     "name": "נבטי אפונה ירוקה (מדוד)",
     "safeBrand": "משק חקלאי",
@@ -2062,7 +2110,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_256",
+    "id": "sibo_shop_262",
     "category": "veggies_fruits",
     "name": "פטריות אויסטר (יער) טריות",
     "safeBrand": "חוות תקוע / מרינה",
@@ -2070,7 +2118,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_257",
+    "id": "sibo_shop_263",
     "category": "veggies_fruits",
     "name": "פטריות מלך היער (King Oyster)",
     "safeBrand": "חוות תקוע",
@@ -2078,7 +2126,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_258",
+    "id": "sibo_shop_264",
     "category": "veggies_fruits",
     "name": "פטריות שימג׳י לבנות (עד 35 גרם למנה)",
     "safeBrand": "חוות תקוע",
@@ -2086,7 +2134,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_259",
+    "id": "sibo_shop_265",
     "category": "veggies_fruits",
     "name": "פטריות שימג׳י חומות (מדוד)",
     "safeBrand": "חוות תקוע",
@@ -2094,7 +2142,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_260",
+    "id": "sibo_shop_266",
     "category": "veggies_fruits",
     "name": "במבה ירוקה (במיה טרייה)",
     "safeBrand": "שוק טרי",
@@ -2102,7 +2150,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_261",
+    "id": "sibo_shop_267",
     "category": "veggies_fruits",
     "name": "במיה הודית ארוכה",
     "safeBrand": "שוק אסייתי",
@@ -2110,7 +2158,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_262",
+    "id": "sibo_shop_268",
     "category": "veggies_fruits",
     "name": "לוביה ירוקה טרייה (שעועית ארוכה)",
     "safeBrand": "שוק איכרים",
@@ -2118,7 +2166,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_263",
+    "id": "sibo_shop_269",
     "category": "veggies_fruits",
     "name": "שורש סלרי (רק לבישול בציר וסינון)",
     "safeBrand": "שופרסל",
@@ -2126,7 +2174,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_264",
+    "id": "sibo_shop_270",
     "category": "veggies_fruits",
     "name": "גבעולי סלרי אמריקאי (עד 1/4 גבעול למנה)",
     "safeBrand": "חסלט",
@@ -2134,7 +2182,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_265",
+    "id": "sibo_shop_271",
     "category": "veggies_fruits",
     "name": "שעועית ירוקה עדינה קפואה",
     "safeBrand": "סנפרוסט עדין",
@@ -2142,7 +2190,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_266",
+    "id": "sibo_shop_272",
     "category": "veggies_fruits",
     "name": "שעועית צהובה עדינה קפואה",
     "safeBrand": "סנפרוסט",
@@ -2150,7 +2198,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "שקית"
   },
   {
-    "id": "sibo_shop_267",
+    "id": "sibo_shop_273",
     "category": "veggies_fruits",
     "name": "ברוקולי ראשים טריים (פרחים בלבד עד 45 גרם)",
     "safeBrand": "שופרסל גרין",
@@ -2158,7 +2206,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_268",
+    "id": "sibo_shop_274",
     "category": "veggies_fruits",
     "name": "כרוב ניצנים טרי (עד 2 יח׳ מבושלות)",
     "safeBrand": "שוק טרי",
@@ -2166,7 +2214,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_269",
+    "id": "sibo_shop_275",
     "category": "veggies_fruits",
     "name": "לבבות דקל בשימורים",
     "safeBrand": "שופרסל / וילי פוד",
@@ -2174,7 +2222,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_270",
+    "id": "sibo_shop_276",
     "category": "veggies_fruits",
     "name": "ערמוני מים בשימורים (Water Chestnuts)",
     "safeBrand": "Taste of Asia",
@@ -2182,7 +2230,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_271",
+    "id": "sibo_shop_277",
     "category": "veggies_fruits",
     "name": "נצרי במבוק בשימורים (Bamboo Shoots)",
     "safeBrand": "Taste of Asia",
@@ -2190,7 +2238,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_272",
+    "id": "sibo_shop_278",
     "category": "veggies_fruits",
     "name": "תות שדה טרי מתוק",
     "safeBrand": "משק תותים / שופרסל גרין",
@@ -2198,15 +2246,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_273",
-    "category": "veggies_fruits",
-    "name": "תות שדה קפוא ללא סוכר",
-    "safeBrand": "סנפרוסט פירות קפואים",
-    "warningNote": "לשייקים וסורבה ביתי",
-    "unit": "שקית"
-  },
-  {
-    "id": "sibo_shop_274",
+    "id": "sibo_shop_279",
     "category": "veggies_fruits",
     "name": "אוכמניות כחולות טריות (Blueberries)",
     "safeBrand": "שופרסל גרין / ברי פלוס",
@@ -2214,15 +2254,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_275",
-    "category": "veggies_fruits",
-    "name": "אוכמניות קפואות 100% טבעי",
-    "safeBrand": "סנפרוסט",
-    "warningNote": "לשייקים",
-    "unit": "שקית"
-  },
-  {
-    "id": "sibo_shop_276",
+    "id": "sibo_shop_280",
     "category": "veggies_fruits",
     "name": "פטל אדום טרי (Raspberries)",
     "safeBrand": "ברי פלוס",
@@ -2230,15 +2262,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_277",
-    "category": "veggies_fruits",
-    "name": "פטל קפוא ללא סוכר",
-    "safeBrand": "סנפרוסט",
-    "warningNote": "לשייקים",
-    "unit": "שקית"
-  },
-  {
-    "id": "sibo_shop_278",
+    "id": "sibo_shop_281",
     "category": "veggies_fruits",
     "name": "פטל שחור טרי (Blackberries)",
     "safeBrand": "ברי פלוס",
@@ -2246,7 +2270,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_279",
+    "id": "sibo_shop_282",
     "category": "veggies_fruits",
     "name": "חמוציות טריות (שלמות ללא סוכר)",
     "safeBrand": "ברי פלוס",
@@ -2254,7 +2278,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_280",
+    "id": "sibo_shop_283",
     "category": "veggies_fruits",
     "name": "בננה צהובה-ירוקה (לא בשלה מדי!)",
     "safeBrand": "שופרסל טרי",
@@ -2262,7 +2286,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_281",
+    "id": "sibo_shop_284",
     "category": "veggies_fruits",
     "name": "בננות בייבי קטנות מוצקות",
     "safeBrand": "שוק טרי",
@@ -2270,7 +2294,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_282",
+    "id": "sibo_shop_285",
     "category": "veggies_fruits",
     "name": "פלנטיין ירוק (בננה לבישול)",
     "safeBrand": "שוק לוינסקי",
@@ -2278,7 +2302,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_283",
+    "id": "sibo_shop_286",
     "category": "veggies_fruits",
     "name": "קיווי ירוק קשה-בינוני",
     "safeBrand": "שופרסל גרין",
@@ -2286,7 +2310,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_284",
+    "id": "sibo_shop_287",
     "category": "veggies_fruits",
     "name": "קיווי זהוב (Golden Kiwi)",
     "safeBrand": "שופרסל פרימיום",
@@ -2294,7 +2318,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_285",
+    "id": "sibo_shop_288",
     "category": "veggies_fruits",
     "name": "אננס טרי שלם",
     "safeBrand": "שוק טרי",
@@ -2302,15 +2326,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_286",
-    "category": "veggies_fruits",
-    "name": "אננס קפוא 100% טבעי ללא סוכר",
-    "safeBrand": "סנפרוסט פירות",
-    "warningNote": "לשייק קיצי",
-    "unit": "שקית"
-  },
-  {
-    "id": "sibo_shop_287",
+    "id": "sibo_shop_289",
     "category": "veggies_fruits",
     "name": "מלון כתום (קנטלופ) טרי",
     "safeBrand": "שוק טרי",
@@ -2318,7 +2334,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_288",
+    "id": "sibo_shop_290",
     "category": "veggies_fruits",
     "name": "מלון ירוק (טל דבש / Honeydew)",
     "safeBrand": "שוק טרי",
@@ -2326,7 +2342,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_289",
+    "id": "sibo_shop_291",
     "category": "veggies_fruits",
     "name": "מלון גליה ישראלי",
     "safeBrand": "טרי מהשוק",
@@ -2334,7 +2350,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_290",
+    "id": "sibo_shop_292",
     "category": "veggies_fruits",
     "name": "פפאיה טרייה בשלה",
     "safeBrand": "שוק איכרים",
@@ -2342,7 +2358,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_291",
+    "id": "sibo_shop_293",
     "category": "veggies_fruits",
     "name": "לימונים צהובים עסיסיים",
     "safeBrand": "טרי מהשוק",
@@ -2350,7 +2366,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_292",
+    "id": "sibo_shop_294",
     "category": "veggies_fruits",
     "name": "ליים ירוק ארומטי",
     "safeBrand": "שוק טרי",
@@ -2358,7 +2374,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "רשת"
   },
   {
-    "id": "sibo_shop_293",
+    "id": "sibo_shop_295",
     "category": "veggies_fruits",
     "name": "תפוז מתוק לקילוף (1 קטן ביום)",
     "safeBrand": "שופרסל טרי",
@@ -2366,7 +2382,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_294",
+    "id": "sibo_shop_296",
     "category": "veggies_fruits",
     "name": "קלמנטינות טריות",
     "safeBrand": "שוק טרי",
@@ -2374,7 +2390,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_295",
+    "id": "sibo_shop_297",
     "category": "veggies_fruits",
     "name": "מנדרינות מתוקות",
     "safeBrand": "שוק טרי",
@@ -2382,7 +2398,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_296",
+    "id": "sibo_shop_298",
     "category": "veggies_fruits",
     "name": "אשכולית אדומה (עד חצי אשכולית)",
     "safeBrand": "שוק טרי",
@@ -2390,7 +2406,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_297",
+    "id": "sibo_shop_299",
     "category": "veggies_fruits",
     "name": "ענבים ירוקים / אדומים (עד 6 ענבים למנה)",
     "safeBrand": "שופרסל גרין",
@@ -2398,7 +2414,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_298",
+    "id": "sibo_shop_300",
     "category": "veggies_fruits",
     "name": "ענבי אצבעות מתוקים (במידה מדודה)",
     "safeBrand": "שוק טרי",
@@ -2406,7 +2422,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_299",
+    "id": "sibo_shop_301",
     "category": "veggies_fruits",
     "name": "פסיפלורה טרייה",
     "safeBrand": "שוק טרי",
@@ -2414,7 +2430,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_300",
+    "id": "sibo_shop_302",
     "category": "veggies_fruits",
     "name": "גויאבה טרייה מוצקה (עד 1 קטנה)",
     "safeBrand": "שוק עונתי",
@@ -2422,7 +2438,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_301",
+    "id": "sibo_shop_303",
     "category": "veggies_fruits",
     "name": "גויאבה תותית קטנה",
     "safeBrand": "משק פירות",
@@ -2430,7 +2446,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_302",
+    "id": "sibo_shop_304",
     "category": "veggies_fruits",
     "name": "פרי הדר פומלה קלופה (במידה מדודה)",
     "safeBrand": "שוק טרי",
@@ -2438,7 +2454,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_303",
+    "id": "sibo_shop_305",
     "category": "veggies_fruits",
     "name": "פומלית ירוקה (מדוד)",
     "safeBrand": "שוק טרי",
@@ -2446,7 +2462,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_304",
+    "id": "sibo_shop_306",
     "category": "veggies_fruits",
     "name": "קרמבולה טרייה פרוסה",
     "safeBrand": "שוק איכרים",
@@ -2454,7 +2470,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_305",
+    "id": "sibo_shop_307",
     "category": "veggies_fruits",
     "name": "פיטאיה אדומה/לבנה (Dragon Fruit)",
     "safeBrand": "שוק איכרים",
@@ -2462,7 +2478,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_306",
+    "id": "sibo_shop_308",
     "category": "veggies_fruits",
     "name": "סברס קלוף ומוכן (עד 1 יח׳)",
     "safeBrand": "שוק טרי",
@@ -2470,7 +2486,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_307",
+    "id": "sibo_shop_309",
     "category": "veggies_fruits",
     "name": "רימון שלם (גרגירים עד 1 כף לקישוט)",
     "safeBrand": "שוק טרי",
@@ -2478,7 +2494,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_308",
+    "id": "sibo_shop_310",
     "category": "veggies_fruits",
     "name": "אבוקדו האס בשל מוצק",
     "safeBrand": "שופרסל גרין / גרנות",
@@ -2486,7 +2502,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "רשת"
   },
   {
-    "id": "sibo_shop_309",
+    "id": "sibo_shop_311",
     "category": "veggies_fruits",
     "name": "אבוקדו פוקרטה עונתי",
     "safeBrand": "משק חקלאי",
@@ -2494,7 +2510,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_310",
+    "id": "sibo_shop_312",
     "category": "veggies_fruits",
     "name": "אבוקדו ריד קיצי",
     "safeBrand": "משק גרנות",
@@ -2502,7 +2518,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_311",
+    "id": "sibo_shop_313",
     "category": "veggies_fruits",
     "name": "קומקוואט (תפוז סיני קטן)",
     "safeBrand": "משק הדרים",
@@ -2510,7 +2526,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_312",
+    "id": "sibo_shop_314",
     "category": "meat_fish",
     "name": "קוביות פרגית עוף נקייה",
     "safeBrand": "טרי מהקצב / משק ארצי / שופרסל גרין",
@@ -2518,7 +2534,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_313",
+    "id": "sibo_shop_315",
     "category": "meat_fish",
     "name": "סטייק פרגית שלם ללא עצם",
     "safeBrand": "טרי מהקצב",
@@ -2526,7 +2542,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_314",
+    "id": "sibo_shop_316",
     "category": "meat_fish",
     "name": "שיפודי פרגית מוכנים לצלייה (ללא תיבול)",
     "safeBrand": "קצב מובחר",
@@ -2534,7 +2550,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_315",
+    "id": "sibo_shop_317",
     "category": "meat_fish",
     "name": "חזה עוף שלם טרי",
     "safeBrand": "עוף טוב / שופרסל טרי / משק",
@@ -2542,7 +2558,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_316",
+    "id": "sibo_shop_318",
     "category": "meat_fish",
     "name": "שניצל עוף דק פרוס טרי",
     "safeBrand": "טרי מהקצב",
@@ -2550,7 +2566,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_317",
+    "id": "sibo_shop_319",
     "category": "meat_fish",
     "name": "שניצל עוף עבה בסגנון אמריקאי",
     "safeBrand": "טרי מהקצב",
@@ -2558,7 +2574,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_318",
+    "id": "sibo_shop_320",
     "category": "meat_fish",
     "name": "רצועות חזה עוף להקפצה",
     "safeBrand": "עוף טוב",
@@ -2566,7 +2582,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_319",
+    "id": "sibo_shop_321",
     "category": "meat_fish",
     "name": "כרעיים עוף טריים",
     "safeBrand": "טרי מהקצב",
@@ -2574,7 +2590,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_320",
+    "id": "sibo_shop_322",
     "category": "meat_fish",
     "name": "שוקי עוף טריים (פולקע)",
     "safeBrand": "משק ארצי / שופרסל",
@@ -2582,7 +2598,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_321",
+    "id": "sibo_shop_323",
     "category": "meat_fish",
     "name": "ירכי עוף טריות ללא עור",
     "safeBrand": "עוף טוב",
@@ -2590,7 +2606,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_322",
+    "id": "sibo_shop_324",
     "category": "meat_fish",
     "name": "כנפי עוף טריות",
     "safeBrand": "עוף טוב / שופרסל",
@@ -2598,7 +2614,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_323",
+    "id": "sibo_shop_325",
     "category": "meat_fish",
     "name": "עוף שלם טרי למרק/צלייה",
     "safeBrand": "משק חקלאי",
@@ -2606,7 +2622,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_324",
+    "id": "sibo_shop_326",
     "category": "meat_fish",
     "name": "עוף אורגני שלם",
     "safeBrand": "הרדוף אורגני",
@@ -2614,7 +2630,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "יח׳"
   },
   {
-    "id": "sibo_shop_325",
+    "id": "sibo_shop_327",
     "category": "meat_fish",
     "name": "בשר עוף טחון טרי",
     "safeBrand": "טרי מהקצב",
@@ -2622,7 +2638,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_326",
+    "id": "sibo_shop_328",
     "category": "meat_fish",
     "name": "קורקבני עוף מנוקים",
     "safeBrand": "טרי מהקצב",
@@ -2630,7 +2646,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_327",
+    "id": "sibo_shop_329",
     "category": "meat_fish",
     "name": "לבבות עוף טריים",
     "safeBrand": "טרי מהקצב",
@@ -2638,7 +2654,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_328",
+    "id": "sibo_shop_330",
     "category": "meat_fish",
     "name": "חזה אווז מעושן טבעי ללא סוכר",
     "safeBrand": "מעדני בשר פרימיום",
@@ -2646,7 +2662,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "אריזה"
   },
   {
-    "id": "sibo_shop_329",
+    "id": "sibo_shop_331",
     "category": "meat_fish",
     "name": "בשר בקר טחון טרי (צוואר/צלעות)",
     "safeBrand": "אטליז איכותי / שופרסל טרי",
@@ -2654,7 +2670,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_330",
+    "id": "sibo_shop_332",
     "category": "meat_fish",
     "name": "בשר בקר טחון רזה (שייטל/כתף)",
     "safeBrand": "אטליז מובחר",
@@ -2662,7 +2678,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_331",
+    "id": "sibo_shop_333",
     "category": "meat_fish",
     "name": "נתח סטייק אנטרקוט טרי מיושן",
     "safeBrand": "אטליז בוטיק / שופרסל פרימיום",
@@ -2670,7 +2686,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_332",
+    "id": "sibo_shop_334",
     "category": "meat_fish",
     "name": "אנטרקוט עם עצם (Prime Rib)",
     "safeBrand": "קצב מובחר",
@@ -2678,7 +2694,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_333",
+    "id": "sibo_shop_335",
     "category": "meat_fish",
     "name": "נתח סטייק סינטה בקר טרי",
     "safeBrand": "אטליז איכותי",
@@ -2686,7 +2702,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_334",
+    "id": "sibo_shop_336",
     "category": "meat_fish",
     "name": "מדליוני פילה בקר טרי",
     "safeBrand": "קצב מובחר",
@@ -2694,7 +2710,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_335",
+    "id": "sibo_shop_337",
     "category": "meat_fish",
     "name": "נתח פיקניה בקר עם שכבת שומן",
     "safeBrand": "אטליז ברזילאי",
@@ -2702,7 +2718,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_336",
+    "id": "sibo_shop_338",
     "category": "meat_fish",
     "name": "נתח שייטל בקר פרוס דק",
     "safeBrand": "טרי מהקצב",
@@ -2710,7 +2726,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_337",
+    "id": "sibo_shop_339",
     "category": "meat_fish",
     "name": "נתח אונטריב בקר לבישול ארוך",
     "safeBrand": "טרי מהקצב",
@@ -2718,7 +2734,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_338",
+    "id": "sibo_shop_340",
     "category": "meat_fish",
     "name": "נתח צלי כתף (מס׳ 5)",
     "safeBrand": "קצב מובחר",
@@ -2726,7 +2742,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_339",
+    "id": "sibo_shop_341",
     "category": "meat_fish",
     "name": "קוביות בקר לגולאש/קדירה (מס׳ 5/8)",
     "safeBrand": "טרי מהקצב",
@@ -2734,7 +2750,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_340",
+    "id": "sibo_shop_342",
     "category": "meat_fish",
     "name": "אסאדו בקר טרי (עם עצם / בלי עצם)",
     "safeBrand": "אטליז מובחר",
@@ -2742,7 +2758,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_341",
+    "id": "sibo_shop_343",
     "category": "meat_fish",
     "name": "אוסובוקו עגל עם מח עצם",
     "safeBrand": "טרי מהקצב",
@@ -2750,7 +2766,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_342",
+    "id": "sibo_shop_344",
     "category": "meat_fish",
     "name": "חזה בקר (בריסקט) לעישון וצלייה",
     "safeBrand": "אטליז בוטיק",
@@ -2758,7 +2774,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_343",
+    "id": "sibo_shop_345",
     "category": "meat_fish",
     "name": "צלעות טלה טריות",
     "safeBrand": "קצב טלה מובחר",
@@ -2766,7 +2782,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_344",
+    "id": "sibo_shop_346",
     "category": "meat_fish",
     "name": "בשר טלה טחון טרי",
     "safeBrand": "אטליז בוטיק",
@@ -2774,7 +2790,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_345",
+    "id": "sibo_shop_347",
     "category": "meat_fish",
     "name": "שוק טלה טרייה שלמה",
     "safeBrand": "אטליז מובחר",
@@ -2782,7 +2798,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_346",
+    "id": "sibo_shop_348",
     "category": "meat_fish",
     "name": "כתף טלה לצלייה ארוכה",
     "safeBrand": "קצב מובחר",
@@ -2790,7 +2806,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_347",
+    "id": "sibo_shop_349",
     "category": "meat_fish",
     "name": "אוסובוקו טלה",
     "safeBrand": "טרי מהקצב",
@@ -2798,7 +2814,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_348",
+    "id": "sibo_shop_350",
     "category": "meat_fish",
     "name": "שווארמה הודו נקבה נקייה (פרגית הודו)",
     "safeBrand": "טרי מהקצב",
@@ -2806,7 +2822,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_349",
+    "id": "sibo_shop_351",
     "category": "meat_fish",
     "name": "חזה הודו שלם טרי",
     "safeBrand": "עוף טוב / שופרסל",
@@ -2814,7 +2830,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_350",
+    "id": "sibo_shop_352",
     "category": "meat_fish",
     "name": "בשר הודו אדום טחון",
     "safeBrand": "טרי מהקצב",
@@ -2822,7 +2838,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_351",
+    "id": "sibo_shop_353",
     "category": "meat_fish",
     "name": "שווארמה הודו פילדלפיה רצועות",
     "safeBrand": "טרי מהקצב",
@@ -2830,7 +2846,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_352",
+    "id": "sibo_shop_354",
     "category": "meat_fish",
     "name": "שוק הודו שלמה (פולקע הודו)",
     "safeBrand": "משק ארצי",
@@ -2838,7 +2854,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_353",
+    "id": "sibo_shop_355",
     "category": "meat_fish",
     "name": "כנפי הודו למרק",
     "safeBrand": "טרי מהקצב",
@@ -2846,7 +2862,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_354",
+    "id": "sibo_shop_356",
     "category": "meat_fish",
     "name": "פסטרמה הודו 100% טבעית ללא תוספים",
     "safeBrand": "טירת צבי 100% טבעי / יחיעם טבעי",
@@ -2854,7 +2870,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "אריזה"
   },
   {
-    "id": "sibo_shop_355",
+    "id": "sibo_shop_357",
     "category": "meat_fish",
     "name": "פילה סלמון נורבגי טרי (עם עור)",
     "safeBrand": "דגת הארץ / שופרסל פרימיום דגים",
@@ -2862,7 +2878,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_356",
+    "id": "sibo_shop_358",
     "category": "meat_fish",
     "name": "פילה סלמון בר פראי (Wild Salmon)",
     "safeBrand": "דגת הים הקפוא",
@@ -2870,7 +2886,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_357",
+    "id": "sibo_shop_359",
     "category": "meat_fish",
     "name": "סטייק סלמון טרי עם עצם",
     "safeBrand": "דייג מקומי",
@@ -2878,7 +2894,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_358",
+    "id": "sibo_shop_360",
     "category": "meat_fish",
     "name": "סלמון מעושן פרימיום ללא תוספת סוכר",
     "safeBrand": "מעדני מיקי / רמב״ם / Balik",
@@ -2886,7 +2902,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "אריזה"
   },
   {
-    "id": "sibo_shop_359",
+    "id": "sibo_shop_361",
     "category": "meat_fish",
     "name": "פילה דניס טרי מפולט",
     "safeBrand": "דגי תנובה / שופרסל טרי",
@@ -2894,7 +2910,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_360",
+    "id": "sibo_shop_362",
     "category": "meat_fish",
     "name": "דניס שלם טרי מנוקה",
     "safeBrand": "שוק דגים",
@@ -2902,7 +2918,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_361",
+    "id": "sibo_shop_363",
     "category": "meat_fish",
     "name": "פילה לברק טרי מפולט",
     "safeBrand": "דגת הארץ / שוק דגים",
@@ -2910,7 +2926,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_362",
+    "id": "sibo_shop_364",
     "category": "meat_fish",
     "name": "לברק שלם טרי",
     "safeBrand": "דייג מקומי",
@@ -2918,7 +2934,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_363",
+    "id": "sibo_shop_365",
     "category": "meat_fish",
     "name": "פילה ברמונדי ישראלי טרי",
     "safeBrand": "ברמונדי ישראלי",
@@ -2926,7 +2942,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_364",
+    "id": "sibo_shop_366",
     "category": "meat_fish",
     "name": "ברמונדי שלם טרי",
     "safeBrand": "ברמונדי מקומי",
@@ -2934,7 +2950,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_365",
+    "id": "sibo_shop_367",
     "category": "meat_fish",
     "name": "פילה מוסר ים טרי",
     "safeBrand": "דייג מקומי",
@@ -2942,7 +2958,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_366",
+    "id": "sibo_shop_368",
     "category": "meat_fish",
     "name": "פילה לוקוס ים טרי",
     "safeBrand": "דייג מובחר",
@@ -2950,7 +2966,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_367",
+    "id": "sibo_shop_369",
     "category": "meat_fish",
     "name": "פילה דג סול קפוא",
     "safeBrand": "דלידג / שופרסל",
@@ -2958,7 +2974,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_368",
+    "id": "sibo_shop_370",
     "category": "meat_fish",
     "name": "פילה בקלה (קוד) קפוא",
     "safeBrand": "דלידג פרימיום",
@@ -2966,7 +2982,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_369",
+    "id": "sibo_shop_371",
     "category": "meat_fish",
     "name": "פילה מליזה (הליבוט) קפוא",
     "safeBrand": "דלידג",
@@ -2974,7 +2990,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_370",
+    "id": "sibo_shop_372",
     "category": "meat_fish",
     "name": "פילה פורל ורוד טרי (נחל דן)",
     "safeBrand": "דגי דן",
@@ -2982,7 +2998,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_371",
+    "id": "sibo_shop_373",
     "category": "meat_fish",
     "name": "פילה מטיאס הולנדי כבוש במלח ושמן",
     "safeBrand": "מעדני מיקי / שוק",
@@ -2990,7 +3006,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "אריזה"
   },
   {
-    "id": "sibo_shop_372",
+    "id": "sibo_shop_374",
     "category": "meat_fish",
     "name": "טונה בהירה בשמן זית (שלישיית שימורים)",
     "safeBrand": "ריו מרה Rio Mare / פילטונה בשמן זית",
@@ -2998,7 +3014,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_373",
+    "id": "sibo_shop_375",
     "category": "meat_fish",
     "name": "טונה במים (ללא שמן)",
     "safeBrand": "פילטונה במים / סטארקיסט במים",
@@ -3006,7 +3022,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_374",
+    "id": "sibo_shop_376",
     "category": "meat_fish",
     "name": "טונה בהירה בשמן זרעי חמניות טהור",
     "safeBrand": "ריו מרה",
@@ -3014,7 +3030,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_375",
+    "id": "sibo_shop_377",
     "category": "meat_fish",
     "name": "נתחי טונה פרימיום בצנצנת זכוכית בשמן זית",
     "safeBrand": "Ortiz Bonito del Norte Jar",
@@ -3022,7 +3038,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_376",
+    "id": "sibo_shop_378",
     "category": "meat_fish",
     "name": "סרדינים שלמים בשמן זית כתית מעולה",
     "safeBrand": "Ortiz / מטיאס / ריו מרה",
@@ -3030,7 +3046,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_377",
+    "id": "sibo_shop_379",
     "category": "meat_fish",
     "name": "סרדינים ספרדיים ללא עור ועצמות בשמן זית",
     "safeBrand": "Ortiz Bonito del Norte",
@@ -3038,7 +3054,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_378",
+    "id": "sibo_shop_380",
     "category": "meat_fish",
     "name": "אנשובי איטלקי פרימיום בשמן זית",
     "safeBrand": "Ortiz / Rizzoli / Zarotti",
@@ -3046,7 +3062,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_379",
+    "id": "sibo_shop_381",
     "category": "meat_fish",
     "name": "פילה טונה אדומה טרייה (סושי גרייד)",
     "safeBrand": "דייג מובחר",
@@ -3054,7 +3070,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_380",
+    "id": "sibo_shop_382",
     "category": "meat_fish",
     "name": "פילה אינטיאס (שולה) טרי",
     "safeBrand": "דייג ים",
@@ -3062,7 +3078,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_381",
+    "id": "sibo_shop_383",
     "category": "meat_fish",
     "name": "פילה פלמידה לבנה טרייה",
     "safeBrand": "שוק דגים",
@@ -3070,7 +3086,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_382",
+    "id": "sibo_shop_384",
     "category": "meat_fish",
     "name": "פילה מליטה (ברקודה) טרי",
     "safeBrand": "שוק דגים",
@@ -3078,7 +3094,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_383",
+    "id": "sibo_shop_385",
     "category": "meat_fish",
     "name": "דג בורי טרי מפולט",
     "safeBrand": "שוק דגים",
@@ -3086,7 +3102,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_384",
+    "id": "sibo_shop_386",
     "category": "meat_fish",
     "name": "פילה ברבוניה אדומה טרייה",
     "safeBrand": "שוק דגים",
@@ -3094,7 +3110,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_385",
+    "id": "sibo_shop_387",
     "category": "meat_fish",
     "name": "פילה דג בס טרי",
     "safeBrand": "דגת הארץ",
@@ -3102,7 +3118,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_386",
+    "id": "sibo_shop_388",
     "category": "meat_fish",
     "name": "פילה פורל ים טרי",
     "safeBrand": "שוק דגים",
@@ -3110,7 +3126,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_387",
+    "id": "sibo_shop_389",
     "category": "meat_fish",
     "name": "סטייק טונה אדומה קפוא",
     "safeBrand": "דלידג פרימיום",
@@ -3118,7 +3134,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_388",
+    "id": "sibo_shop_390",
     "category": "meat_fish",
     "name": "פילה סלמון מעושן חם",
     "safeBrand": "מעדני מיקי",
@@ -3126,7 +3142,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "אריזה"
   },
   {
-    "id": "sibo_shop_389",
+    "id": "sibo_shop_391",
     "category": "meat_fish",
     "name": "פילה לברק קפוא בוואקום",
     "safeBrand": "דגת הארץ",
@@ -3134,23 +3150,15 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_390",
-    "category": "meat_fish",
-    "name": "קבב בקר ביתי מוכן (ללא בצל ושום)",
-    "safeBrand": "אטליז איכותי לפי הזמנה",
-    "warningNote": "מתובל בפטרוזיליה, כמון ומלח בלבד",
-    "unit": "מארז"
-  },
-  {
-    "id": "sibo_shop_391",
-    "category": "meat_fish",
-    "name": "המבורגר בקר 100% טבעי (ללא תבלינים תעשייתיים)",
-    "safeBrand": "אטליז בוטיק",
-    "warningNote": "בשר בקר טהור ללא גלוטן ושום",
-    "unit": "מארז"
-  },
-  {
     "id": "sibo_shop_392",
+    "category": "meat_fish",
+    "name": "המבורגר בקר 100% טבעי לא מתובל",
+    "safeBrand": "אטליז מובחר / שופרסל טרי",
+    "warningNote": "בשר בקר טהור ללא גלוטן, שום ובצל",
+    "unit": "מארז"
+  },
+  {
+    "id": "sibo_shop_393",
     "category": "meat_fish",
     "name": "עצמות בקר/עגל לציר מרק עשיר בקולגן",
     "safeBrand": "אטליז מובחר",
@@ -3158,7 +3166,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_393",
+    "id": "sibo_shop_394",
     "category": "meat_fish",
     "name": "עצמות עוף למרק",
     "safeBrand": "טרי מהקצב",
@@ -3166,7 +3174,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_394",
+    "id": "sibo_shop_395",
     "category": "meat_fish",
     "name": "גרונות הודו/עוף למרק",
     "safeBrand": "טרי מהקצב",
@@ -3174,7 +3182,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_395",
+    "id": "sibo_shop_396",
     "category": "meat_fish",
     "name": "כבד עוף טרי מוכשר",
     "safeBrand": "טרי מהקצב",
@@ -3182,7 +3190,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_396",
+    "id": "sibo_shop_397",
     "category": "meat_fish",
     "name": "כבד בקר טרי",
     "safeBrand": "קצב מובחר",
@@ -3190,7 +3198,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_397",
+    "id": "sibo_shop_398",
     "category": "meat_fish",
     "name": "לשון בקר טרייה",
     "safeBrand": "קצב איכותי",
@@ -3198,7 +3206,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "ק\"ג"
   },
   {
-    "id": "sibo_shop_398",
+    "id": "sibo_shop_399",
     "category": "meat_fish",
     "name": "ביצי דגים / קוויאר סלמון טבעי",
     "safeBrand": "מעדניית דגים",
@@ -3206,7 +3214,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_399",
+    "id": "sibo_shop_400",
     "category": "dairy_oils",
     "name": "ביצי חופש אורגניות טריות (L / XL)",
     "safeBrand": "משק צביאלי / גליקסמן חופש / שופרסל גרין",
@@ -3214,7 +3222,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "תבנית"
   },
   {
-    "id": "sibo_shop_400",
+    "id": "sibo_shop_401",
     "category": "dairy_oils",
     "name": "ביצי חופש מועשרות באומגה 3",
     "safeBrand": "גליקסמן אומגה 3",
@@ -3222,7 +3230,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "תבנית"
   },
   {
-    "id": "sibo_shop_401",
+    "id": "sibo_shop_402",
     "category": "dairy_oils",
     "name": "ביצי שלו קטנות טריות",
     "safeBrand": "משק שלו",
@@ -3230,7 +3238,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "מארז"
   },
   {
-    "id": "sibo_shop_402",
+    "id": "sibo_shop_403",
     "category": "dairy_oils",
     "name": "גבינת פרמזן רג׳יאנו איטלקית מקורית (Parmigiano Reggiano)",
     "safeBrand": "Zanetti / Parmareggio 24/36 חודש",
@@ -3238,7 +3246,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_403",
+    "id": "sibo_shop_404",
     "category": "dairy_oils",
     "name": "גבינת פרמזן מגוררת דק 100% טהורה",
     "safeBrand": "Zanetti Grated Parmesan",
@@ -3246,7 +3254,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_404",
+    "id": "sibo_shop_405",
     "category": "dairy_oils",
     "name": "גבינת גרנה פדנו מיושנת 16+ חודש",
     "safeBrand": "Zanetti Grana Padano",
@@ -3254,7 +3262,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_405",
+    "id": "sibo_shop_406",
     "category": "dairy_oils",
     "name": "גבינת גרנה פדנו מגוררת דק 100%",
     "safeBrand": "Zanetti Grana Padano Grated",
@@ -3262,7 +3270,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_406",
+    "id": "sibo_shop_407",
     "category": "dairy_oils",
     "name": "גבינת פקורינו רומאנו מחלב כבשים (מיושנת)",
     "safeBrand": "Locatelli / Zanetti Pecorino",
@@ -3270,7 +3278,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_407",
+    "id": "sibo_shop_408",
     "category": "dairy_oils",
     "name": "גבינת פקורינו מגוררת דק 100%",
     "safeBrand": "Locatelli Grated Pecorino",
@@ -3278,7 +3286,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_408",
+    "id": "sibo_shop_409",
     "category": "dairy_oils",
     "name": "גבינת פקורינו סרדו (Sardo)",
     "safeBrand": "Zanetti",
@@ -3286,7 +3294,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_409",
+    "id": "sibo_shop_410",
     "category": "dairy_oils",
     "name": "גבינת מנצ׳גו ספרדית מיושנת מחלב כבשים (12 חודש)",
     "safeBrand": "García Baquero Manchego Curado",
@@ -3294,7 +3302,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_410",
+    "id": "sibo_shop_411",
     "category": "dairy_oils",
     "name": "גבינת גאודה עיזים קשה מיושנת",
     "safeBrand": "Frico Goat Cheese Aged / משק צוריאל",
@@ -3302,7 +3310,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_411",
+    "id": "sibo_shop_412",
     "category": "dairy_oils",
     "name": "גבינת גאודה הולנדית מיושנת 12 חודש (Old Gouda)",
     "safeBrand": "Frico Old Holland",
@@ -3310,7 +3318,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_412",
+    "id": "sibo_shop_413",
     "category": "dairy_oils",
     "name": "גבינת גאודה כמהין",
     "safeBrand": "Frico Truffle Gouda",
@@ -3318,7 +3326,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_413",
+    "id": "sibo_shop_414",
     "category": "dairy_oils",
     "name": "גבינת צ׳דר אנגלית מיושנת חריפה (Mature Cheddar)",
     "safeBrand": "Cathedral City Mature / Wyke Farms",
@@ -3326,7 +3334,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_414",
+    "id": "sibo_shop_415",
     "category": "dairy_oils",
     "name": "גבינת צ׳דר וינטג׳ מיושנת 18 חודש",
     "safeBrand": "Cathedral City Vintage",
@@ -3334,7 +3342,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_415",
+    "id": "sibo_shop_416",
     "category": "dairy_oils",
     "name": "גבינת צ׳דר עיזים קשה",
     "safeBrand": "משק צוריאל",
@@ -3342,7 +3350,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_416",
+    "id": "sibo_shop_417",
     "category": "dairy_oils",
     "name": "גבינת גרוייר שוויצרית מקורית (Gruyère AOP)",
     "safeBrand": "Emmi Le Gruyère Switzerland",
@@ -3350,7 +3358,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_417",
+    "id": "sibo_shop_418",
     "category": "dairy_oils",
     "name": "גבינת אמנטל שוויצרית מקורית",
     "safeBrand": "Emmi Emmentaler AOP",
@@ -3358,7 +3366,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חריץ"
   },
   {
-    "id": "sibo_shop_418",
+    "id": "sibo_shop_419",
     "category": "dairy_oils",
     "name": "גבינת פטה עיזים/כבשים קשה מלוחה",
     "safeBrand": "משק צוריאל פטה עיזים / פיראוס פטה",
@@ -3366,7 +3374,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_419",
+    "id": "sibo_shop_420",
     "category": "dairy_oils",
     "name": "גבינת חלומי עיזים/בקר לטיגון וצלייה",
     "safeBrand": "פיראוס חלומי / משק דותן",
@@ -3374,7 +3382,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_420",
+    "id": "sibo_shop_421",
     "category": "dairy_oils",
     "name": "גבינת ברי צרפתית אותנטית (Brie)",
     "safeBrand": "Président Brie",
@@ -3382,7 +3390,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "משולש"
   },
   {
-    "id": "sibo_shop_421",
+    "id": "sibo_shop_422",
     "category": "dairy_oils",
     "name": "גבינת קממבר צרפתית מקורית (Camembert)",
     "safeBrand": "Président Camembert",
@@ -3390,7 +3398,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_422",
+    "id": "sibo_shop_423",
     "category": "dairy_oils",
     "name": "חמאה צרפתית איכותית 82% שומן",
     "safeBrand": "Elle & Vire / Président / Lurpak",
@@ -3398,7 +3406,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_423",
+    "id": "sibo_shop_424",
     "category": "dairy_oils",
     "name": "חמאה צרפתית עם גבישי מלח ים (Demi-Sel)",
     "safeBrand": "Président aux Cristaux de Sel",
@@ -3406,7 +3414,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_424",
+    "id": "sibo_shop_425",
     "category": "dairy_oils",
     "name": "חמאה הולנדית ללא מלח",
     "safeBrand": "Frico Pure Butter",
@@ -3414,27 +3422,19 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "חבילה"
   },
   {
-    "id": "sibo_shop_425",
-    "category": "dairy_oils",
-    "name": "חמאת גהי הודית מזוככת (Ghee 100% שומן חלב טהור)",
-    "safeBrand": "Organic Valley Ghee / Pukka / ביתי",
-    "warningNote": "הערה קלינית: זיכוך החמאה מסיר 100% ממוצקי החלב והלקטוז!",
-    "unit": "צנצנת"
-  },
-  {
     "id": "sibo_shop_426",
     "category": "dairy_oils",
-    "name": "חמאת גהי אורגנית עם כורכום",
-    "safeBrand": "Organic Valley Turmeric Ghee",
-    "warningNote": "גהי מועשר בכורכומין",
+    "name": "חמאת גהי הודית מזוככת (Ghee 100% שומן חלב טהור)",
+    "safeBrand": "Organic Valley Ghee / Pukka",
+    "warningNote": "הערה קלינית: זיכוך החמאה מסיר 100% ממוצקי החלב והלקטוז!",
     "unit": "צנצנת"
   },
   {
     "id": "sibo_shop_427",
     "category": "dairy_oils",
-    "name": "חמאת גהי עם שמן שום",
-    "safeBrand": "ביתי / Garlic Ghee",
-    "warningNote": "גהי מושרה בשום — 0% פרוקטנים",
+    "name": "חמאת גהי אורגנית עם כורכום",
+    "safeBrand": "Organic Valley Turmeric Ghee",
+    "warningNote": "גהי מועשר בכורכומין",
     "unit": "צנצנת"
   },
   {
@@ -4034,7 +4034,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "category": "pantry_baking",
     "name": "צנוברים טבעיים מובחרים",
     "safeBrand": "שקדיה / פרג",
-    "warningNote": "להכנת פסטו ביתי וקלייה לסלטים",
+    "warningNote": "להכנת פסטו וקלייה לסלטים",
     "unit": "שקית"
   },
   {
@@ -4112,21 +4112,13 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
   {
     "id": "sibo_shop_512",
     "category": "pantry_baking",
-    "name": "קמח שקדים דק מנופה לעוגות",
-    "safeBrand": "שקדיה פרימיום",
-    "warningNote": "בסיס לאפייה ביתית בריאה",
-    "unit": "שקית"
-  },
-  {
-    "id": "sibo_shop_513",
-    "category": "pantry_baking",
     "name": "שמן MCT קוקוס טהור",
     "safeBrand": "Jarrow Formulas 100% MCT Oil",
     "warningNote": "שומן מהיר לאנרגיה מוחית ללא מעמסת עיכול",
     "unit": "בקבוק"
   },
   {
-    "id": "sibo_shop_514",
+    "id": "sibo_shop_513",
     "category": "pantry_baking",
     "name": "זיתי קלמטה שלמים במי מלח ושמן זית",
     "safeBrand": "אנשי הזית / זיתא קלמטה",
@@ -4134,7 +4126,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "צנצנת"
   },
   {
-    "id": "sibo_shop_515",
+    "id": "sibo_shop_514",
     "category": "pantry_baking",
     "name": "זיתים ירוקים מבוקעים במלח בלבד",
     "safeBrand": "בית השיטה במלח בלבד",
@@ -4142,7 +4134,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_516",
+    "id": "sibo_shop_515",
     "category": "pantry_baking",
     "name": "זיתי טאסוס שחורים מיובשים במלח",
     "safeBrand": "אנשי הזית",
@@ -4150,7 +4142,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "קופסה"
   },
   {
-    "id": "sibo_shop_517",
+    "id": "sibo_shop_516",
     "category": "pantry_baking",
     "name": "מלפפונים חמוצים במלח בלבד (קופסת שימורים ירוקה)",
     "safeBrand": "בית השיטה במלח / בני דרום במלח",
@@ -4158,23 +4150,7 @@ export const SIBO_SHOPPING_500_ITEMS: SiboShopping500Item[] = [
     "unit": "פחית"
   },
   {
-    "id": "sibo_shop_518",
-    "category": "pantry_baking",
-    "name": "אבקת ג׳לטין טבעית 100% בקר מאושר",
-    "safeBrand": "Great Lakes Gelatin / Now Foods Pure Gelatin",
-    "warningNote": "לשיקום רירית הקיבה והמעיים",
-    "unit": "פחית"
-  },
-  {
-    "id": "sibo_shop_519",
-    "category": "pantry_baking",
-    "name": "פפטידי קולגן טהורים ללא טעם",
-    "safeBrand": "Vital Proteins Collagen Peptides",
-    "warningNote": "נמס מיד בכל משקה חם או קר",
-    "unit": "מכל"
-  },
-  {
-    "id": "sibo_shop_520",
+    "id": "sibo_shop_517",
     "category": "pantry_baking",
     "name": "אבקת אלקטרוליטים ללא סוכר (סודיום, פוטסיום, מגנזיום)",
     "safeBrand": "LMNT Raw Unflavored / Dr. Berg",
