@@ -262,7 +262,7 @@ export default function App() {
       />
 
       {/* Main App Content Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4 space-y-3 pb-4">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-1 sm:py-2 space-y-1 pb-0">
 
         {/* Error Alert if any */}
         {errorMsg && (
@@ -282,7 +282,7 @@ export default function App() {
 
         {/* TAB 1: SUPERMARKET HUB (Shopping List to Send + Self Scan) */}
         {activeTab === 'scanner' && (
-          <div className="space-y-4">
+          <div className="space-y-1">
             {isShoppingListExpanded ? (
               <SiboShoppingListView
                 currentPhase={currentPhase}
@@ -468,8 +468,8 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="bg-white border-t border-stone-200 py-8 mt-12 text-center text-xs text-stone-500 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 space-y-4">
+      <footer className="bg-white border-t border-stone-200 py-3 mt-0 text-center text-xs text-stone-500 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 space-y-2">
           {/* Main Credits and Bug reporting */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-stone-50 border border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-right">
             <div className="space-y-1 text-center sm:text-right">

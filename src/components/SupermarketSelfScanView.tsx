@@ -82,21 +82,21 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-1 sm:p-2 space-y-3 animate-fadeIn text-stone-900" dir="rtl">
+    <div className="max-w-3xl mx-auto p-0 space-y-2 animate-fadeIn text-stone-900" dir="rtl">
       {/* 🥑 SUPER PROMINENT DOUBLE-SIZED HUNGER RESCUE BUTTON */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && onOpenHungerWizard && (
         <button
           type="button"
           onClick={onOpenHungerWizard}
-          className="w-full p-4 sm:p-5 rounded-3xl bg-[#BDECB6] hover:bg-[#aee4a6] text-[#064e3b] font-black shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3 border-2 border-[#a2dba0] active:scale-98 cursor-pointer group"
+          className="w-full p-3 sm:p-3.5 rounded-2xl sm:rounded-3xl bg-[#BDECB6] hover:bg-[#aee4a6] text-[#064e3b] font-black shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 border-2 border-[#a2dba0] active:scale-98 cursor-pointer group"
         >
-          <div className="flex items-center gap-3 sm:gap-4 text-right min-w-0 flex-1">
-            <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-white text-[#064e3b] flex items-center justify-center text-3xl sm:text-4xl shadow-xs group-hover:scale-110 transition-transform shrink-0 border border-[#a2dba0]">
+          <div className="flex items-center gap-2.5 sm:gap-3 text-right min-w-0 flex-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white text-[#064e3b] flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform shrink-0 border border-[#a2dba0]">
               🥑
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase px-2.5 py-0.5 bg-white text-[#064e3b] border border-[#a2dba0] rounded-full shadow-2xs">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase px-2 py-0.5 bg-white text-[#064e3b] border border-[#a2dba0] rounded-full shadow-2xs">
                   חירום שובע מהיר
                 </span>
                 <h3 className="text-base sm:text-xl font-black tracking-tight text-[#064e3b] truncate">
@@ -111,15 +111,15 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
         </button>
       )}
 
-      {/* 1. TOP PROMINENT CARD: לשלוח למישהו לקנות בסופר (Entire card is a clickable button) */}
+      {/* 1. FIRST SECTION: לשלוח למישהו לקנות בסופר */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && (
         <button
           type="button"
           onClick={onOpenShoppingList}
-          className="w-full bg-white rounded-3xl p-4 sm:p-5 border-2 border-emerald-800/30 hover:border-emerald-800 shadow-sm hover:shadow-md transition-all text-right space-y-2.5 cursor-pointer group active:scale-[0.99] block"
+          className="w-full p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white hover:bg-emerald-50/40 text-stone-900 border-2 border-emerald-600/70 shadow-xs hover:shadow-md transition-all text-right cursor-pointer transform active:scale-98 space-y-2 group"
         >
           <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-black">
                 <span>אפשרות 1: שולחת מישהו אחר</span>
               </div>
@@ -130,12 +130,12 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
                 סמני מה חסר לך במקרר (מתוך 500+ מוצרים ומותגים בטוחים) ושלחי ישירות לוואטסאפ של הקונה!
               </p>
             </div>
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl sm:text-2xl shrink-0 border border-emerald-200 shadow-2xs group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl sm:text-2xl shrink-0 border border-emerald-200 shadow-2xs group-hover:scale-105 transition-transform">
               📱
             </div>
           </div>
 
-          <div className="pt-2.5 border-t border-stone-100 w-full flex items-center justify-between gap-2 text-stone-700">
+          <div className="pt-2 border-t border-stone-100 w-full flex items-center justify-between gap-2 text-stone-700">
             <div className="text-xs text-stone-500 font-medium">
               {selectedShoppingCount > 0 ? (
                 <span className="font-bold text-emerald-800">
@@ -156,12 +156,12 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 
       {/* 2. SECOND SECTION: קניות בעצמי בסופר (צלם / סרוק) */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && (
-        <div className="bg-stone-50 rounded-3xl p-4 sm:p-6 border border-stone-300 shadow-xs space-y-3 sm:space-y-4 text-right">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-800 text-[11px] font-black">
+        <div className="bg-stone-50 rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-stone-300 shadow-xs space-y-2.5 text-right">
+          <div className="space-y-0.5">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-stone-200 text-stone-800 text-[10.5px] font-black">
               <span>אפשרות 2: את נמצאת בעצמך בסופר</span>
             </div>
-            <h3 className="text-base sm:text-xl font-black text-stone-900">
+            <h3 className="text-base sm:text-lg font-black text-stone-900">
               קניות בעצמי בסופר 🛒
             </h3>
             <p className="text-xs text-stone-600 font-medium">
@@ -169,21 +169,21 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-1">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-0.5">
             {/* Button 1: 📸 צלם רשימת מרכיבים */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 sm:p-4 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-amber-500/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
+              className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-amber-500/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
             >
-              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                 <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="w-full">
-                <h4 className="text-xs sm:text-base font-black tracking-tight text-stone-900 leading-tight">
+                <h4 className="text-xs sm:text-sm font-black tracking-tight text-stone-900 leading-tight">
                   צלם רשימת מרכיבים 📸
                 </h4>
-                <p className="text-[10px] sm:text-xs font-semibold text-stone-600 mt-0.5 line-clamp-1">
+                <p className="text-[10px] sm:text-[11px] font-semibold text-stone-600 mt-0.5 line-clamp-1">
                   צילום תווית / גב אריזה
                 </p>
               </div>
@@ -196,16 +196,16 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
             <button
               type="button"
               onClick={() => setActiveScanMode('barcode')}
-              className="p-3 sm:p-4 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-emerald-700/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
+              className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-emerald-700/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
             >
-              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                 <Barcode className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="w-full">
-                <h4 className="text-xs sm:text-base font-black tracking-tight text-stone-900 leading-tight">
+                <h4 className="text-xs sm:text-sm font-black tracking-tight text-stone-900 leading-tight">
                   סרוק ברקוד 🏷️
                 </h4>
-                <p className="text-[10px] sm:text-xs font-semibold text-stone-600 mt-0.5 line-clamp-1">
+                <p className="text-[10px] sm:text-[11px] font-semibold text-stone-600 mt-0.5 line-clamp-1">
                   סריקה חיה של ברקוד
                 </p>
               </div>
