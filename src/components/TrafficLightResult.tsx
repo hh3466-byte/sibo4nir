@@ -113,20 +113,16 @@ export const TrafficLightResult: React.FC<TrafficLightResultProps> = ({
   };
 
   const isUnidentified = Boolean(
-    result.isPackagedProduct ||
-    result.foodName?.includes('לא מזוהה') ||
-    result.foodName?.includes('לא ברור') ||
-    result.foodName?.includes('לא ברורה') ||
-    result.foodName?.includes('לא ידוע') ||
-    result.foodName?.includes('לא ניתן לזהות') ||
-    result.foodName?.includes('מטושטש') ||
-    result.foodName?.includes('מוצר ארוז') ||
-    result.foodName?.includes('משקה לא מזוהה') ||
-    result.foodName?.includes('מוצר מסחרי שטרם זוהה') ||
-    result.shortVerdict?.includes('מוצר לא מזוהה') ||
-    result.detailedExplanation?.includes('מוצר לא מזוהה') ||
-    result.foodName?.toLowerCase().includes('unidentified') ||
-    result.foodName?.toLowerCase().includes('unknown')
+    result.status === 'RED' &&
+    (
+      result.foodName === 'מוצר לא מזוהה' ||
+      result.foodName === 'משקה לא מזוהה' ||
+      result.foodName === 'מאכל שצולם' ||
+      result.foodName === 'מאכל שצולם במצלמה' ||
+      result.foodName?.startsWith('מוצר לא מזוהה') ||
+      result.foodName?.startsWith('משקה לא מזוהה') ||
+      (result.shortVerdict?.startsWith('מוצר לא מזוהה') && !result.foodName)
+    )
   );
 
   const statusConfig: Record<

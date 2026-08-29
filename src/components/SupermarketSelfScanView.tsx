@@ -3,6 +3,7 @@ import { Camera, Barcode, RotateCcw, AlertTriangle, CheckCircle2, XCircle, Spark
 import { SiboPhase, FoodAnalysisResult } from '../types';
 import { CameraScanner } from './CameraScanner';
 import { TrafficLightResult } from './TrafficLightResult';
+import { optimizeImageForOcr } from '../utils/imageUtils';
 
 interface SupermarketSelfScanViewProps {
   currentPhase: SiboPhase;
@@ -28,20 +29,29 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   const [activeScanMode, setActiveScanMode] = useState<'idle' | 'camera' | 'barcode'>('idle');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
+    try {
+      const optimizedBase64 = await optimizeImageForOcr(file);
       onAnalyze({
-        imageBase64: base64,
-        mimeType: file.type || 'image/jpeg',
+        imageBase64: optimizedBase64,
+        mimeType: 'image/jpeg',
       });
-      setActiveScanMode('idle');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.warn('[PhotoCapture] Optimizer error, fallback to raw:', err);
+      const reader = new FileReader();
+      reader.onload = () => {
+        onAnalyze({
+          imageBase64: reader.result as string,
+          mimeType: file.type || 'image/jpeg',
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+    setActiveScanMode('idle');
+    e.target.value = '';
   };
 
   return (
