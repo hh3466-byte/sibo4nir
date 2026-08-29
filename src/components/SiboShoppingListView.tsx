@@ -78,6 +78,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [onlyCheckedFilter, setOnlyCheckedFilter] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -354,143 +355,51 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-2.5 sm:p-5 space-y-4 animate-fadeIn pb-28 text-stone-900" dir="rtl">
-      {/* Calm Header Card */}
-      <div className="bg-stone-900 text-white p-4 sm:p-5 rounded-3xl shadow-md text-right border border-stone-800 flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-800 text-emerald-100 text-[10px] sm:text-xs font-black">
-            <span>מאגר 500+ מוצרים ומותגים מאושרים</span>
-          </div>
-          <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
-            <span>הכנת רשימת קניות לשליחה 📋</span>
+    <div className="max-w-4xl mx-auto p-1.5 sm:p-3 space-y-3 animate-fadeIn pb-32 text-stone-900" dir="rtl">
+      {/* 🌟 Slim, Clean Top Header Bar (No bulky black box!) */}
+      <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-stone-100/90 backdrop-blur-sm rounded-2xl border border-stone-200 text-stone-900 shadow-2xs">
+        <div className="flex items-center gap-2">
+          {onBackToScanner && (
+            <button
+              type="button"
+              onClick={onBackToScanner}
+              className="px-2.5 py-1.5 bg-white hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold transition-colors border border-stone-200 flex items-center gap-1 cursor-pointer shadow-2xs"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>חזרה</span>
+            </button>
+          )}
+          <h2 className="text-xs sm:text-sm font-black tracking-tight text-stone-900 flex items-center gap-1.5">
+            <span>רשימת קניות 📋</span>
+            <span className="text-[10px] text-stone-500 font-bold hidden sm:inline">(500+ מוצרים ומותגים)</span>
           </h2>
-          <p className="text-xs text-stone-300 font-medium">
-            סמני או חפשי מוצרים שחסרים לך במקרר/מזווה – ושלחי ישירות לוואטסאפ של הקונה!
-          </p>
         </div>
 
-        {onBackToScanner && (
-          <button
-            type="button"
-            onClick={onBackToScanner}
-            className="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-xs font-bold shrink-0 transition-colors border border-stone-700 flex items-center gap-1 cursor-pointer"
-          >
-            <span>קניות בעצמי</span>
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-        )}
-      </div>
-
-      {/* Sticky Bottom/Top WhatsApp Action Bar */}
-      <div className="sticky top-14 z-30 bg-white/95 backdrop-blur-md p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-stone-300 shadow-md space-y-2.5">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm shadow-xs ${
-              selectedCount > 0 ? 'bg-emerald-700 text-white' : 'bg-stone-100 text-stone-600'
-            }`}>
-              {selectedCount}
-            </span>
-            <div>
-              <span className="text-xs sm:text-sm font-black text-stone-900 block leading-tight">
-                {selectedCount > 0 ? `${selectedCount} מוצרים נבחרו להזמנה` : 'הרשימה ריקה כרגע'}
-              </span>
-              <span className="text-[10.5px] text-stone-500 font-medium">
-                {selectedCount > 0 ? 'מוכן לשליחה מהירה בוואטסאפ' : 'סמני מה חסר לך או השתמשי בחיפוש למטה'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleCopyList}
-              className="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200"
-              title="העתק טקסט"
-            >
-              {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedSuccess ? 'הועתק!' : 'העתק'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAddingCustom(true)}
-              className="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200"
-            >
-              <Plus className="w-3.5 h-3.5 text-emerald-700" />
-              <span>הוסף אישי</span>
-            </button>
-
-            {selectedCount > 0 && (
-              <button
-                type="button"
-                onClick={handleClearAll}
-                className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-rose-200"
-                title="נקה את כל הסימונים"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>נקה</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Big Unified Green WhatsApp Button */}
-        <button
-          type="button"
-          onClick={handleSendWhatsApp}
-          disabled={selectedCount === 0}
-          className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-35 disabled:hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
-        >
-          <Send className="w-4 h-4 rtl:rotate-180" />
-          <span>שלחי בוואטסאפ למי שקונה 📱 ({selectedCount} מוצרים)</span>
-        </button>
-
-        {/* Filters and Shopper Phone */}
-        <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1 border-t border-stone-100">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setOnlyCheckedFilter(!onlyCheckedFilter)}
-            className={`font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+            className={`font-black text-xs px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 ${
               onlyCheckedFilter
-                ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
-                : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+                ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs'
+                : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
             }`}
           >
-            {onlyCheckedFilter ? '✓ מציג רק מסומנים' : 'הצג רק מה שסומן'}
+            <span>{onlyCheckedFilter ? '✓ מסומנים בלבד' : 'סנן מסומנים:'}</span>
+            <span className="bg-emerald-100 text-emerald-950 px-1.5 py-0.2 rounded-full text-[10.5px] font-black">
+              {selectedCount}
+            </span>
           </button>
 
-          <div>
-            {isEditingPhone ? (
-              <div className="flex items-center gap-1">
-                <input
-                  type="tel"
-                  value={directPhone}
-                  onChange={(e) => setDirectPhone(e.target.value)}
-                  placeholder="מספר לקונה (05X...)"
-                  className="px-2 py-0.5 border border-stone-300 rounded text-xs w-28 text-left"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    localStorage.setItem('sibo_shopper_phone', directPhone);
-                    setIsEditingPhone(false);
-                  }}
-                  className="font-black text-emerald-700 px-1 cursor-pointer"
-                >
-                  שמור
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditingPhone(true)}
-                className="text-stone-500 hover:text-stone-900 hover:underline cursor-pointer flex items-center gap-1"
-              >
-                <Smartphone className="w-3 h-3" />
-                <span>{directPhone ? `נשלח ישירות ל: ${directPhone}` : 'הגדרת מספר קבוע לקונה'}</span>
-              </button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsAddingCustom(true)}
+            className="px-2.5 py-1.5 bg-white hover:bg-stone-50 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-stone-200 shadow-2xs"
+            title="הוסיפי מוצר אישי"
+          >
+            <Plus className="w-3.5 h-3.5 text-emerald-700" />
+            <span className="hidden sm:inline">מוצר אישי</span>
+          </button>
         </div>
       </div>
 
@@ -953,6 +862,192 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* 🛒 Floating Bottom Order & WhatsApp Bar (Always accessible, doesn't crowd product selection!) */}
+      {selectedCount > 0 && (
+        <div className="fixed bottom-3 inset-x-3 sm:max-w-lg sm:mx-auto z-40 animate-slideUp">
+          <div className="bg-stone-900/95 backdrop-blur-md text-white p-3 rounded-2xl sm:rounded-3xl border-2 border-emerald-500 shadow-2xl flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                {selectedCount}
+              </span>
+              <div className="min-w-0">
+                <span className="text-xs sm:text-sm font-black text-white block truncate">
+                  {selectedCount} מוצרים בסל הקניות
+                </span>
+                <span className="text-[10.5px] text-emerald-300 font-bold block truncate">
+                  מוכן לאריזה ושליחה ✨
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsOrderModalOpen(true)}
+                className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center gap-2 cursor-pointer active:scale-95 transition-all"
+              >
+                <span>📦 ארוז ושלח בוואטסאפ</span>
+                <Send className="w-3.5 h-3.5 rtl:rotate-180" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📦 Order Packaging & WhatsApp Sending Modal */}
+      {isOrderModalOpen && (
+        <div className="fixed inset-0 z-50 bg-stone-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fadeIn" dir="rtl">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-600 overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 bg-stone-900 text-white flex items-center justify-between gap-3 border-b border-stone-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-xl shrink-0">
+                  📦
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white">
+                    אריזת רשימת הקניות ({selectedCount} מוצרים)
+                  </h3>
+                  <p className="text-[11px] text-stone-300 font-medium">
+                    בדקי את הרשימה, הגדירי מספר ושלחי ישירות לוואטסאפ
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsOrderModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 flex items-center justify-center text-sm font-bold cursor-pointer transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body: Selected Items Breakdown */}
+            <div className="p-4 overflow-y-auto space-y-3 flex-1 text-right text-xs sm:text-sm">
+              <div className="space-y-2">
+                {allItems.filter((i) => checkedIds[i.id]).map((item) => {
+                  const qty = quantities[item.id] || 1;
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-between gap-2"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className="font-black text-stone-900 block truncate">
+                          {qty > 1 ? `${qty}x ` : ''}{item.name}
+                        </span>
+                        {item.safeBrand && (
+                          <span className="text-[10.5px] text-stone-500 block truncate">
+                            🏷️ {item.safeBrand}
+                          </span>
+                        )}
+                        {item.warningNote && (
+                          <span className="text-[10px] text-amber-800 block truncate">
+                            ⚠️ {item.warningNote}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Quantity Counter */}
+                        <div className="flex items-center gap-1 bg-white border border-stone-300 rounded-lg p-0.5 shadow-2xs">
+                          <button
+                            type="button"
+                            onClick={(e) => updateQuantity(item.id, -1, e)}
+                            className="w-5 h-5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold flex items-center justify-center text-xs cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="w-5 text-center text-xs font-black text-stone-900">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => updateQuantity(item.id, 1, e)}
+                            className="w-5 h-5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center text-xs cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleItem(item.id)}
+                          className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
+                          title="הסר פריט"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Direct Phone configuration */}
+              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1.5">
+                <span className="text-xs font-black text-emerald-950 block">
+                  📱 מספר טלפון של הקונה (לשליחה ישירה):
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="tel"
+                    value={directPhone}
+                    onChange={(e) => {
+                      setDirectPhone(e.target.value);
+                      localStorage.setItem('sibo_shopper_phone', e.target.value);
+                    }}
+                    placeholder="למשל: 054-1234567 (אופציונלי)"
+                    className="flex-1 p-2 bg-white border border-emerald-300 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-emerald-600 text-left"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="p-4 bg-stone-50 border-t border-stone-200 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  handleSendWhatsApp();
+                  setIsOrderModalOpen(false);
+                }}
+                disabled={selectedCount === 0}
+                className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all active:scale-98"
+              >
+                <Send className="w-4 h-4 rtl:rotate-180" />
+                <span>שלחי עכשיו בוואטסאפ 🚀</span>
+              </button>
+
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleCopyList}
+                  className="flex-1 py-2 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedSuccess ? 'הרשימה הועתקה!' : 'העתק טקסט 📋'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleClearAll();
+                    setIsOrderModalOpen(false);
+                  }}
+                  className="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>נקה סל</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
