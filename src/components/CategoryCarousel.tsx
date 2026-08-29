@@ -92,14 +92,53 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
     return 'bg-white hover:bg-stone-100/90 text-stone-800 border-stone-200 shadow-2xs';
   };
 
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setTouchStartX(clientX);
+    setTouchStartY(clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    if (touchStartX === null || touchStartY === null) return;
+    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
+    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : e.clientY;
+    const deltaX = clientX - touchStartX;
+    const deltaY = clientY - touchStartY;
+
+    // Only swipe if horizontal movement is dominant and > 35px
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+      if (deltaX < 0) {
+        // Swiped Left -> In RTL, this goes forward to Next
+        handleNext();
+      } else {
+        // Swiped Right -> In RTL, this goes back to Prev
+        handlePrev();
+      }
+    }
+
+    setTouchStartX(null);
+    setTouchStartY(null);
+  };
+
   return (
-    <div className="bg-stone-100/90 backdrop-blur-sm p-2 sm:p-2.5 rounded-2xl border border-stone-300 shadow-xs space-y-1.5 text-right select-none" dir="rtl">
+    <div
+      className="bg-stone-100/90 backdrop-blur-sm p-2 sm:p-2.5 rounded-2xl border border-stone-300 shadow-xs space-y-1.5 text-right select-none touch-pan-y"
+      dir="rtl"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleTouchStart}
+      onMouseUp={handleTouchEnd}
+    >
       {/* Header with Title, Page Indicator & Grid Modal Toggle */}
       <div className="flex items-center justify-between px-1 text-[11px] font-black text-stone-600">
         <div className="flex items-center gap-1.5">
           <span>{title}</span>
           <span className="text-[10px] text-stone-400 font-bold">
-            (עמוד {currentPage + 1} מתוך {totalPages})
+            (עמוד {currentPage + 1} מתוך {totalPages} • החליקי באצבע ↔️)
           </span>
         </div>
 
@@ -114,7 +153,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
         </button>
       </div>
 
-      {/* 🎠 Carousel Stepper Row (Arrows on edges, perfectly visible cards in between) */}
+      {/* 🎠 Carousel Stepper Row (Swipe with finger or click arrows) */}
       <div className="flex items-center gap-1 sm:gap-2">
         {/* Right Arrow (Previous in RTL) */}
         <button
