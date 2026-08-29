@@ -1812,4 +1812,51 @@ export const ISRAELI_SUPERMARKET_CATALOG: Record<string, Partial<BarcodeProductI
     categories: 'אטריות אורז',
   },
 
+
+  // =========================================================================
+  // 22. CORNFLOUR, STARCHES & GLUTEN-FREE FLOURS (קורנפלור, עמילנים וקמחים מותרים)
+  // =========================================================================
+  '7290013145970': {
+    productName: 'קורנפלור טהור 500 גרם (גלעם / Galam Pure Cornflour)',
+    brand: 'גלעם Galam / דגן',
+    ingredientsText: '100% עמילן תירס טהור (ללא גלוטן, ללא שום, ללא לקטוז, דל FODMAP - אור ירוק ל-SIBO ולצליאק! 🟢)',
+    categories: 'אפייה, קורנפלור ועמילנים',
+  },
+  '7290000060018': {
+    productName: 'קורנפלור סוגת 500 גרם (Sugat Pure Cornstarch)',
+    brand: 'סוגת Sugat',
+    ingredientsText: '100% עמילן תירס טהור למאכל (אור ירוק 🟢)',
+    categories: 'אפייה וקורנפלור',
+  },
+  '7290108350012': {
+    productName: 'קורנפלור מיה 500 גרם (Maya Cornstarch)',
+    brand: 'מיה תעשיות מזון Maya',
+    ingredientsText: '100% עמילן תירס מובחר (אור ירוק 🟢)',
+    categories: 'אפייה וקורנפלור',
+  },
+  '7290104720017': {
+    productName: 'קורנפלור שופרסל 500 גרם (Shufersal Cornstarch)',
+    brand: 'שופרסל',
+    ingredientsText: '100% עמילן תירס טהור (אור ירוק 🟢)',
+    categories: 'אפייה וקורנפלור',
+  },
+  '7290013145000': {
+    productName: 'קמח תפוחי אדמה גלעם 500 גרם (Potato Starch)',
+    brand: 'גלעם Galam',
+    ingredientsText: '100% עמילן תפוחי אדמה טהור (אור ירוק 🟢)',
+    categories: 'אפייה ועמילנים',
+  },
+  '7290005401052': {
+    productName: 'קמח אורז לבן טהור תבואות 500 גרם (White Rice Flour)',
+    brand: 'תבואות Tevuot',
+    ingredientsText: '100% קמח אורז לבן טהור (אור ירוק 🟢)',
+    categories: 'קמחים ללא גלוטן',
+  },
+  '7290005401069': {
+    productName: 'קמח טפיוקה טהור תבואות 500 גרם (Tapioca Starch)',
+    brand: 'תבואות Tevuot',
+    ingredientsText: '100% עמילן טפיוקה טהור (אור ירוק 🟢)',
+    categories: 'קמחים ללא גלוטן ועמילנים',
+  },
+
 };

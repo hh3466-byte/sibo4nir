@@ -10,6 +10,7 @@ export type { BarcodeProductInfo };
  * GS1 Israel Manufacturer Prefixes for instant recognition of unindexed Israeli barcodes
  */
 export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defaultCategory: string }> = {
+  '72900131': { brand: 'גלעם (Galam) / דגן', defaultCategory: 'קורנפלור, עמילנים, גלוקוז ומוצרי אפייה' },
   '72901053': { brand: 'עלית / שטראוס חטיפים ומלוחים (Tapuchips / Elite)', defaultCategory: 'תפוצ׳יפס, דוריטוס וחטיפים מלוחים' },
   '72900182': { brand: 'סוויטנגו (Sweetango) / מילניום', defaultCategory: 'פודינג, שוקולד ותחליפי סוכר ללא סוכר' },
   '72900151': { brand: 'וילקוניק (Wilconic) / מזרח ומערב', defaultCategory: 'דפי אורז, אטריות אורז ומזון אסיאתי' },
