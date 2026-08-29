@@ -179,13 +179,12 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 
           <CameraScanner
             currentPhase={currentPhase}
-            onAnalyze={(payload) => {
+            onAnalyze={async (payload) => {
               onAnalyze(payload);
               setActiveScanMode('idle');
             }}
             isLoading={isLoading}
             initialMode="barcode"
-            onReset={() => {}}
           />
         </div>
       )}
@@ -208,12 +207,12 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
         <div className="space-y-4">
           <TrafficLightResult
             result={analysisResult}
-            currentPhase={currentPhase}
             onReset={() => {
               onClearResult();
               setActiveScanMode('idle');
             }}
             onSaveToDiary={() => {}}
+            onExploreAlternative={() => {}}
             isSaved={false}
           />
 

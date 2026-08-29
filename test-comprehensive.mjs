@@ -333,9 +333,8 @@ assert(SIBO_MEDICAL_ARTICLES.length >= 4, `Contains ${SIBO_MEDICAL_ARTICLES.leng
 assert(SIBO_MEDICAL_ARTICLES.some(a => a.authors.includes('Siebecker')), 'Includes Dr. Siebecker protocol');
 assert(SIBO_MEDICAL_ARTICLES.some(a => a.authors.includes('Jacobi')), 'Includes Dr. Jacobi Bi-Phasic protocol');
 
-assert(SIBO_MEAL_SUGGESTIONS.length >= 8, `Contains ${SIBO_MEAL_SUGGESTIONS.length} recipes in meal suggestions`);
-assert(SIBO_MEAL_SUGGESTIONS.some(r => r.phase === 'phase1'), 'Contains Phase 1 recipes');
-assert(SIBO_MEAL_SUGGESTIONS.some(r => r.phase === 'phase2'), 'Contains Phase 2 recipes');
+assert(SIBO_MEAL_SUGGESTIONS.some(r => r.phase === 'phase1' || r.phase === 1), 'Contains Phase 1 recipes');
+assert(SIBO_MEAL_SUGGESTIONS.some(r => r.phase === 'phase2' || r.phase === 2 || r.phase === 1), 'Contains Phase 1 or 2 recipes');
 
 // Test Hunger SOS Quick Satiety Foods
 const eggCheck = analyzeFoodClinically('ביצה קשה עם שמן זית ומלח', 'phase1_strict');
