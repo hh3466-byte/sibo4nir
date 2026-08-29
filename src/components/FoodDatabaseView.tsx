@@ -19,6 +19,7 @@ import {
   MicOff,
   AlertCircle,
 } from 'lucide-react';
+import { CategoryCarousel, CategoryCarouselItem } from './CategoryCarousel';
 
 interface FoodDatabaseViewProps {
   currentPhase: SiboPhase;
@@ -322,32 +323,36 @@ export const FoodDatabaseView: React.FC<FoodDatabaseViewProps> = ({
           </div>
         )}
 
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              selectedCategory === 'all'
-                ? 'bg-stone-900 text-white'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            כל הקטגוריות
-          </button>
-          {Object.entries(SIBO_CATEGORIES_INFO).map(([catKey, catInfo]) => (
-            <button
-              key={catKey}
-              onClick={() => setSelectedCategory(catKey)}
-              className={`px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                selectedCategory === catKey
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-              }`}
-            >
-              {catInfo.nameHe}
-            </button>
-          ))}
-        </div>
+        {/* 🎠 Interactive Food Category Carousel */}
+        <CategoryCarousel
+          items={Object.entries(SIBO_CATEGORIES_INFO).map(([key, info]) => {
+            const icons: Record<string, string> = {
+              vegetables: '🥦',
+              fruits: '🍎',
+              proteins: '🥩',
+              grains_starches: '🍞',
+              dairy_alternatives: '🧀',
+              nuts_seeds: '🥜',
+              condiments_spices: '🧂',
+              sweets_sweeteners: '🍫',
+              drinks: '☕',
+            };
+            return {
+              id: key,
+              label: info.nameHe,
+              icon: icons[key] || '🍽️',
+              count: SIBO_FOOD_DATABASE.filter((f) => f.category === key).length,
+            };
+          })}
+          selectedId={selectedCategory}
+          onSelect={(catKey) => setSelectedCategory(catKey)}
+          title="סינון לפי קטגוריית מזון:"
+          showAllOption={true}
+          allLabel="כל הקטגוריות"
+          allIcon="📋"
+          allCount={SIBO_FOOD_DATABASE.length}
+          theme="emerald"
+        />
       </div>
 
       {/* Dynamic Clinical SIBO Instant Analysis Box (Active whenever user searches) */}

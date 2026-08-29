@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { SiboRecipe, SIBO_MEAL_SUGGESTIONS, findMatchingRecipes } from '../data/siboMealSuggestions';
 import { SiboPhase } from '../types';
+import { CategoryCarousel, CategoryCarouselItem } from './CategoryCarousel';
 
 interface MealSuggestionsModalProps {
   isOpen: boolean;
@@ -397,111 +398,29 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           </div>
         </div>
 
-        {/* Meal Segment Switcher - Multi-Row Wrap for Full Visibility on Mobile */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1.5 bg-stone-100 rounded-2xl border border-stone-200 shrink-0">
-          <button
-            onClick={() => {
-              setSelectedMealType('all');
+        {/* 🎠 Category Carousel for Meal Types (קרוסלת ארוחות אינטראקטיבית) */}
+        <div className="shrink-0">
+          <CategoryCarousel
+            items={[
+              { id: 'favorites', label: 'אהבתי', icon: '❤️', count: favoritesCount },
+              { id: 'quick', label: 'קלות ומהירות', icon: '⚡', count: mealCounts.quick },
+              { id: 'breakfast', label: 'ארוחות בוקר', icon: '🍳', count: mealCounts.breakfast },
+              { id: 'lunch', label: 'ארוחות צהריים', icon: '☀️', count: mealCounts.lunch },
+              { id: 'dinner', label: 'ארוחות ערב', icon: '🌙', count: mealCounts.dinner },
+              { id: 'dessert', label: 'מתוקים וקינוחים', icon: '🍫', count: mealCounts.dessert },
+            ]}
+            selectedId={selectedMealType}
+            onSelect={(id) => {
+              setSelectedMealType(id as any);
               setSelectedRecipe(null);
             }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
-              selectedMealType === 'all'
-                ? 'bg-emerald-800 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
-            }`}
-          >
-            <span>הכל ({mealCounts.all})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('favorites');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'favorites'
-                ? 'bg-rose-700 text-white shadow-xs'
-                : favoritesCount > 0
-                ? 'text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200'
-                : 'bg-white/80 text-stone-700 hover:text-rose-700 hover:bg-white'
-            }`}
-          >
-            <span>❤️ אהבתי ({favoritesCount})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('quick');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'quick'
-                ? 'bg-emerald-800 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>קלות ({mealCounts.quick})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('breakfast');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'breakfast'
-                ? 'bg-emerald-800 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
-            }`}
-          >
-            <Coffee className="w-3.5 h-3.5" />
-            <span>בוקר ({mealCounts.breakfast})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('lunch');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'lunch'
-                ? 'bg-emerald-800 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
-            }`}
-          >
-            <Sun className="w-3.5 h-3.5" />
-            <span>צהריים ({mealCounts.lunch})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('dinner');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'dinner'
-                ? 'bg-emerald-800 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-emerald-900 hover:bg-white'
-            }`}
-          >
-            <Moon className="w-3.5 h-3.5" />
-            <span>ערב ({mealCounts.dinner})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('dessert');
-              setSelectedRecipe(null);
-            }}
-            className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'dessert'
-                ? 'bg-amber-700 text-white shadow-xs'
-                : 'bg-white/80 text-stone-700 hover:text-amber-900 hover:bg-white'
-            }`}
-          >
-            <span>🍫 מתוקים ({mealCounts.dessert})</span>
-          </button>
+            title="סינון סוג ארוחה:"
+            showAllOption={true}
+            allLabel="כל המתכונים"
+            allIcon="👨‍🍳"
+            allCount={mealCounts.all}
+            theme="emerald"
+          />
         </div>
 
         {/* Content Body: List of Meals or Open Recipe */}

@@ -28,6 +28,7 @@ import {
   SIBO_CATEGORIES,
   SiboShopping500Item,
 } from '../data/siboShopping500';
+import { CategoryCarousel, CategoryCarouselItem } from './CategoryCarousel';
 
 interface CustomShoppingItem {
   id: string;
@@ -643,62 +644,27 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
         )}
       </div>
 
-      {/* 🏷️ Ultra-Compact Single-Line Category Scroll Bar (דק, חסכוני במקום ולא מסתיר את המסך) */}
-      <div className="bg-stone-100/80 p-2 sm:p-2.5 rounded-2xl border border-stone-200 space-y-1 text-right">
-        <div className="flex items-center justify-between px-1 text-[11px] font-black text-stone-600">
-          <span>סינון קטגוריות (גללי ימינה/שמאלה ↔️):</span>
-          <span className="text-[10px] text-stone-400 font-bold">15 קטגוריות</span>
-        </div>
-
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5 scroll-smooth">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('all')}
-            className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
-              selectedCategory === 'all'
-                ? 'bg-stone-900 text-white border-stone-900 shadow-xs scale-102'
-                : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
-            }`}
-          >
-            <span>📋</span>
-            <span>הכל (500+)</span>
-          </button>
-
-          {SIBO_CATEGORIES.map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-emerald-800 text-white border-emerald-800 shadow-xs scale-102'
-                    : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'
-                }`}
-              >
-                <span>{cat.icon}</span>
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-
-          {customItems.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setSelectedCategory('custom')}
-              className={`py-1.5 px-3 rounded-xl font-black text-xs transition-all cursor-pointer shrink-0 border flex items-center gap-1.5 ${
-                selectedCategory === 'custom'
-                  ? 'bg-amber-700 text-white border-amber-700 shadow-xs scale-102'
-                  : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
-              }`}
-            >
-              <span>✨</span>
-              <span>מוצרים שלי ({customItems.length})</span>
-            </button>
-          )}
-        </div>
-      </div>
+      {/* 🎠 Interactive Category Carousel (קרוסלת קטגוריות חכמה עם חיצים ללא גלילה מעייפת) */}
+      <CategoryCarousel
+        items={SIBO_CATEGORIES.map((cat) => ({
+          id: cat.id,
+          label: cat.label.split('(')[0].trim(),
+          icon: cat.icon,
+          count: allItems.filter((i) => i.category === cat.id).length,
+        })).concat(
+          customItems.length > 0
+            ? [{ id: 'custom', label: 'מוצרים שלי', icon: '✨', count: customItems.length }]
+            : []
+        )}
+        selectedId={selectedCategory}
+        onSelect={(catId) => setSelectedCategory(catId)}
+        title="סינון קטגוריות מהיר:"
+        showAllOption={true}
+        allLabel="הכל"
+        allIcon="📋"
+        allCount={allItems.length}
+        theme="emerald"
+      />
 
       {/* Inline Form to Add Custom Item */}
       {isAddingCustom && (
