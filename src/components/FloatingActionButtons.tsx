@@ -20,7 +20,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         id="btn-floating-hunger-sos"
         type="button"
         onClick={onOpenHungerWizard}
-        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-teal-700 hover:bg-teal-800 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95 group cursor-pointer border border-teal-600"
+        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-teal-600/90 hover:bg-teal-700 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-xs hover:shadow-md active:scale-95 group cursor-pointer border border-teal-500/40"
         title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
       >
         <span className="text-base sm:text-lg group-hover:scale-110 transition-transform">🥑</span>

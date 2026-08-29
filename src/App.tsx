@@ -260,27 +260,27 @@ export default function App() {
             id="banner-hunger-sos-btn"
             type="button"
             onClick={() => setIsHungerWizardOpen(true)}
-            className="w-full p-4 sm:p-5 rounded-3xl bg-teal-950/90 hover:bg-teal-950 text-white font-black text-sm sm:text-base shadow-md transition-all flex items-center justify-between gap-3 border border-teal-800/80 active:scale-98 cursor-pointer group"
+            className="w-full p-4 sm:p-5 rounded-3xl bg-[#0f4743] hover:bg-[#0c3e3a] text-white font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 border border-[#1b625d] active:scale-98 cursor-pointer group"
           >
             <div className="flex items-center gap-3.5 text-right">
-              <div className="w-12 h-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform shrink-0 border border-teal-600">
+              <div className="w-12 h-12 rounded-2xl bg-teal-600/90 text-white flex items-center justify-center text-2xl shadow-2xs group-hover:scale-105 transition-transform shrink-0 border border-teal-400/40">
                 🥑
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-teal-800/60 text-teal-200 border border-teal-600/40 rounded-full">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-teal-700/60 text-teal-100 border border-teal-500/40 rounded-full">
                     חירום שובע
                   </span>
                   <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
                     אני רעבה!!! (מה לאכול עכשיו?) ✨
                   </h3>
                 </div>
-                <p className="text-xs text-teal-200/80 font-medium mt-0.5">
+                <p className="text-xs text-teal-100/85 font-medium mt-0.5">
                   פתרונות מהירים ב-3 דקות • מקרר ומזווה • תחנות דלק • מסעדות סביבך
                 </p>
               </div>
             </div>
-            <div className="px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
+            <div className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-2xs shrink-0 transition-colors">
               פתחי אשף ⚡
             </div>
           </button>
