@@ -167,7 +167,7 @@ async function startServer() {
 4. קטגוריית המוצר (categories).
 `;
 
-        const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+        const modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
         for (const model of modelsToTry) {
           try {
             const timeoutPromise = new Promise<never>((_, reject) =>
@@ -957,7 +957,7 @@ ${imageBase64 ? 'זהה מתוך התמונה את כל המצרכים הבטו�
 4. אם רלוונטי, ציין טיפ פרקטי למטבח או לאכילה מחוץ לבית.
 `;
 
-      const modelsToTry = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const modelsToTry = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
       let response: any = null;
       let lastError: any = null;
 
