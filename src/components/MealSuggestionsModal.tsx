@@ -18,6 +18,7 @@ import {
   Mic,
   MicOff,
   Cookie,
+  Zap,
 } from 'lucide-react';
 import { SiboRecipe, SIBO_MEAL_SUGGESTIONS, findMatchingRecipes } from '../data/siboMealSuggestions';
 import { SiboPhase } from '../types';
@@ -37,7 +38,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   initialSearchQuery = null,
   initialRecipeId = null,
 }) => {
-  const [selectedMealType, setSelectedMealType] = useState<'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack'>('all');
+  const [selectedMealType, setSelectedMealType] = useState<'all' | 'quick' | 'breakfast' | 'lunch' | 'dinner'>('all');
   const [selectedRecipe, setSelectedRecipe] = useState<SiboRecipe | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -61,7 +62,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
       const found = SIBO_MEAL_SUGGESTIONS.find((r) => r.id === initialRecipeId);
       if (found) {
         setSelectedRecipe(found);
-        setSelectedMealType(found.mealType);
+        setSelectedMealType(found.mealType as any);
         return;
       }
     }
@@ -163,16 +164,16 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
     }
   };
 
-  const quickPills = ['🍗 שיפודים ופרגית', '🥩 בקר וקציצות', '🐟 דגים וסלמון', '🥔 קומפיר', '🌯 דפי אורז', '🥞 פנקייק', '🍫 סניקרס וצ׳יה', '🍲 מרק', '🍳 ביצים'];
+  const quickPills = ['⚡ קלות ומהירות', '🍗 שיפודים ופרגית', '🥩 בקר וקציצות', '🐟 דגים וסלמון', '🥔 קומפיר', '🌯 דפי אורז', '🥞 פנקייק', '🍫 סניקרס וצ׳יה', '🍲 מרק'];
 
   // Counts by meal type
   const mealCounts = useMemo(() => {
     return {
       all: SIBO_MEAL_SUGGESTIONS.length,
+      quick: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'quick').length,
       breakfast: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'breakfast').length,
       lunch: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'lunch').length,
       dinner: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dinner').length,
-      snack: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'snack').length,
     };
   }, []);
 
@@ -186,7 +187,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
 
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
-      const matched = findMatchingRecipes(q, 35);
+      const matched = findMatchingRecipes(q, 50);
       if (matched.length > 0) {
         if (selectedMealType === 'all') {
           return matched;
@@ -337,7 +338,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           </div>
         </div>
 
-        {/* Meal Segment Switcher (All, Breakfast, Lunch, Dinner, Snack) */}
+        {/* Meal Segment Switcher (All, Quick, Breakfast, Lunch, Dinner) */}
         <div className="flex items-center justify-center gap-1.5 p-1 bg-stone-100 rounded-2xl border border-stone-200 shrink-0 overflow-x-auto">
           <button
             onClick={() => {
@@ -351,6 +352,21 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
             }`}
           >
             <span>הכל ({mealCounts.all})</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedMealType('quick');
+              setSelectedRecipe(null);
+            }}
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              selectedMealType === 'quick'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <span>קלות ({mealCounts.quick})</span>
           </button>
 
           <button
@@ -396,21 +412,6 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           >
             <Moon className="w-3.5 h-3.5" />
             <span>ערב ({mealCounts.dinner})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedMealType('snack');
-              setSelectedRecipe(null);
-            }}
-            className={`flex-1 min-w-[80px] py-2 px-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              selectedMealType === 'snack'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-emerald-800 hover:bg-stone-200/60'
-            }`}
-          >
-            <Cookie className="w-3.5 h-3.5" />
-            <span>נשנוש ({mealCounts.snack})</span>
           </button>
         </div>
 

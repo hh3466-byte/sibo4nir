@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FoodAnalysisResult, MealLogEntry, SiboPhase } from './types';
 import { analyzeFoodClinically } from './services/siboClinicalEngine';
 import { Header } from './components/Header';
+import { SupermarketSelfScanView } from './components/SupermarketSelfScanView';
+import { SiboShoppingListView } from './components/SiboShoppingListView';
 import { CameraScanner } from './components/CameraScanner';
 import { TrafficLightResult } from './components/TrafficLightResult';
 import { FoodDatabaseView } from './components/FoodDatabaseView';
@@ -15,7 +17,7 @@ import { MealSuggestionsModal } from './components/MealSuggestionsModal';
 import { InstallShareModal } from './components/InstallShareModal';
 import { HungerRescueWizard } from './components/HungerRescueWizard';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
-import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ShieldCheck, Heart, Smartphone, Phone, MessageSquare, Bug, ShoppingCart, ListChecks, ChefHat, Sparkles } from 'lucide-react';
 
 export default function App() {
   // State for Diet Phase (Default to Phase 1 Strict as requested for Nir)
@@ -299,45 +301,31 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 1: SCANNER */}
+        {/* TAB 1: SUPERMARKET SELF SCANNER (צלם / סרוק) */}
         {activeTab === 'scanner' && (
-          <div className="relative">
-            <CameraScanner
-              currentPhase={currentPhase}
-              onAnalyze={handleAnalyze}
-              onCancelAnalyze={handleCancelAnalyze}
-              isLoading={isLoading}
-              onOpenAllowedForbidden={() => setIsAllowedForbiddenOpen(true)}
-              initialMode={scannerMode}
-              resetTrigger={resetCounter}
-            />
-
-            {/* Analysis Result Pop-up Modal */}
-            {analysisResult && (
-              <TrafficLightResult
-                result={analysisResult}
-                onReset={() => {
-                  setAnalysisResult(null);
-                  setErrorMsg(null);
-                  setResetCounter((c) => c + 1);
-                }}
-                onSaveToDiary={handleSaveToDiary}
-                onExploreAlternative={handleExploreAlternative}
-                onOpenRecipe={handleOpenRecipe}
-                onScanBarcode={() => {
-                  setAnalysisResult(null);
-                  setErrorMsg(null);
-                  setResetCounter((c) => c + 1);
-                  setScannerMode('barcode');
-                }}
-                isSaved={isSavedInDiary}
-                isModal={true}
-              />
-            )}
-          </div>
+          <SupermarketSelfScanView
+            currentPhase={currentPhase}
+            onAnalyze={handleAnalyze}
+            isLoading={isLoading}
+            analysisResult={analysisResult}
+            onClearResult={() => {
+              setAnalysisResult(null);
+              setErrorMsg(null);
+              setResetCounter((c) => c + 1);
+            }}
+            onOpenShoppingList={() => setActiveTab('shopping_list')}
+          />
         )}
 
-        {/* TAB 2: SEARCHABLE FOOD DATABASE */}
+        {/* TAB 2: SMART SIBO SHOPPING LIST WITH WHATSAPP EXPORT */}
+        {activeTab === 'shopping_list' && (
+          <SiboShoppingListView
+            currentPhase={currentPhase}
+            onBackToScanner={() => setActiveTab('scanner')}
+          />
+        )}
+
+        {/* TAB 3: SEARCHABLE FOOD DATABASE */}
         {activeTab === 'database' && (
           <FoodDatabaseView
             currentPhase={currentPhase}
@@ -348,21 +336,42 @@ export default function App() {
           />
         )}
 
-        {/* TAB 3: MEAL & RECIPE CHECKER */}
+        {/* TAB 4: MEAL & RECIPE CHECKER & MASTER 60+ RECIPE BOOK */}
         {activeTab === 'recipe' && (
-          <MealAnalyzer
-            currentPhase={currentPhase}
-            onAnalyzeRecipe={async (payload) => {
-              await handleAnalyze(payload);
-            }}
-            isLoading={isLoading}
-          />
+          <div className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-3xl shadow-md flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-xl">
+                  🍲
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">ספר המתכונים של שף דלה פופו (60+ מנות)</h3>
+                  <p className="text-xs text-emerald-100 font-medium">קלות ומהירות • בוקר • צהריים • ערב</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMealSuggestionsOpen(true)}
+                className="px-4 py-2 bg-white text-emerald-900 rounded-xl font-black text-xs shadow-xs hover:bg-stone-100 cursor-pointer"
+              >
+                פתחי ספר מתכונים 📖
+              </button>
+            </div>
+
+            <MealAnalyzer
+              currentPhase={currentPhase}
+              onAnalyzeRecipe={async (payload) => {
+                await handleAnalyze(payload);
+              }}
+              isLoading={isLoading}
+            />
+          </div>
         )}
 
-        {/* TAB 4: MEDICAL ARTICLES & PROTOCOLS */}
+        {/* TAB 5: MEDICAL ARTICLES & PROTOCOLS */}
         {activeTab === 'articles' && <MedicalGuideView />}
 
-        {/* TAB 5: SYMPTOM & FOOD DIARY */}
+        {/* TAB 6: SYMPTOM & FOOD DIARY */}
         {activeTab === 'diary' && (
           <SymptomDiary
             entries={diaryEntries}
@@ -371,7 +380,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 6: AI SIBO NUTRITION CONSULTANT */}
+        {/* TAB 7: AI SIBO NUTRITION CONSULTANT */}
         {activeTab === 'consult' && <SIBOAssistantModal currentPhase={currentPhase} />}
       </main>
 
@@ -380,6 +389,60 @@ export default function App() {
         onOpenMealSuggestions={() => setIsMealSuggestionsOpen(true)}
         onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
       />
+
+      {/* Mobile Minimalist Bottom Navigation Bar */}
+      <nav aria-label="ניווט מהיר" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-2xl py-2 px-3 flex items-center justify-around sm:hidden">
+        <button
+          onClick={() => setIsHungerWizardOpen(true)}
+          className="flex flex-col items-center gap-0.5 text-amber-600 font-black cursor-pointer active:scale-95"
+        >
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white flex items-center justify-center text-sm shadow-md animate-pulse">
+            🥑
+          </div>
+          <span className="text-[10px]">אני רעבה!</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab('scanner');
+            setAnalysisResult(null);
+          }}
+          className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
+            activeTab === 'scanner' ? 'text-emerald-700 font-black' : 'text-stone-500'
+          }`}
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span className="text-[10px]">בסופר</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('shopping_list')}
+          className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
+            activeTab === 'shopping_list' ? 'text-amber-600 font-black' : 'text-stone-500'
+          }`}
+        >
+          <ListChecks className="w-5 h-5" />
+          <span className="text-[10px]">רשימה</span>
+        </button>
+
+        <button
+          onClick={() => setIsMealSuggestionsOpen(true)}
+          className="flex flex-col items-center gap-0.5 text-teal-700 font-bold cursor-pointer active:scale-95"
+        >
+          <ChefHat className="w-5 h-5" />
+          <span className="text-[10px]">מתכונים</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('database')}
+          className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
+            activeTab === 'database' ? 'text-indigo-700 font-black' : 'text-stone-500'
+          }`}
+        >
+          <Sparkles className="w-5 h-5" />
+          <span className="text-[10px]">מאגר</span>
+        </button>
+      </nav>
 
       {/* Hunger Rescue SOS Wizard Modal */}
       <HungerRescueWizard

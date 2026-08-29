@@ -13,7 +13,7 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
   return (
     <div
       id="floating-sibo-actions"
-      className="fixed bottom-4 left-4 z-30 flex flex-col gap-2.5 items-start"
+      className="hidden sm:flex fixed bottom-5 left-5 z-30 flex-col gap-2.5 items-start"
     >
       {/* אני רעבה SOS Floating Button */}
       <button
