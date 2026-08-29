@@ -55,7 +55,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-2.5 sm:p-5 space-y-4 animate-fadeIn text-stone-900" dir="rtl">
+    <div className="max-w-3xl mx-auto p-1 sm:p-2 space-y-3 animate-fadeIn text-stone-900" dir="rtl">
       {/* 🥑 SUPER PROMINENT DOUBLE-SIZED HUNGER RESCUE BUTTON */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && onOpenHungerWizard && (
         <button
@@ -63,11 +63,11 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
           onClick={onOpenHungerWizard}
           className="w-full p-4 sm:p-5 rounded-3xl bg-[#BDECB6] hover:bg-[#aee4a6] text-[#064e3b] font-black shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3 border-2 border-[#a2dba0] active:scale-98 cursor-pointer group"
         >
-          <div className="flex items-center gap-3 sm:gap-4 text-right min-w-0">
+          <div className="flex items-center gap-3 sm:gap-4 text-right min-w-0 flex-1">
             <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-white text-[#064e3b] flex items-center justify-center text-3xl sm:text-4xl shadow-xs group-hover:scale-110 transition-transform shrink-0 border border-[#a2dba0]">
               🥑
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] sm:text-[11px] font-black uppercase px-2.5 py-0.5 bg-white text-[#064e3b] border border-[#a2dba0] rounded-full shadow-2xs">
                   חירום שובע מהיר
@@ -76,13 +76,10 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
                   אני רעבה!!! (מה לאכול עכשיו?) ✨
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-[#0f5132] font-bold mt-0.5 truncate">
-                פתרונות מהירים ב-3 דקות • מקרר ומזווה • תחנות דלק • מנות שף
+              <p className="text-xs sm:text-sm text-[#0f5132] font-black mt-1">
+                פתרונות מהירים מאת שף דלה פופו 👨‍🍳 (ב-3 דקות • מקרר ומזווה • תחנות דלק)
               </p>
             </div>
-          </div>
-          <div className="px-3.5 sm:px-5 py-2.5 bg-[#064e3b] group-hover:bg-[#022c22] text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
-            פתחי אשף ⚡
           </div>
         </button>
       )}
@@ -92,7 +89,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
         <button
           type="button"
           onClick={onOpenShoppingList}
-          className="w-full bg-white rounded-3xl p-4 sm:p-6 border-2 border-emerald-800/30 hover:border-emerald-800 shadow-sm hover:shadow-md transition-all text-right space-y-3 cursor-pointer group active:scale-[0.99] block"
+          className="w-full bg-white rounded-3xl p-4 sm:p-5 border-2 border-emerald-800/30 hover:border-emerald-800 shadow-sm hover:shadow-md transition-all text-right space-y-2.5 cursor-pointer group active:scale-[0.99] block"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
@@ -111,7 +108,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
             </div>
           </div>
 
-          <div className="pt-2 flex items-center justify-between gap-3 flex-wrap border-t border-stone-100">
+          <div className="pt-2.5 border-t border-stone-100 w-full flex items-center justify-between gap-2 text-stone-700">
             <div className="text-xs text-stone-500 font-medium">
               {selectedShoppingCount > 0 ? (
                 <span className="font-bold text-emerald-800">
@@ -122,9 +119,9 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
               )}
             </div>
 
-            <div className="px-4 py-2 sm:px-5 sm:py-2.5 bg-emerald-800 group-hover:bg-emerald-900 text-white rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm shadow-xs transition-colors flex items-center gap-2">
-              <ListChecks className="w-4 h-4" />
-              <span>פתחי רשימת קניות לשליחה 📋</span>
+            <div className="font-black text-xs sm:text-sm text-emerald-900 flex items-center gap-1.5 group-hover:text-emerald-700 transition-colors">
+              <ListChecks className="w-4 h-4 text-emerald-700" />
+              <span>פתחי רשימת קניות לשליחה 📋 ➔</span>
             </div>
           </div>
         </button>

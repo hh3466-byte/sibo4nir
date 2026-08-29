@@ -259,7 +259,7 @@ export default function App() {
       />
 
       {/* Main App Content Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 pb-28">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4 space-y-3 pb-4">
 
         {/* Error Alert if any */}
         {errorMsg && (
