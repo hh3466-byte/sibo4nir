@@ -10,6 +10,13 @@ export type { BarcodeProductInfo };
  * GS1 Israel Manufacturer Prefixes for instant recognition of unindexed Israeli barcodes
  */
 export const ISRAELI_MANUFACTURER_PREFIXES: Record<string, { brand: string; defaultCategory: string }> = {
+  '72901053': { brand: 'עלית / שטראוס חטיפים ומלוחים (Tapuchips / Elite)', defaultCategory: 'תפוצ׳יפס, דוריטוס וחטיפים מלוחים' },
+  '72900182': { brand: 'סוויטנגו (Sweetango) / מילניום', defaultCategory: 'פודינג, שוקולד ותחליפי סוכר ללא סוכר' },
+  '72900151': { brand: 'וילקוניק (Wilconic) / מזרח ומערב', defaultCategory: 'דפי אורז, אטריות אורז ומזון אסיאתי' },
+  '72901008': { brand: 'שטראוס עלית (Strauss Elite)', defaultCategory: 'קפה, ממתקים וחטיפים' },
+  '72901193': { brand: 'שטראוס קפה (Strauss Coffee)', defaultCategory: 'קפה שחור וטורקי עלית' },
+  '72901047': { brand: 'שופרסל גרין ומותג פרטי (Shufersal)', defaultCategory: 'מוצרי סופרמרקט ובריאות' },
+  '72901083': { brand: 'מיה תעשיות מזון (Maya Foods)', defaultCategory: 'אורז, קטניות, קוואקר ותבלינים' },
   '72900084': { brand: 'הרדוף אורגני (Harduf Organic) / תנובה', defaultCategory: 'קוואקר, שיבולת שועל, דגנים ומזון אורגני' },
   '72900054': { brand: 'תבואות (Tevuot)', defaultCategory: 'קוואקר, דגנים וקטניות אורגניות' },
   '72900192': { brand: 'שופרסל גרין (Shufersal Green)', defaultCategory: 'מזון אורגני ובריאות ללא גלוטן' },

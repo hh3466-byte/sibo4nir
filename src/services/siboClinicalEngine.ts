@@ -357,7 +357,13 @@ export function analyzeIngredientsList(
   const rawIngs = ingredientsText.toLowerCase();
 
   // Split ingredients by comma, semicolon, or newlines
-  const rawList = ingredientsText
+  // Strip out informational metadata or parenthetical notes before parsing individual ingredients
+  const cleanIngsText = ingredientsText
+    .replace(/\(.*?ללא.*?\)/gi, '')
+    .replace(/\(.*?אור ירוק.*?\)/gi, '')
+    .replace(/\(.*?מתאים ל.*?\)/gi, '');
+
+  const rawList = cleanIngsText
     .split(/[,;\n\r]/)
     .map((s) => s.trim().replace(/^[-•*\s]+/, ''))
     .filter((s) => s.length > 1);
@@ -370,12 +376,42 @@ export function analyzeIngredientsList(
   for (const ing of rawList) {
     const lower = ing.toLowerCase();
 
+    // 0. Check NEGATION & SAFE DECLARATIONS (e.g. "ללא שום", "ללא בצל", "ללא גלוטן", "ללא תוספת סוכר", "0% לקטוז")
+    const isNegated = /ללא|0%|נקי מ|אינו מכיל|free from|without|no added|non-/i.test(lower);
+
+    if (isNegated && /ללא\s*(?:תוספת\s*)?שום|נקי משום|אינו מכיל שום/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'נקי משום (0 פרוקטנים)' });
+      continue;
+    }
+    if (isNegated && /ללא\s*(?:תוספת\s*)?בצל|נקי מבצל|אינו מכיל בצל/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'נקי מבצל (0 פרוקטנים)' });
+      continue;
+    }
+    if (isNegated && /ללא\s*(?:תוספת\s*)?גלוטן|gluten.?free|ללא חיטה|נקי מגלוטן/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'ללא גלוטן' });
+      continue;
+    }
+    if (isNegated && /ללא\s*(?:תוספת\s*)?סוכר|0%\s*סוכר|sugar.?free|ללא סוכרים/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'ללא סוכר מוסף' });
+      continue;
+    }
+    if (isNegated && /ללא\s*לקטוז|0%\s*לקטוז|lactose.?free|דל לקטוז/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'ללא לקטוז' });
+      continue;
+    }
+
+    // Check Safe Sweeteners (Erythritol / Stevia / סוויטנגו)
+    if (/אריתריטול|erythritol|סטיביה|stevia|סטיביול|גליקוזיד|גליקוזידים|סוויטנגו|sweetango/i.test(lower)) {
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'ממתיק בטוח שאינו מותסס (אריתריטול/סטיביה)' });
+      continue;
+    }
+
     // 1. Check RED triggers
-    if (/שום|אבקת שום|מיצוי שום|garlic/i.test(lower)) {
+    if (/שום|אבקת שום|מיצוי שום|garlic/i.test(lower) && !/ללא\s*שום/i.test(lower)) {
       breakdown.push({ name: ing, status: 'RED', notes: 'מכיל פרוקטנים מתסיסים' });
       if (!triggers.includes('שום (פרוקטנים)')) triggers.push('שום (פרוקטנים)');
       hasRed = true;
-    } else if (/בצל|אבקת בצל|מיצוי בצל|כרישה|שאלוט|onion|leek|shallot/i.test(lower)) {
+    } else if (/בצל|אבקת בצל|מיצוי בצל|כרישה|שאלוט|onion|leek|shallot/i.test(lower) && !/ללא\s*בצל/i.test(lower)) {
       breakdown.push({ name: ing, status: 'RED', notes: 'מכיל פרוקטנים מתסיסים' });
       if (!triggers.includes('בצל (פרוקטנים)')) triggers.push('בצל (פרוקטנים)');
       hasRed = true;
@@ -391,15 +427,15 @@ export function analyzeIngredientsList(
       breakdown.push({ name: ing, status: 'RED', notes: 'ממתיק פוליאולי מתסיס' });
       if (!triggers.includes('פוליאולים / ממתיקים מתסיסים (Polyols)')) triggers.push('פוליאולים / ממתיקים מתסיסים (Polyols)');
       hasRed = true;
-    } else if (/חלב פרה|אבקת חלב|מי גבינה|whey|מוצקי חלב/i.test(lower) && !/0%\s*לקטוז|ללא לקטוז|דל לקטוז/i.test(rawIngs)) {
+    } else if (/חלב פרה|אבקת חלב|מי גבינה|whey|מוצקי חלב/i.test(lower) && !/0%\s*לקטוז|ללא לקטוז|דל לקטוז|ללא חלב/i.test(rawIngs)) {
       breakdown.push({ name: ing, status: isPhase1 ? 'RED' : 'YELLOW', notes: 'מכיל לקטוז' });
       if (!triggers.includes('לקטוז (Lactose)')) triggers.push('לקטוז (Lactose)');
       if (isPhase1) hasRed = true; else hasYellow = true;
-    } else if (/קמח חיטה|חיטה|wheat|שיפון|שעורה|לתת|גלוטן|קמח כוסמין מלא/i.test(lower)) {
+    } else if (/קמח חיטה|חיטה|wheat|שיפון|שעורה|לתת|גלוטן|קמח כוסמין מלא/i.test(lower) && !/ללא\s*גלוטן|ללא\s*חיטה/i.test(lower)) {
       breakdown.push({ name: ing, status: 'RED', notes: 'דגן עתיר פרוקטנים' });
       if (!triggers.includes('פרוקטנים מדגנים (חיטה/שיפון)')) triggers.push('פרוקטנים מדגנים (חיטה/שיפון)');
       hasRed = true;
-    } else if (/קמח חומוס|קמח עדשים|סויה|פולי סויה|חלבון סויה/i.test(lower) && !/רוטב סויה|שמן סויה|לציטין סויה/i.test(lower)) {
+    } else if (/קמח חומוס|קמח עדשים|סויה|פולי סויה|חלבון סויה/i.test(lower) && !/רוטב סויה|שמן סויה|לציטין סויה|ללא סויה/i.test(lower)) {
       breakdown.push({ name: ing, status: 'RED', notes: 'קטניות עתירות גלקטנים' });
       if (!triggers.includes('גלקטנים (GOS)')) triggers.push('גלקטנים (GOS)');
       hasRed = true;
@@ -409,7 +445,7 @@ export function analyzeIngredientsList(
       hasRed = true;
     }
     // 2. Check YELLOW triggers
-    else if (/סוכר|סוכרוז|sugar|גלוקוז|דקסטרוז/i.test(lower)) {
+    else if (/\b(סוכר|סוכרוז|sugar|גלוקוז|דקסטרוז)\b|סוכר /i.test(lower) && !/סטיביול|גליקוזיד|ללא\s*(?:תוספת\s*)?סוכר|0%\s*סוכר/i.test(lower)) {
       breakdown.push({ name: ing, status: 'YELLOW', notes: 'סוכר מוסף (מוגבל במינון)' });
       if (!triggers.includes('סוכר מוסף')) triggers.push('סוכר מוסף');
       hasYellow = true;
@@ -418,8 +454,7 @@ export function analyzeIngredientsList(
       if (!triggers.includes('רכז פרי')) triggers.push('רכז פרי');
       hasYellow = true;
     } else if (/עמילן מעובד|עמילן תירס|עמילן טפיוקה|מלטודקסטרין/i.test(lower)) {
-      breakdown.push({ name: ing, status: isPhase1 ? 'YELLOW' : 'GREEN', notes: 'עמילן (מוגבל בשלב 1)' });
-      if (isPhase1) hasYellow = true;
+      breakdown.push({ name: ing, status: 'GREEN', notes: 'עמילן דל תסיסה לעיבוי (דל FODMAP)' });
     }
     // 3. GREEN triggers
     else {
@@ -475,6 +510,71 @@ export function analyzeIngredientsList(
 
 // Extensive dictionary of clinical SIBO dietary rules
 const CLINICAL_SIBO_RULES: ClinicalRule[] = [
+  // --- אינסטנט פודינג וניל סוויטנגו / ממתיק סוויטנגו (Sweetango) - GREEN לניר ---
+  {
+    keywords: [
+      'סוויטנגו',
+      'סוויטאנגו',
+      'sweetango',
+      'פודינג סוויטנגו',
+      'אינסטנט פודינג סוויטנגו',
+      'פודינג וניל סוויטנגו',
+      'אינסטנט פודינג וניל של סוויטנגו',
+      'פודינג וניל ללא סוכר',
+      'אינסטנט פודינג ללא סוכר',
+      'ממתיק סוויטנגו'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'אינסטנט פודינג וניל ללא סוכר סוויטנגו (Sweetango)',
+    foodNameEn: 'Sweetango Sugar-Free Instant Vanilla Pudding',
+    verdictHe: 'אור ירוק! אינסטנט פודינג וניל סוויטנגו מתאים ובטוח לניר בסיבו. 🟢',
+    explanationHe: 'אינסטנט פודינג וניל של סוויטנגו ממותק באמצעות שילוב של אריתריטול (Erythritol) וסטיביה טהורה ללא שום סוכר מוסף. בניגוד לסורביטול, מלטיטול או קסיליטול, אריתריטול נספג ברובו במעי הדק ואינו מותסס על ידי חיידקי ה-SIBO. עמילן הטפיוקה/תירס המעובד בכמות מדודה בטוח לעיכול. מומלץ להכין עם חלב שקדים ללא סוכר או מים לקבלת קינוח מושלם וטעים ללא נפיחות!',
+    fodmapTriggers: ['0 סוכר (ממותק באריתריטול וסטיביה שאינם מותססים)'],
+    maxSafePortionHe: 'מנה אישית (1-2 כוסות פודינג מוכן)',
+    safeSubstitutions: [
+      '🍮 פודינג וניל סוויטנגו מוכן עם חלב שקדים ללא סוכר',
+      '🍓 תותים טריים עם קצפת צמחית ריץ׳',
+      '🍫 שוקולד מריר סוויטנגו ללא סוכר'
+    ],
+    cookingTips: [
+      'להקציף עם 2 כוסות חלב שקדים קר ללא סוכר במקום חלב פרה רגיל',
+      'לשלב עם תותים טריים חתוכים מעל'
+    ],
+    riskScore: 1,
+  },
+  // --- דפי אורז לבן / וילקוניק (Wilconic Rice Paper) - GREEN לניר ---
+  {
+    keywords: [
+      'דפי אורז',
+      'דפי אורז לבן',
+      'דפי אורז וילקוניק',
+      'דפי אורז לבן של וילקוניק',
+      'דפי אורז עגולים',
+      'דף אורז',
+      'וילקוניק',
+      'wilconic',
+      'rice paper'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'דפי אורז לבן (וילקוניק Wilconic / מזרח ומערב)',
+    foodNameEn: 'White Rice Paper Sheets (Wilconic)',
+    verdictHe: 'אור ירוק! דפי אורז לבן מותרים, בטוחים ומצוינים לניר בסיבו. 🟢',
+    explanationHe: 'דפי אורז לבן (כגון וילקוניק) מיוצרים מ-100% קמח אורז לבן, עמילן טפיוקה, מים ומלח. הם 0% גלוטן, 0% פרוקטנים, 0% לקטוז ואינם מתסיסים כלל את חיידקי המעי הדק. מושלמים להכנת רולים קראנצ׳יים ממולאים בעוף מבושל, מלפפון, גזר ונבטים!',
+    fodmapTriggers: ['ללא FODMAP (מבוסס על אורז לבן וטפיוקה)'],
+    maxSafePortionHe: '3-5 דפי אורז בארוחה',
+    safeSubstitutions: [
+      '🌯 רול דפי אורז ממולא ברצועות חזה עוף, מלפפון וגזר',
+      '🍚 אורז בסמטי לבן מבושל',
+      '🌾 פריכיות אורז מלא'
+    ],
+    cookingTips: [
+      'לטבול במים פושרים למשך 5-10 שניות בלבד עד לריכוך קל',
+      'למלא בחלבון מותר (עוף, סלמון, ביצה) וירקות דלי FODMAP (גזר, מלפפון, תרד)'
+    ],
+    riskScore: 1,
+  },
   // --- תפוצ'יפס בטעמים מתובלים (שמנת בצל / ברביקיו / מקסיקני) - RED לניר ---
   {
     keywords: [
