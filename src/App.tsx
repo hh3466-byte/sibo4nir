@@ -42,6 +42,7 @@ export default function App() {
   const [isSavedInDiary, setIsSavedInDiary] = useState(false);
   const [scannerMode, setScannerMode] = useState<'camera' | 'barcode' | 'upload' | 'text'>('camera');
   const [resetCounter, setResetCounter] = useState<number>(0);
+  const [isShoppingListExpanded, setIsShoppingListExpanded] = useState(false);
   const [recipeFilterQuery, setRecipeFilterQuery] = useState<string | null>(null);
   const [recipeTargetId, setRecipeTargetId] = useState<string | null>(null);
 
@@ -259,27 +260,27 @@ export default function App() {
             id="banner-hunger-sos-btn"
             type="button"
             onClick={() => setIsHungerWizardOpen(true)}
-            className="w-full p-4 sm:p-4.5 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white font-black text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all flex items-center justify-between gap-3 border-2 border-amber-200 active:scale-98 cursor-pointer group animate-pulse"
+            className="w-full p-4 sm:p-5 rounded-3xl bg-stone-900 hover:bg-stone-950 text-white font-black text-sm sm:text-base shadow-lg transition-all flex items-center justify-between gap-3 border border-stone-800 active:scale-98 cursor-pointer group"
           >
-            <div className="flex items-center gap-3 text-right">
-              <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition-transform shrink-0 border border-white/30">
+            <div className="flex items-center gap-3.5 text-right">
+              <div className="w-12 h-12 rounded-2xl bg-amber-600/90 text-white flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform shrink-0">
                 🥑
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-white text-stone-900 rounded-full shadow-2xs">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">
                     חירום שובע
                   </span>
-                  <h3 className="text-base sm:text-lg font-black tracking-tight leading-tight">
+                  <h3 className="text-base sm:text-lg font-black tracking-tight text-white">
                     אני רעבה!!! (מה לאכול עכשיו?) ✨
                   </h3>
                 </div>
-                <p className="text-xs text-amber-100 font-bold mt-0.5">
-                  פתרונות ב-3 דקות • צילום מקרר ומזווה • תחנות דלק • איתור מסעדות וסופרים סביבך
+                <p className="text-xs text-stone-400 font-medium mt-0.5">
+                  פתרונות מהירים ב-3 דקות • מקרר ומזווה • תחנות דלק • מסעדות סביבך
                 </p>
               </div>
             </div>
-            <div className="px-3.5 py-2 bg-stone-950/80 hover:bg-stone-950 text-amber-300 font-extrabold text-xs sm:text-sm rounded-xl shadow-md shrink-0 border border-amber-400/40">
+            <div className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs shrink-0 transition-colors">
               פתחי אשף ⚡
             </div>
           </button>
@@ -301,58 +302,60 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 1: SUPERMARKET SELF SCANNER (צלם / סרוק) */}
+        {/* TAB 1: SUPERMARKET HUB (Shopping List to Send + Self Scan) */}
         {activeTab === 'scanner' && (
-          <SupermarketSelfScanView
-            currentPhase={currentPhase}
-            onAnalyze={handleAnalyze}
-            isLoading={isLoading}
-            analysisResult={analysisResult}
-            onClearResult={() => {
-              setAnalysisResult(null);
-              setErrorMsg(null);
-              setResetCounter((c) => c + 1);
-            }}
-            onOpenShoppingList={() => setActiveTab('shopping_list')}
-          />
+          <div className="space-y-4">
+            {isShoppingListExpanded ? (
+              <SiboShoppingListView
+                currentPhase={currentPhase}
+                onBackToScanner={() => setIsShoppingListExpanded(false)}
+              />
+            ) : (
+              <SupermarketSelfScanView
+                currentPhase={currentPhase}
+                onAnalyze={handleAnalyze}
+                isLoading={isLoading}
+                analysisResult={analysisResult}
+                onClearResult={() => {
+                  setAnalysisResult(null);
+                  setErrorMsg(null);
+                  setResetCounter((c) => c + 1);
+                }}
+                onOpenShoppingList={() => setIsShoppingListExpanded(true)}
+              />
+            )}
+          </div>
         )}
 
-        {/* TAB 2: SMART SIBO SHOPPING LIST WITH WHATSAPP EXPORT */}
-        {activeTab === 'shopping_list' && (
-          <SiboShoppingListView
-            currentPhase={currentPhase}
-            onBackToScanner={() => setActiveTab('scanner')}
-          />
-        )}
-
-        {/* TAB 3: SEARCHABLE FOOD DATABASE */}
+        {/* TAB 2: SEARCHABLE FOOD DATABASE */}
         {activeTab === 'database' && (
           <FoodDatabaseView
             currentPhase={currentPhase}
             onSelectFoodForAnalysis={(foodName) => {
               setActiveTab('scanner');
+              setIsShoppingListExpanded(false);
               handleAnalyze({ textPrompt: foodName });
             }}
           />
         )}
 
-        {/* TAB 4: MEAL & RECIPE CHECKER & MASTER 60+ RECIPE BOOK */}
+        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 60+ RECIPE BOOK */}
         {activeTab === 'recipe' && (
           <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-3xl shadow-md flex items-center justify-between">
+            <div className="p-4 sm:p-5 bg-stone-900 text-white rounded-3xl shadow-sm border border-stone-800 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-xl">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-xl shrink-0">
                   🍲
                 </div>
                 <div>
                   <h3 className="text-base font-black text-white">ספר המתכונים של שף דלה פופו (60+ מנות)</h3>
-                  <p className="text-xs text-emerald-100 font-medium">קלות ומהירות • בוקר • צהריים • ערב</p>
+                  <p className="text-xs text-stone-300 font-medium">ארוחות קלות ומהירות • בוקר • צהריים • ערב</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMealSuggestionsOpen(true)}
-                className="px-4 py-2 bg-white text-emerald-900 rounded-xl font-black text-xs shadow-xs hover:bg-stone-100 cursor-pointer"
+                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-black text-xs shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 פתחי ספר מתכונים 📖
               </button>
@@ -368,10 +371,10 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 5: MEDICAL ARTICLES & PROTOCOLS */}
+        {/* TAB 4: MEDICAL ARTICLES & PROTOCOLS */}
         {activeTab === 'articles' && <MedicalGuideView />}
 
-        {/* TAB 6: SYMPTOM & FOOD DIARY */}
+        {/* TAB 5: SYMPTOM & FOOD DIARY */}
         {activeTab === 'diary' && (
           <SymptomDiary
             entries={diaryEntries}
@@ -380,11 +383,11 @@ export default function App() {
           />
         )}
 
-        {/* TAB 7: AI SIBO NUTRITION CONSULTANT */}
+        {/* TAB 6: AI SIBO NUTRITION CONSULTANT */}
         {activeTab === 'consult' && <SIBOAssistantModal currentPhase={currentPhase} />}
       </main>
 
-      {/* Floating Action Buttons: אני רעבה + הצעות לארוחות */}
+      {/* Floating Action Buttons: אני רעבה + הצעות לארוחות (Desktop) */}
       <FloatingActionButtons
         onOpenMealSuggestions={() => setIsMealSuggestionsOpen(true)}
         onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
@@ -394,9 +397,9 @@ export default function App() {
       <nav aria-label="ניווט מהיר" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-2xl py-2 px-3 flex items-center justify-around sm:hidden">
         <button
           onClick={() => setIsHungerWizardOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-amber-600 font-black cursor-pointer active:scale-95"
+          className="flex flex-col items-center gap-0.5 text-amber-700 font-black cursor-pointer active:scale-95"
         >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white flex items-center justify-center text-sm shadow-md animate-pulse">
+          <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shadow-sm">
             🥑
           </div>
           <span className="text-[10px]">אני רעבה!</span>
@@ -405,38 +408,29 @@ export default function App() {
         <button
           onClick={() => {
             setActiveTab('scanner');
+            setIsShoppingListExpanded(false);
             setAnalysisResult(null);
           }}
           className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
-            activeTab === 'scanner' ? 'text-emerald-700 font-black' : 'text-stone-500'
+            activeTab === 'scanner' ? 'text-emerald-800 font-black' : 'text-stone-500'
           }`}
         >
           <ShoppingCart className="w-5 h-5" />
-          <span className="text-[10px]">בסופר</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('shopping_list')}
-          className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
-            activeTab === 'shopping_list' ? 'text-amber-600 font-black' : 'text-stone-500'
-          }`}
-        >
-          <ListChecks className="w-5 h-5" />
-          <span className="text-[10px]">רשימה</span>
+          <span className="text-[10px]">סופר וקניות</span>
         </button>
 
         <button
           onClick={() => setIsMealSuggestionsOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-teal-700 font-bold cursor-pointer active:scale-95"
+          className="flex flex-col items-center gap-0.5 text-stone-700 font-bold cursor-pointer active:scale-95"
         >
-          <ChefHat className="w-5 h-5" />
+          <ChefHat className="w-5 h-5 text-emerald-800" />
           <span className="text-[10px]">מתכונים</span>
         </button>
 
         <button
           onClick={() => setActiveTab('database')}
           className={`flex flex-col items-center gap-0.5 font-bold cursor-pointer active:scale-95 ${
-            activeTab === 'database' ? 'text-indigo-700 font-black' : 'text-stone-500'
+            activeTab === 'database' ? 'text-emerald-800 font-black' : 'text-stone-500'
           }`}
         >
           <Sparkles className="w-5 h-5" />

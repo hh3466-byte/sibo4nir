@@ -26,38 +26,31 @@ export const Header: React.FC<HeaderProps> = ({
   const navTabs = [
     {
       id: 'scanner',
-      label: 'קניות בעצמי (צלם/סרוק) 🛒',
-      desc: 'צילום רכיבים וסריקת ברקוד',
-      activeColor: 'bg-emerald-700 text-white shadow-md ring-2 ring-emerald-400/40 font-black',
-      inactiveColor: 'bg-white text-emerald-950 border border-emerald-300 hover:bg-emerald-50 font-bold',
-    },
-    {
-      id: 'shopping_list',
-      label: 'רשימה לסופר (לוואטסאפ) 📋',
-      desc: 'צ׳ק ליסט חכם לשליחה בוואטסאפ',
-      activeColor: 'bg-amber-600 text-white shadow-md ring-2 ring-amber-400/40 font-black',
-      inactiveColor: 'bg-white text-amber-950 border border-amber-300 hover:bg-amber-50 font-bold',
+      label: 'סופר וקניות (500+ מוצרים וסריקה) 🛒',
+      desc: 'רשימה לשליחה וסריקה עצמית',
+      activeColor: 'bg-emerald-800 text-white shadow-sm font-black',
+      inactiveColor: 'bg-stone-100 text-stone-800 hover:bg-stone-200 font-bold border border-stone-200',
     },
     {
       id: 'recipe',
       label: 'מתכונים וארוחות (60+) 🍲',
       desc: 'ספר שף דלה פופו המלא',
-      activeColor: 'bg-teal-700 text-white shadow-md ring-2 ring-teal-400/40 font-black',
-      inactiveColor: 'bg-white text-teal-950 border border-teal-300 hover:bg-teal-50 font-bold',
+      activeColor: 'bg-emerald-800 text-white shadow-sm font-black',
+      inactiveColor: 'bg-stone-100 text-stone-800 hover:bg-stone-200 font-bold border border-stone-200',
     },
     {
       id: 'database',
       label: 'מאגר מזונות וייעוץ 🥦',
       desc: 'חיפוש מותר/אסור ושאלות מומחה',
-      activeColor: 'bg-indigo-700 text-white shadow-md ring-2 ring-indigo-400/40 font-black',
-      inactiveColor: 'bg-white text-indigo-950 border border-indigo-200 hover:bg-indigo-50 font-bold',
+      activeColor: 'bg-emerald-800 text-white shadow-sm font-black',
+      inactiveColor: 'bg-stone-100 text-stone-800 hover:bg-stone-200 font-bold border border-stone-200',
     },
     {
       id: 'diary',
       label: 'יומן תזונה 📔',
       desc: 'מעקב אישי לניר',
-      activeColor: 'bg-rose-600 text-white shadow-md ring-2 ring-rose-400/40 font-black',
-      inactiveColor: 'bg-white text-rose-950 border border-rose-200 hover:bg-rose-50 font-bold',
+      activeColor: 'bg-emerald-800 text-white shadow-sm font-black',
+      inactiveColor: 'bg-stone-100 text-stone-800 hover:bg-stone-200 font-bold border border-stone-200',
     },
   ];
 
@@ -72,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
               <img
                 src="/logo.png"
                 alt="SIBO Safe for Nir"
-                className="w-12 h-12 rounded-2xl object-cover shadow-md ring-2 ring-emerald-600/20 shrink-0 border border-emerald-100"
+                className="w-12 h-12 rounded-2xl object-cover shadow-md ring-2 ring-emerald-800/10 shrink-0 border border-stone-200"
               />
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -89,14 +82,14 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onOpenHungerWizard}
-                className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md animate-pulse cursor-pointer"
+                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-sm cursor-pointer"
                 title="אשף אני רעבה! מה לאכול עכשיו?"
               >
                 <span>🥑 אני רעבה!</span>
               </button>
               <button
                 onClick={onOpenInstallShare}
-                className="p-2 text-emerald-600 hover:text-emerald-800 rounded-lg hover:bg-emerald-50"
+                className="p-2 text-stone-700 hover:text-stone-900 rounded-lg hover:bg-stone-100"
                 title="התקנה בטלפון ושיתוף"
               >
                 <Smartphone className="w-5 h-5" />
@@ -118,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="desktop-hunger-sos-btn"
               type="button"
               onClick={onOpenHungerWizard}
-              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 border border-amber-300 px-3.5 py-2 rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer active:scale-95 animate-pulse"
+              className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer active:scale-95"
               title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
             >
               <span className="text-sm">🥑</span>
@@ -128,9 +121,9 @@ export const Header: React.FC<HeaderProps> = ({
               id="install-share-btn"
               type="button"
               onClick={onOpenInstallShare}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-300 px-3 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 border border-stone-300 px-3 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
             >
-              <Smartphone className="w-3.5 h-3.5 text-teal-600" />
+              <Smartphone className="w-3.5 h-3.5 text-stone-600" />
               <span>התקנה בטלפון ושיתוף 📲</span>
             </button>
 

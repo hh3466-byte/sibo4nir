@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Barcode, RotateCcw, AlertTriangle, CheckCircle2, XCircle, Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { Camera, Barcode, RotateCcw, AlertTriangle, CheckCircle2, XCircle, Sparkles, Loader2, RefreshCw, Send, ListChecks, ChevronLeft } from 'lucide-react';
 import { SiboPhase, FoodAnalysisResult } from '../types';
 import { CameraScanner } from './CameraScanner';
 import { TrafficLightResult } from './TrafficLightResult';
@@ -11,6 +11,7 @@ interface SupermarketSelfScanViewProps {
   analysisResult: FoodAnalysisResult | null;
   onClearResult: () => void;
   onOpenShoppingList: () => void;
+  selectedShoppingCount?: number;
 }
 
 export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = ({
@@ -20,6 +21,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   analysisResult,
   onClearResult,
   onOpenShoppingList,
+  selectedShoppingCount = 0,
 }) => {
   const [activeScanMode, setActiveScanMode] = useState<'idle' | 'camera' | 'barcode'>('idle');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -41,50 +43,85 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-3 sm:p-5 space-y-5 animate-fadeIn" dir="rtl">
-      {/* Calm Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white p-5 rounded-3xl shadow-lg relative overflow-hidden text-right">
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-amber-400 text-stone-950 rounded-full">
-              סורק סופרמרקט חכם
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              קניות בעצמי בסופר 🛒
-            </h2>
-            <p className="text-xs text-emerald-100 font-medium max-w-md">
-              בחרי אם לצלם את רשימת הרכיבים באריזה או לסרוק ברקוד — ותקבלי רמזור מיידי תוך שנייה!
-            </p>
+    <div className="max-w-3xl mx-auto p-3 sm:p-5 space-y-4 animate-fadeIn text-stone-900" dir="rtl">
+      {/* 1. TOP PROMINENT CARD: לשלוח למישהו לקנות בסופר (placed ABOVE self-shopping as requested) */}
+      {!analysisResult && !isLoading && activeScanMode === 'idle' && (
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-emerald-800/20 shadow-md space-y-3 text-right">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-black">
+                <span>אפשרות 1: שולחת מישהו אחר</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-stone-950 flex items-center gap-2">
+                <span>לשלוח למישהו לקנות בסופר 📋</span>
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 font-medium max-w-lg">
+                סמני מה חסר לך במקרר (מתוך 500+ מוצרים ומותגים בטוחים) ושלחי ישירות לוואטסאפ של הקונה!
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center text-2xl shrink-0 border border-emerald-200 shadow-2xs">
+              📱
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl shrink-0 shadow-inner">
-            🔍
+
+          <div className="pt-1 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-xs text-stone-500 font-medium">
+              {selectedShoppingCount > 0 ? (
+                <span className="font-bold text-emerald-800">
+                  ✓ {selectedShoppingCount} מוצרים מסומנים ברשימה
+                </span>
+              ) : (
+                <span>כל הצ׳ק-בוקסים ריקים כרגע — סמני רק מה שחסר</span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={onOpenShoppingList}
+              className="px-5 py-3 bg-emerald-800 hover:bg-emerald-900 text-white rounded-2xl font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center gap-2 active:scale-98"
+            >
+              <ListChecks className="w-4 h-4" />
+              <span>פתחי רשימת קניות לשליחה 📋</span>
+            </button>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Main 2 Giant Action Buttons when idle & no results */}
+      {/* 2. SECOND SECTION: קניות בעצמי בסופר (צלם / סרוק) */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-stone-50 rounded-3xl p-5 sm:p-6 border border-stone-300 shadow-sm space-y-4 text-right">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-800 text-[11px] font-black">
+              <span>אפשרות 2: את נמצאת בעצמך בסופר</span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-black text-stone-900">
+              קניות בעצמי בסופר 🛒
+            </h3>
+            <p className="text-xs text-stone-600 font-medium">
+              צלמי רכיבים או סרקי ברקוד לבדיקת בטיחות מיידית ברמזור SIBO
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
             {/* Button 1: 📸 צלם */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-xl hover:shadow-2xl transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-3 border-2 border-amber-300/60 group"
+              className="p-5 sm:p-6 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-amber-500/80 shadow-sm hover:shadow-md transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-2.5 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-md flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform">
-                <Camera className="w-8 h-8" />
+              <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                <Camera className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-1">
+                <h4 className="text-lg sm:text-xl font-black tracking-tight text-stone-900">
                   צלם 📸
-                </h3>
-                <p className="text-xs sm:text-sm font-semibold text-amber-100">
+                </h4>
+                <p className="text-xs font-semibold text-stone-600">
                   צילום רשימת רכיבים / מאכל
                 </p>
               </div>
-              <span className="text-[11px] font-black bg-white/20 text-white px-3 py-1 rounded-full">
-                ניתוח AI מיידי ✨
+              <span className="text-[10px] font-extrabold bg-amber-100 text-amber-950 px-2.5 py-0.5 rounded-full">
+                ניתוח AI מיידי
               </span>
             </button>
 
@@ -92,41 +129,22 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
             <button
               type="button"
               onClick={() => setActiveScanMode('barcode')}
-              className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white shadow-xl hover:shadow-2xl transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-3 border-2 border-emerald-400/60 group"
+              className="p-5 sm:p-6 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-emerald-700/80 shadow-sm hover:shadow-md transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-2.5 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-md flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform">
-                <Barcode className="w-8 h-8" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                <Barcode className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-1">
+                <h4 className="text-lg sm:text-xl font-black tracking-tight text-stone-900">
                   סרוק 🏷️
-                </h3>
-                <p className="text-xs sm:text-sm font-semibold text-emerald-100">
+                </h4>
+                <p className="text-xs font-semibold text-stone-600">
                   סריקת ברקוד ישראלי חי
                 </p>
               </div>
-              <span className="text-[11px] font-black bg-white/20 text-white px-3 py-1 rounded-full">
-                מאגר סופרמרקטים 🛒
+              <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-950 px-2.5 py-0.5 rounded-full">
+                מאגר סופרמרקטים
               </span>
-            </button>
-          </div>
-
-          {/* Helper Shortcut to Shopping List */}
-          <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs flex items-center justify-between gap-3 text-right">
-            <div className="space-y-0.5">
-              <h4 className="text-xs sm:text-sm font-black text-stone-900">
-                מעדיפה לשלוח מישהו אחר לקנות עבורך?
-              </h4>
-              <p className="text-[11px] text-stone-600 font-medium">
-                פתחי את רשימת הקניות החכמה ושלחי בוואטסאפ בשנייה אחת
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onOpenShoppingList}
-              className="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl font-black text-xs shrink-0 transition-colors cursor-pointer"
-            >
-              לרשימת קניות 📋
             </button>
           </div>
         </div>
@@ -144,16 +162,16 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
 
       {/* Live Barcode Scanner Component */}
       {activeScanMode === 'barcode' && !analysisResult && (
-        <div className="space-y-3 bg-white p-4 rounded-3xl border-2 border-emerald-500 shadow-xl">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
+        <div className="space-y-3 bg-white p-4 rounded-3xl border-2 border-emerald-700 shadow-xl">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-2.5">
             <h3 className="text-sm sm:text-base font-black text-stone-900 flex items-center gap-2">
-              <Barcode className="w-5 h-5 text-emerald-600" />
+              <Barcode className="w-5 h-5 text-emerald-800" />
               <span>סריקת ברקוד חיה</span>
             </h3>
             <button
               type="button"
               onClick={() => setActiveScanMode('idle')}
-              className="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-lg cursor-pointer"
+              className="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl cursor-pointer"
             >
               ✕ ביטול
             </button>
@@ -175,7 +193,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
       {/* Loading Indicator */}
       {isLoading && (
         <div className="p-8 bg-white rounded-3xl border border-stone-200 shadow-md text-center space-y-3 animate-pulse">
-          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin mx-auto" />
+          <Loader2 className="w-10 h-10 text-emerald-700 animate-spin mx-auto" />
           <h3 className="text-base font-black text-stone-900">
             מנתח את המוצר ברמזור קליני...
           </h3>
@@ -206,7 +224,7 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
                 onClearResult();
                 setActiveScanMode('idle');
               }}
-              className="px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-sm rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-6 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-black text-sm rounded-2xl shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <RefreshCw className="w-4 h-4" />
               <span>סרקי מוצר נוסף בסופר</span>

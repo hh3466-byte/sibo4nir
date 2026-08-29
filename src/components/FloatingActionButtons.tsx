@@ -20,10 +20,10 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         id="btn-floating-hunger-sos"
         type="button"
         onClick={onOpenHungerWizard}
-        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-2xl border-2 border-amber-300 active:scale-95 group cursor-pointer backdrop-blur-md animate-pulse"
+        className="px-4 py-2.5 sm:px-5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg hover:shadow-xl active:scale-95 group cursor-pointer"
         title="אשף שובע מהיר — אני רעבה! מה לאכול עכשיו?"
       >
-        <span className="text-base sm:text-lg group-hover:scale-125 transition-transform">🥑</span>
+        <span className="text-base sm:text-lg group-hover:scale-110 transition-transform">🥑</span>
         <span className="tracking-wide">אני רעבה!!! ✨</span>
       </button>
 
@@ -32,11 +32,11 @@ export const FloatingActionButtons: React.FC<FloatingActionButtonsProps> = ({
         id="btn-floating-meal-suggestions"
         type="button"
         onClick={onOpenMealSuggestions}
-        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-xl border border-emerald-300/40 active:scale-95 group cursor-pointer backdrop-blur-xs ring-2 ring-emerald-400/20"
+        className="px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-full font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-lg hover:shadow-xl active:scale-95 group cursor-pointer"
         title="המלצת שֵׁף דַּלָּה פּוּפוּ — מתכונים מותאמים ל-SIBO"
       >
         <ChefHat className="w-4 h-4 text-emerald-100 group-hover:rotate-12 transition-transform" />
-        <span className="tracking-wide">המלצת שֵׁף דַּלָּה פּוּפוּ 🍲</span>
+        <span className="tracking-wide">מתכוני שֵׁף (60+) 🍲</span>
       </button>
     </div>
   );

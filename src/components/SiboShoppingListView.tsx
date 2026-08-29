@@ -6,106 +6,33 @@ import {
   Copy,
   Check,
   Plus,
+  Minus,
   Trash2,
   Sparkles,
   ShoppingBag,
   Info,
-  RotateCcw,
+  Search,
+  X,
+  AlertTriangle,
   Smartphone,
+  ChevronLeft,
+  Filter,
 } from 'lucide-react';
 import { SiboPhase } from '../types';
+import {
+  SIBO_SHOPPING_500_ITEMS,
+  SIBO_CATEGORIES,
+  SiboShopping500Item,
+} from '../data/siboShopping500';
 
-interface ShoppingItem {
+interface CustomShoppingItem {
   id: string;
-  category: 'meat' | 'veg' | 'dairy_oil' | 'grains' | 'sauces_spices' | 'fruits_snacks' | 'custom';
+  category: 'custom';
   name: string;
-  brandOrNote?: string;
-  isEssential?: boolean;
+  safeBrand?: string;
+  warningNote?: string;
+  unit?: string;
 }
-
-const DEFAULT_SHOPPING_ITEMS: ShoppingItem[] = [
-  // --- 🥩 בשרים, עופות ודגים טריים ---
-  { id: 'm1', category: 'meat', name: 'קוביות פרגית נקייה', brandOrNote: 'לשיפודים ושווארמה ביתית', isEssential: true },
-  { id: 'm2', category: 'meat', name: 'בשר בקר טחון טרי', brandOrNote: 'צוואר/צלעות לקציצות ובולונז', isEssential: true },
-  { id: 'm3', category: 'meat', name: 'סטייק אנטרקוט דק (דקה סטייק)', brandOrNote: 'נתח שלם טרי', isEssential: true },
-  { id: 'm4', category: 'meat', name: 'פילה סלמון טרי', brandOrNote: 'ללא עצמות', isEssential: true },
-  { id: 'm5', category: 'meat', name: 'פילה דניס / לברק טרי', brandOrNote: 'עם העור', isEssential: true },
-  { id: 'm6', category: 'meat', name: 'סלמון מעושן פרוס', brandOrNote: '100 גרם ללא תוספת סוכר', isEssential: true },
-  { id: 'm7', category: 'meat', name: 'פסטרמה 100% נתח שלם', brandOrNote: 'טירת צבי 100% טבעי / יחיעם ללא גלוטן/שום/בצל', isEssential: true },
-  { id: 'm8', category: 'meat', name: 'חזה עוף שלם / חתוך לרצועות', brandOrNote: 'טרי ונקי', isEssential: false },
-  { id: 'm9', category: 'meat', name: 'כנפי עוף טריות', brandOrNote: 'חצויות ונקיות', isEssential: false },
-  { id: 'm10', category: 'meat', name: 'שימורי טונה בשמן זית', brandOrNote: 'ריו מרה / פילטונה בשמן זית כתית', isEssential: true },
-  { id: 'm11', category: 'meat', name: 'שימורי סרדינים בשמן זית כתית מעולה', brandOrNote: 'סרדינים איכותיים', isEssential: false },
-
-  // --- 🥦 ירקות בטוחים (0% תסיסה) ---
-  { id: 'v1', category: 'veg', name: 'קישואים / זוקיני ירוקים מוצקים', brandOrNote: '2-3 ק"ג (לזודלס, קציצות ומרק)', isEssential: true },
-  { id: 'v2', category: 'veg', name: 'מלפפונים טריים פריכים', brandOrNote: '2 ק"ג (בטוח ללא הגבלה)', isEssential: true },
-  { id: 'v3', category: 'veg', name: 'גזרים טריים מוצקים', brandOrNote: '1 ק"ג', isEssential: true },
-  { id: 'v4', category: 'veg', name: 'חסה ערבית פריכה / לבבות חסה', brandOrNote: 'רענן ונקי', isEssential: true },
-  { id: 'v5', category: 'veg', name: 'עלי תרד טריים (בייבי תרד)', brandOrNote: 'שקית/מארז שטוף לחביתות ושקשוקה', isEssential: true },
-  { id: 'v6', category: 'veg', name: 'בצל ירוק טרי', brandOrNote: 'דגש: נשתמש בחלק הירוק העליון בלבד!', isEssential: true },
-  { id: 'v7', category: 'veg', name: 'צרור שמיר טרי', brandOrNote: 'ירוק ורענן', isEssential: true },
-  { id: 'v8', category: 'veg', name: 'צרור פטרוזיליה וכוסברה', brandOrNote: 'טרי', isEssential: true },
-  { id: 'v9', category: 'veg', name: 'ענפי רוזמרין וטימין טריים', brandOrNote: 'לסטייק ודגים', isEssential: false },
-  { id: 'v10', category: 'veg', name: 'שורש ג׳ינג׳ר טרי', brandOrNote: 'שורש קטן ומוצק', isEssential: true },
-  { id: 'v11', category: 'veg', name: 'לימונים טריים עסיסיים', brandOrNote: '1 ק"ג לסחיטה ותיבול', isEssential: true },
-  { id: 'v12', category: 'veg', name: 'תפוחי אדמה בינוניים', brandOrNote: 'לקומפיר אפוי חם וטורטייה', isEssential: true },
-
-  // --- 🥚 ביצים, גבינות קשות (0% לקטוז) ושמנים ---
-  { id: 'd1', category: 'dairy_oil', name: 'תבנית ביצים טריות L/XL', brandOrNote: 'ביצי חופש / משק', isEssential: true },
-  { id: 'd2', category: 'dairy_oil', name: 'גבינת פרמזן רג׳יאנו מיושנת (גוש שלם)', brandOrNote: 'Parmigiano Reggiano מיושנת 24 חודש (0% לקטוז)', isEssential: true },
-  { id: 'd3', category: 'dairy_oil', name: 'גבינת גאודה קשה / מנצ׳גו', brandOrNote: 'גבינה קשה שעברה יישון (0% לקטוז)', isEssential: true },
-  { id: 'd4', category: 'dairy_oil', name: 'גבינת פטה עיזים קשה', brandOrNote: 'במים ומלח (ללא תוספות)', isEssential: false },
-  { id: 'd5', category: 'dairy_oil', name: 'שמן זית כתית מעולה כבישה קרה', brandOrNote: 'חומציות עד 0.8% (יד מרדכי / מסיק קיבוץ מגל)', isEssential: true },
-  { id: 'd6', category: 'dairy_oil', name: 'שמן זית מושרה שום (Garlic Oil)', brandOrNote: 'Garlic Infused Oil (מעניק ארומת שום ללא פרוקטנים!)', isEssential: true },
-  { id: 'd7', category: 'dairy_oil', name: 'שמן שומשום טהור 100%', brandOrNote: 'למוקפצים וסלטים אסייתיים', isEssential: true },
-  { id: 'd8', category: 'dairy_oil', name: 'שמן קוקוס מכבישה קרה', brandOrNote: 'אורגני 100%', isEssential: false },
-
-  // --- 🍞 תחליפי פחמימות ודגנים (ללא גלוטן) ---
-  { id: 'g1', category: 'grains', name: 'פריכיות אורז דקות 100% אורז', brandOrNote: 'מלא/לבן ללא תוספות מלח ושום (B&D / מאסטר שף)', isEssential: true },
-  { id: 'g2', category: 'grains', name: 'דפי אורז עגולים שקופים', brandOrNote: 'מזרח ומערב / Real Thai (רכיבים: אורז, מים, מלח בלבד)', isEssential: true },
-  { id: 'g3', category: 'grains', name: 'קמח שקדים טהור מולבן', brandOrNote: 'לפנקייקים ולציפוי שניצל (שקדיה / הרדוף)', isEssential: true },
-  { id: 'g4', category: 'grains', name: 'אורז בסמטי קלאסי הודי', brandOrNote: 'Tilda / סוגת בסמטי איכותי', isEssential: true },
-  { id: 'g5', category: 'grains', name: 'קינואה לבנה שטופה', brandOrNote: 'סוגת / הרדוף', isEssential: false },
-  { id: 'g6', category: 'grains', name: 'פצפוצי אורז תפוח 100% טבעי', brandOrNote: 'ללא תוספת סוכר (B&D / תבואות)', isEssential: false },
-
-  // --- 🥫 רטבים, תבלינים וממרחים עם מותגים מדויקים ---
-  { id: 's1', category: 'sauces_spices', name: 'רוטב סויה תמרי ללא גלוטן', brandOrNote: 'מותג: San-J Tamari Gluten-Free או קיקומן ללא גלוטן (פקק כחול)', isEssential: true },
-  { id: 's2', category: 'sauces_spices', name: 'טחינה גולמית 100% שומשום טהור', brandOrNote: 'מותג: אל ארז / היונה / הר ברכה (ללא שום וללא מלח מוסף)', isEssential: true },
-  { id: 's3', category: 'sauces_spices', name: 'חרדל דיז׳ון חלק ללא סוכר', brandOrNote: 'מותג: Maille Dijon Originale (לוודא: ללא שום וללא סוכר)', isEssential: true },
-  { id: 's4', category: 'sauces_spices', name: 'חמאת בוטנים 100% טבעית', brandOrNote: 'מותג: B&D 100% טבעי / ראסטיס / סקיפי ללא סוכר (ללא שמן דקלים)', isEssential: true },
-  { id: 's5', category: 'sauces_spices', name: 'שוקולד מריר 85% איכותי', brandOrNote: 'מותג: Lindt Excellence 85% Cocoa (שחור וזהב)', isEssential: true },
-  { id: 's6', category: 'sauces_spices', name: 'זרעי צ׳יה טבעיים', brandOrNote: 'הרדוף / תבואות / שקדיה', isEssential: true },
-  { id: 's7', category: 'sauces_spices', name: 'סירופ מייפל 100% טהור', brandOrNote: 'מותג: Maple Joe דרגת Grade A טהור', isEssential: true },
-  { id: 's8', category: 'sauces_spices', name: 'חומץ תפוחים טבעי לא מסונן', brandOrNote: 'מותג: Bragg Organic Apple Cider Vinegar', isEssential: false },
-  { id: 's9', category: 'sauces_spices', name: 'חלב שקדים טהור ללא סוכר', brandOrNote: 'מותג: אלפרו ללא סוכר (פקק תכלת) / Isola Bio שקדים טהור', isEssential: true },
-  { id: 's10', category: 'sauces_spices', name: 'חלב קוקוס טבעי בקרטון/פחית', brandOrNote: 'מותג: Aroy-D 100% (ללא חומרים משמרים וללא סוכר)', isEssential: false },
-  { id: 's11', category: 'sauces_spices', name: 'אבקת קקאו הולנדי טהור 100%', brandOrNote: 'מותג: עלית קקאו טהור לאפייה / הרדוף אורגני', isEssential: false },
-  { id: 's12', category: 'sauces_spices', name: 'כמון טחון טהור', brandOrNote: 'תבליני טעם וריח / פרג 100% טהור ללא תערובות', isEssential: true },
-  { id: 's13', category: 'sauces_spices', name: 'כורכום טהור 100%', brandOrNote: 'תבלין טהור ללא תוספות', isEssential: true },
-  { id: 's14', category: 'sauces_spices', name: 'פפריקה מתוקה ופפריקה מעושנת טהורה', brandOrNote: '100% פפריקה טהורה', isEssential: true },
-  { id: 's15', category: 'sauces_spices', name: 'מלח ים אטלנטי גס ופלפל שחור גרוס', brandOrNote: 'מלח אטלנטי טבעי', isEssential: true },
-  { id: 's16', category: 'sauces_spices', name: 'סומאק טהור ואורגנו יבש', brandOrNote: 'ללא תוספת מלח ושום', isEssential: false },
-
-  // --- 🍓 פירות ונשנושים בטוחים ---
-  { id: 'f1', category: 'fruits_snacks', name: 'תותים טריים שטופים', brandOrNote: '1-2 סלסלות (דל פודמאפ מאושר)', isEssential: true },
-  { id: 'f2', category: 'fruits_snacks', name: 'אוכמניות טריות', brandOrNote: 'סלסלה קטנה', isEssential: false },
-  { id: 'f3', category: 'fruits_snacks', name: 'אגוזי מלך טבעיים לא קלויים', brandOrNote: 'שקית/מארז ואקום טרי', isEssential: true },
-  { id: 'f4', category: 'fruits_snacks', name: 'אגוזי פקאן טבעיים לא קלויים', brandOrNote: 'חצאי פקאן טבעי', isEssential: false },
-  { id: 'f5', category: 'fruits_snacks', name: 'בוטנים קלויים מלוחים', brandOrNote: 'שקית בוטנים (ללא סוכר וקמח)', isEssential: false },
-  { id: 'f6', category: 'fruits_snacks', name: 'מלפפונים חמוצים במלח בלבד', brandOrNote: 'מותג: בית השיטה במלח (דגש: ללא חומץ, ללא שום וללא סוכר)', isEssential: true },
-  { id: 'f7', category: 'fruits_snacks', name: 'זיתים שחורים / ירוקים במלח', brandOrNote: 'ללא תבליני שום ובצל', isEssential: false },
-];
-
-const CATEGORY_NAMES: Record<string, { label: string; icon: string }> = {
-  meat: { label: 'בשרים, עופות ודגים טריים', icon: '🥩' },
-  veg: { label: 'ירקות ועשבי תיבול בטוחים', icon: '🥦' },
-  dairy_oil: { label: 'ביצים, גבינות קשות (0% לקטוז) ושמנים', icon: '🥚' },
-  grains: { label: 'תחליפי פחמימות ודגנים (ללא גלוטן)', icon: '🍞' },
-  sauces_spices: { label: 'רטבים, תבלינים וממרחים (מותגים ספציפיים)', icon: '🥫' },
-  fruits_snacks: { label: 'פירות, אגוזים ונשנושים', icon: '🍓' },
-  custom: { label: 'פריטים מותאמים אישית שהוספת', icon: '✨' },
-};
 
 interface SiboShoppingListViewProps {
   currentPhase: SiboPhase;
@@ -116,35 +43,46 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   currentPhase,
   onBackToScanner,
 }) => {
-  // Saved checked items in localStorage
+  // Empty by default as requested: "שכל הצ'ק בוקס יהיו ריקים, מסמנים רק את מה שחסר"
   const [checkedIds, setCheckedIds] = useState<Record<string, boolean>>(() => {
     try {
-      const saved = localStorage.getItem('sibo_shopping_checked_v1');
+      const saved = localStorage.getItem('sibo_shopping_checked_v2');
       if (saved) return JSON.parse(saved);
     } catch {}
-    // Default initial checked essentials for Nir
-    const initial: Record<string, boolean> = {};
-    DEFAULT_SHOPPING_ITEMS.filter((i) => i.isEssential).forEach((i) => {
-      initial[i.id] = true;
-    });
-    return initial;
+    return {};
   });
 
-  // Custom added items
-  const [customItems, setCustomItems] = useState<ShoppingItem[]>(() => {
+  // Quantities per item (default 1)
+  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
     try {
-      const saved = localStorage.getItem('sibo_shopping_custom_v1');
+      const saved = localStorage.getItem('sibo_shopping_quantities_v2');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {};
+  });
+
+  // Custom user-added items
+  const [customItems, setCustomItems] = useState<CustomShoppingItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('sibo_shopping_custom_v2');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [];
   });
 
-  const [newCustomName, setNewCustomName] = useState('');
-  const [newCustomNote, setNewCustomNote] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [onlyCheckedFilter, setOnlyCheckedFilter] = useState(false);
+
+  // Form for custom item
   const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [newCustomName, setNewCustomName] = useState('');
+  const [newCustomBrand, setNewCustomBrand] = useState('');
+  const [newCustomWarning, setNewCustomWarning] = useState('');
+
   const [copiedSuccess, setCopiedSuccess] = useState(false);
 
-  // Preferred phone number for 1-tap direct WhatsApp sending (saved in storage)
+  // Saved contact phone for direct WhatsApp sending
   const [directPhone, setDirectPhone] = useState<string>(() => {
     try {
       return localStorage.getItem('sibo_shopper_phone') || '';
@@ -154,21 +92,28 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   });
   const [isEditingPhone, setIsEditingPhone] = useState(false);
 
-  // Sync to localStorage
+  // Save to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('sibo_shopping_checked_v1', JSON.stringify(checkedIds));
+      localStorage.setItem('sibo_shopping_checked_v2', JSON.stringify(checkedIds));
     } catch {}
   }, [checkedIds]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('sibo_shopping_custom_v1', JSON.stringify(customItems));
+      localStorage.setItem('sibo_shopping_quantities_v2', JSON.stringify(quantities));
+    } catch {}
+  }, [quantities]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sibo_shopping_custom_v2', JSON.stringify(customItems));
     } catch {}
   }, [customItems]);
 
+  // Combine static 500 items + custom
   const allItems = useMemo(() => {
-    return [...DEFAULT_SHOPPING_ITEMS, ...customItems];
+    return [...(SIBO_SHOPPING_500_ITEMS as (SiboShopping500Item | CustomShoppingItem)[]), ...customItems];
   }, [customItems]);
 
   const selectedCount = useMemo(() => {
@@ -176,49 +121,50 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   }, [checkedIds]);
 
   const toggleItem = (id: string) => {
-    setCheckedIds((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setCheckedIds((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      if (!next[id]) {
+        delete next[id];
+      }
+      return next;
+    });
   };
 
-  const handleSelectAll = () => {
-    const all: Record<string, boolean> = {};
-    allItems.forEach((item) => {
-      all[item.id] = true;
+  const updateQuantity = (id: string, delta: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setQuantities((prev) => {
+      const current = prev[id] || 1;
+      const next = Math.max(1, current + delta);
+      return { ...prev, [id]: next };
     });
-    setCheckedIds(all);
-  };
-
-  const handleSelectEssentialsOnly = () => {
-    const essentials: Record<string, boolean> = {};
-    allItems.forEach((item) => {
-      if (item.isEssential) essentials[item.id] = true;
-    });
-    setCheckedIds(essentials);
   };
 
   const handleClearAll = () => {
     setCheckedIds({});
+    setQuantities({});
   };
 
   const handleAddCustomItem = () => {
     if (!newCustomName.trim()) return;
-    const newItem: ShoppingItem = {
-      id: `custom-${Date.now()}`,
+    const newItem: CustomShoppingItem = {
+      id: `custom_${Date.now()}`,
       category: 'custom',
       name: newCustomName.trim(),
-      brandOrNote: newCustomNote.trim() || undefined,
-      isEssential: false,
+      safeBrand: newCustomBrand.trim() || undefined,
+      warningNote: newCustomWarning.trim() || undefined,
+      unit: 'יח׳',
     };
-    setCustomItems((prev) => [...prev, newItem]);
+    setCustomItems((prev) => [newItem, ...prev]);
     setCheckedIds((prev) => ({ ...prev, [newItem.id]: true }));
+    setQuantities((prev) => ({ ...prev, [newItem.id]: 1 }));
     setNewCustomName('');
-    setNewCustomNote('');
+    setNewCustomBrand('');
+    setNewCustomWarning('');
     setIsAddingCustom(false);
   };
 
-  const handleRemoveCustomItem = (id: string) => {
+  const handleRemoveCustomItem = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setCustomItems((prev) => prev.filter((i) => i.id !== id));
     setCheckedIds((prev) => {
       const copy = { ...prev };
@@ -227,29 +173,64 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     });
   };
 
-  // Generate WhatsApp Message formatted cleanly by supermarket aisles
-  const generateWhatsAppMessage = () => {
-    const selectedItems = allItems.filter((i) => checkedIds[i.id]);
+  // Filter items by category & search query
+  const filteredItems = useMemo(() => {
+    return allItems.filter((item) => {
+      // Category filter
+      if (selectedCategory !== 'all') {
+        if (selectedCategory === 'custom' && item.category !== 'custom') return false;
+        if (selectedCategory !== 'custom' && item.category !== selectedCategory) return false;
+      }
 
-    if (selectedItems.length === 0) {
-      return 'היי! רשימת הקניות ל-SIBO ריקה כרגע. אנא סמני פריטים באפליקציה.';
+      // Only checked filter
+      if (onlyCheckedFilter && !checkedIds[item.id]) {
+        return false;
+      }
+
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        const matchName = item.name.toLowerCase().includes(q);
+        const matchBrand = item.safeBrand?.toLowerCase().includes(q);
+        const matchWarn = item.warningNote?.toLowerCase().includes(q);
+        return matchName || matchBrand || matchWarn;
+      }
+
+      return true;
+    });
+  }, [allItems, selectedCategory, onlyCheckedFilter, searchQuery, checkedIds]);
+
+  // Generate clean WhatsApp message
+  const generateWhatsAppMessage = () => {
+    const selected = allItems.filter((i) => checkedIds[i.id]);
+
+    if (selected.length === 0) {
+      return 'היי! רשימת הקניות ל-SIBO ריקה כרגע. אנא סמני את הפריטים שחסרים לך באפליקציה.';
     }
 
     let msg = `🛒 *רשימת קניות מותאמת ובטוחה ל-SIBO עבור ניר* 🌿\n`;
     msg += `------------------------------------\n`;
-    msg += `⚠️ *דגש קריטי לקונה:* ללא שום, ללא בצל, ללא גלוטן! נא להקפיד על המותגים וההערות המפורטות.\n\n`;
+    msg += `⚠️ *דגש קריטי לקונה:* ללא שום, ללא בצל, ללא גלוטן! נא לקנות אך ורק את המותגים וההנחיות הרשומות.\n\n`;
 
-    const categories = ['meat', 'veg', 'dairy_oil', 'grains', 'sauces_spices', 'fruits_snacks', 'custom'];
+    const categoryOrder = [
+      ...SIBO_CATEGORIES.map((c) => c.id),
+      'custom',
+    ];
 
-    categories.forEach((catKey) => {
-      const itemsInCat = selectedItems.filter((i) => i.category === catKey);
-      if (itemsInCat.length > 0) {
-        const catInfo = CATEGORY_NAMES[catKey] || { label: 'שונות', icon: '📦' };
+    categoryOrder.forEach((catKey) => {
+      const inCat = selected.filter((i) => i.category === catKey);
+      if (inCat.length > 0) {
+        const catInfo = SIBO_CATEGORIES.find((c) => c.id === catKey) || { label: 'פריטים נוספים', icon: '✨' };
         msg += `${catInfo.icon} *${catInfo.label}:*\n`;
-        itemsInCat.forEach((item) => {
-          msg += `  ▫️ *${item.name}*`;
-          if (item.brandOrNote) {
-            msg += ` (${item.brandOrNote})`;
+        inCat.forEach((item) => {
+          const qty = quantities[item.id] || 1;
+          const qtyStr = qty > 1 ? `${qty}x ` : '';
+          msg += `  ▫️ *${qtyStr}${item.name}*`;
+          if (item.safeBrand) {
+            msg += `\n     🏷️ מותג: ${item.safeBrand}`;
+          }
+          if (item.warningNote) {
+            msg += `\n     ${item.warningNote}`;
           }
           msg += `\n`;
         });
@@ -258,7 +239,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
     });
 
     msg += `------------------------------------\n`;
-    msg += `תודה רבה רבה על העזרה וההקפדה! ❤️`;
+    msg += `סה"כ ${selected.length} מוצרים מסומנים. תודה רבה על העזרה וההקפדה! ❤️`;
     return msg;
   };
 
@@ -284,115 +265,123 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-3 sm:p-5 space-y-5 animate-fadeIn pb-24" dir="rtl">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-amber-600 text-white p-5 rounded-3xl shadow-lg relative overflow-hidden text-right">
-        <div className="relative z-10 flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 bg-amber-400 text-stone-950 rounded-full">
-              רשימת קניות לשליחה
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              רשימת קניות לסופר (לשלוח למישהו) 📋
+    <div className="max-w-4xl mx-auto p-3 sm:p-5 space-y-4 animate-fadeIn pb-28 text-stone-900" dir="rtl">
+      {/* Calm & Soothing Header Card */}
+      <div className="bg-stone-900 text-white p-5 rounded-3xl shadow-md relative overflow-hidden text-right border border-stone-800">
+        <div className="flex items-center justify-between gap-3">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-800 text-emerald-100 text-[11px] font-black tracking-wide">
+              <span>מאגר 500+ מוצרים ומותגים מדויקים ל-SIBO</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              <span>רשימת קניות לסופר (לשלוח למישהו) 📋</span>
             </h2>
-            <p className="text-xs text-emerald-100 font-medium max-w-md">
-              סמני מה חסר במקרר ובמזווה, ולחצי על כפתור הוואטסאפ לשליחה מיידית לקונה!
+            <p className="text-xs sm:text-sm text-stone-300 font-medium max-w-xl">
+              <strong className="text-amber-300">ניר, סמני רק את מה שחסר לך במקרר או במזווה.</strong> ליד כל מוצר מופיע המותג המאושר ודגשי זהירות לקונה.
             </p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl shrink-0 shadow-inner">
-            🛒
-          </div>
+
+          {onBackToScanner && (
+            <button
+              type="button"
+              onClick={onBackToScanner}
+              className="px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-2xl text-xs font-bold shrink-0 transition-colors border border-stone-700 flex items-center gap-1"
+            >
+              <span>קניות בעצמי</span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Floating Bottom WhatsApp Action Bar */}
-      <div className="sticky top-2 z-30 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500 shadow-xl space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shadow-xs">
+      {/* Sticky Bottom/Top WhatsApp Action Bar */}
+      <div className="sticky top-2 z-30 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl border border-stone-300 shadow-xl space-y-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <span className={`w-9 h-9 rounded-2xl flex items-center justify-center font-black text-sm shadow-xs ${
+              selectedCount > 0 ? 'bg-emerald-700 text-white' : 'bg-stone-100 text-stone-600'
+            }`}>
               {selectedCount}
             </span>
             <div>
               <span className="text-xs sm:text-sm font-black text-stone-900 block">
-                פריטים מסומנים לקנייה
+                {selectedCount > 0 ? `${selectedCount} מוצרים נבחרו לקנייה` : 'כל המוצרים ריקים כרגע'}
               </span>
-              <span className="text-[11px] text-stone-500">
-                המקרר תמיד יהיה מלא לכל הארוחות
+              <span className="text-[11px] text-stone-500 font-medium">
+                {selectedCount > 0 ? 'מוכן לשליחה מהירה בוואטסאפ' : 'סמני את הפריטים שחסרים לך'}
               </span>
             </div>
           </div>
 
-          {/* Quick Copy & Selection Buttons */}
           <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={handleCopyList}
-              className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="העתק טקסט ללוח"
+              className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-stone-200"
+              title="העתק טקסט"
             >
-              {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedSuccess ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedSuccess ? 'הועתק!' : 'העתק'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsAddingCustom(true)}
-              className="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-stone-200"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-emerald-700" />
               <span>הוסף מוצר</span>
             </button>
+
+            {selectedCount > 0 && (
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-xl font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-rose-200"
+                title="נקה את כל הסימונים"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>נקה</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Giant WhatsApp Send Button */}
+        {/* Big Unified Green WhatsApp Button */}
         <button
           type="button"
           onClick={handleSendWhatsApp}
           disabled={selectedCount === 0}
-          className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 disabled:opacity-40 text-white rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg active:scale-98"
+          className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-30 disabled:hover:bg-emerald-700 text-white rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-98"
         >
           <Send className="w-5 h-5 rtl:rotate-180" />
           <span>שלחי בוואטסאפ למי שקונה 📱 ({selectedCount} מוצרים)</span>
         </button>
 
-        {/* Action Filter Pills */}
-        <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-100">
-          <div className="flex items-center gap-1.5">
+        {/* Set Shopper Phone Helper */}
+        <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1 border-t border-stone-100">
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleSelectEssentialsOnly}
-              className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+              onClick={() => setOnlyCheckedFilter(!onlyCheckedFilter)}
+              className={`font-bold px-2 py-0.5 rounded-lg border transition-all ${
+                onlyCheckedFilter
+                  ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
+                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+              }`}
             >
-              ⭐ סמני מוצרי בסיס חיוניים
-            </button>
-            <span className="text-stone-300">•</span>
-            <button
-              type="button"
-              onClick={handleSelectAll}
-              className="text-[11px] font-bold text-stone-600 hover:underline cursor-pointer"
-            >
-              בחר הכל
-            </button>
-            <span className="text-stone-300">•</span>
-            <button
-              type="button"
-              onClick={handleClearAll}
-              className="text-[11px] font-bold text-stone-600 hover:underline cursor-pointer"
-            >
-              נקה הכל
+              {onlyCheckedFilter ? '✓ מציג רק מסומנים' : 'הצג רק מה שסומן'}
             </button>
           </div>
 
-          {/* Optional Direct Contact Phone */}
-          <div className="text-[11px] text-stone-500">
+          <div>
             {isEditingPhone ? (
               <div className="flex items-center gap-1">
                 <input
                   type="tel"
                   value={directPhone}
                   onChange={(e) => setDirectPhone(e.target.value)}
-                  placeholder="מספר טלפון לקונה..."
+                  placeholder="מספר לקונה (05X...)"
                   className="px-2 py-0.5 border border-stone-300 rounded text-xs w-28 text-left"
                 />
                 <button
@@ -401,7 +390,7 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
                     localStorage.setItem('sibo_shopper_phone', directPhone);
                     setIsEditingPhone(false);
                   }}
-                  className="font-bold text-emerald-700"
+                  className="font-black text-emerald-700 px-1"
                 >
                   שמור
                 </button>
@@ -410,138 +399,237 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsEditingPhone(true)}
-                className="text-stone-500 hover:text-stone-800 hover:underline cursor-pointer flex items-center gap-1"
+                className="text-stone-500 hover:text-stone-900 hover:underline cursor-pointer flex items-center gap-1"
               >
                 <Smartphone className="w-3 h-3" />
-                <span>{directPhone ? `נשלח ל: ${directPhone}` : 'הגדר מספר קבוע לקונה'}</span>
+                <span>{directPhone ? `נשלח ישירות ל: ${directPhone}` : 'הגדרת מספר קבוע לקונה'}</span>
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Modal / Inline form for Custom Item */}
+      {/* Inline Form to Add Custom Item */}
       {isAddingCustom && (
-        <div className="p-4 bg-amber-50 rounded-2xl border-2 border-amber-300 space-y-3 text-right">
-          <h4 className="text-xs sm:text-sm font-black text-amber-950 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            <span>הוספת מוצר מותאם אישית לרשימה:</span>
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="p-4 bg-stone-50 rounded-3xl border border-stone-300 space-y-3 text-right animate-fadeIn shadow-sm">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+            <h4 className="text-xs sm:text-sm font-black text-stone-900 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-700" />
+              <span>הוספת מוצר מותאם אישית לרשימה:</span>
+            </h4>
+            <button
+              type="button"
+              onClick={() => setIsAddingCustom(false)}
+              className="text-stone-400 hover:text-stone-700 text-xs"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <input
               type="text"
               value={newCustomName}
               onChange={(e) => setNewCustomName(e.target.value)}
               placeholder="שם המוצר (למשל: תפוחי עץ ירוקים)..."
-              className="p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-amber-500"
+              className="p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-emerald-600"
             />
             <input
               type="text"
-              value={newCustomNote}
-              onChange={(e) => setNewCustomNote(e.target.value)}
-              placeholder="מותג / הערה לקונה (למשל: רק גרני סמית)..."
-              className="p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-amber-500"
+              value={newCustomBrand}
+              onChange={(e) => setNewCustomBrand(e.target.value)}
+              placeholder="מותג מומלץ (למשל: גרני סמית)..."
+              className="p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-emerald-600"
+            />
+            <input
+              type="text"
+              value={newCustomWarning}
+              onChange={(e) => setNewCustomWarning(e.target.value)}
+              placeholder="הערת זהירות (למשל: לא אדום)..."
+              className="p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-emerald-600"
             />
           </div>
+
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="px-3 py-1.5 bg-stone-200 text-stone-700 font-bold text-xs rounded-xl"
+              className="px-3.5 py-1.5 bg-stone-200 text-stone-700 font-bold text-xs rounded-xl"
             >
               ביטול
             </button>
             <button
               type="button"
               onClick={handleAddCustomItem}
-              className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-xl shadow-xs"
+              className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-xs"
             >
-              הוסף לרשימה
+              הוסף וסמן לרשימה
             </button>
           </div>
         </div>
       )}
 
-      {/* Categorized Checklist */}
-      <div className="space-y-6">
-        {['meat', 'veg', 'dairy_oil', 'grains', 'sauces_spices', 'fruits_snacks', 'custom'].map((catKey) => {
-          const itemsInCat = allItems.filter((i) => i.category === catKey);
-          if (itemsInCat.length === 0) return null;
+      {/* Search Bar Across 500+ Items */}
+      <div className="relative">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="חפשי כל מוצר, ירק, מותג או תבלין מתוך 500 מוצרים..."
+          className="w-full py-3 pr-10 pl-9 rounded-2xl bg-white border border-stone-300 text-xs sm:text-sm font-semibold placeholder:text-stone-400 focus:outline-none focus:border-emerald-600 shadow-2xs text-right"
+        />
+        <Search className="w-4 h-4 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 hover:bg-stone-300 flex items-center justify-center text-xs absolute left-3 top-1/2 -translate-y-1/2"
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
-          const catInfo = CATEGORY_NAMES[catKey] || { label: 'שונות', icon: '📦' };
-          const checkedInCat = itemsInCat.filter((i) => checkedIds[i.id]).length;
+      {/* Category Filter Chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('all')}
+          className={`py-1.5 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border ${
+            selectedCategory === 'all'
+              ? 'bg-stone-900 text-white border-stone-900 shadow-2xs'
+              : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+          }`}
+        >
+          הכל (500+)
+        </button>
+        {SIBO_CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`py-1.5 px-3 rounded-xl font-bold text-xs shrink-0 transition-all cursor-pointer border flex items-center gap-1.5 ${
+                isSelected
+                  ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs'
+                  : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50'
+              }`}
+            >
+              <span>{cat.icon}</span>
+              <span>{cat.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Items List Grouped by Category */}
+      <div className="space-y-5">
+        {SIBO_CATEGORIES.map((cat) => {
+          const inCat = filteredItems.filter((i) => i.category === cat.id);
+          if (inCat.length === 0) return null;
+
+          const checkedInCat = inCat.filter((i) => checkedIds[i.id]).length;
 
           return (
             <div
-              key={catKey}
-              className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-sm space-y-3 text-right"
+              key={cat.id}
+              className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right"
             >
               {/* Category Header */}
               <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{catInfo.icon}</span>
+                  <span className="text-xl">{cat.icon}</span>
                   <h3 className="text-sm sm:text-base font-black text-stone-900">
-                    {catInfo.label}
+                    {cat.label}
                   </h3>
                 </div>
-                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                  {checkedInCat} / {itemsInCat.length}
+                <span className="text-xs font-bold text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200">
+                  {checkedInCat} מתוך {inCat.length}
                 </span>
               </div>
 
               {/* Items Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {itemsInCat.map((item) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {inCat.map((item) => {
                   const isChecked = !!checkedIds[item.id];
+                  const qty = quantities[item.id] || 1;
+
                   return (
                     <div
                       key={item.id}
                       onClick={() => toggleItem(item.id)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-2.5 ${
+                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                         isChecked
-                          ? 'bg-emerald-50/80 border-emerald-400 shadow-xs'
-                          : 'bg-stone-50/50 hover:bg-stone-50 border-stone-200/80 opacity-75'
+                          ? 'bg-emerald-50/90 border-emerald-400 shadow-xs ring-1 ring-emerald-300'
+                          : 'bg-stone-50/40 hover:bg-stone-50 border-stone-200/80 text-stone-700'
                       }`}
                     >
-                      <div className="flex items-start gap-2.5">
-                        <div className="pt-0.5 text-emerald-700">
-                          {isChecked ? (
-                            <CheckSquare className="w-4 h-4 text-emerald-600" />
-                          ) : (
-                            <Square className="w-4 h-4 text-stone-400" />
-                          )}
-                        </div>
-                        <div className="space-y-0.5">
-                          <span
-                            className={`text-xs sm:text-sm font-extrabold block ${
-                              isChecked ? 'text-stone-950' : 'text-stone-700'
-                            }`}
-                          >
-                            {item.name}
-                          </span>
-                          {item.brandOrNote && (
+                      {/* Top row: Checkbox, Name, and Quantity Counter */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                          <div className="pt-0.5 shrink-0">
+                            {isChecked ? (
+                              <CheckSquare className="w-5 h-5 text-emerald-700" />
+                            ) : (
+                              <Square className="w-5 h-5 text-stone-400" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
                             <span
-                              className={`text-[11px] block font-medium ${
-                                isChecked ? 'text-emerald-900 font-semibold' : 'text-stone-500'
+                              className={`text-xs sm:text-sm font-extrabold block leading-tight ${
+                                isChecked ? 'text-stone-950 font-black' : 'text-stone-800'
                               }`}
                             >
-                              🏷️ {item.brandOrNote}
+                              {item.name}
                             </span>
-                          )}
+                          </div>
+                        </div>
+
+                        {/* Quantity Counter [+ 1 -] */}
+                        <div
+                          className="flex items-center gap-1 bg-white border border-stone-300 rounded-xl p-0.5 shrink-0 shadow-2xs"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={(e) => updateQuantity(item.id, -1, e)}
+                            className="w-6 h-6 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold flex items-center justify-center text-xs transition-colors cursor-pointer"
+                            title="הפחת כמות"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-6 text-center text-xs font-black text-stone-900">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              updateQuantity(item.id, 1, e);
+                              if (!isChecked) toggleItem(item.id);
+                            }}
+                            className="w-6 h-6 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center text-xs transition-colors cursor-pointer"
+                            title="הגדל כמות"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
                         </div>
                       </div>
 
-                      {item.category === 'custom' && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveCustomItem(item.id);
-                          }}
-                          className="text-rose-500 hover:text-rose-700 p-1"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                      {/* Brand Note & Warnings */}
+                      {(item.safeBrand || item.warningNote) && (
+                        <div className="space-y-1 text-right text-[11px] pt-1 border-t border-stone-100/80">
+                          {item.safeBrand && (
+                            <div className="text-stone-600 font-medium">
+                              <span className="font-bold text-emerald-800">🏷️ מותג מומלץ:</span> {item.safeBrand}
+                            </div>
+                          )}
+                          {item.warningNote && (
+                            <div className="text-amber-900 bg-amber-50/80 p-1.5 rounded-lg border border-amber-200 text-[10.5px] leading-tight font-semibold">
+                              {item.warningNote}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   );
@@ -550,6 +638,92 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
             </div>
           );
         })}
+
+        {/* Custom Items Section if any */}
+        {customItems.length > 0 && (
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-xs space-y-3 text-right">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
+              <h3 className="text-sm sm:text-base font-black text-stone-900 flex items-center gap-2">
+                <span>✨</span>
+                <span>מוצרים נוספים שהוספת אישית ({customItems.length})</span>
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {customItems.map((item) => {
+                const isChecked = !!checkedIds[item.id];
+                const qty = quantities[item.id] || 1;
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => toggleItem(item.id)}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                      isChecked
+                        ? 'bg-emerald-50 border-emerald-400 shadow-xs'
+                        : 'bg-stone-50 border-stone-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                        <div className="pt-0.5 shrink-0">
+                          {isChecked ? (
+                            <CheckSquare className="w-5 h-5 text-emerald-700" />
+                          ) : (
+                            <Square className="w-5 h-5 text-stone-400" />
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-xs sm:text-sm font-black text-stone-900 block">
+                            {item.name}
+                          </span>
+                          {item.safeBrand && (
+                            <span className="text-[11px] text-stone-500 block">
+                              🏷️ {item.safeBrand}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="flex items-center gap-1 bg-white border border-stone-300 rounded-xl p-0.5 shadow-2xs"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={(e) => updateQuantity(item.id, -1, e)}
+                            className="w-6 h-6 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold flex items-center justify-center text-xs"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-6 text-center text-xs font-black text-stone-900">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => updateQuantity(item.id, 1, e)}
+                            className="w-6 h-6 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center text-xs"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => handleRemoveCustomItem(item.id, e)}
+                          className="p-1.5 text-rose-500 hover:text-rose-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
