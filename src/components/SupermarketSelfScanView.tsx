@@ -135,47 +135,47 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {/* Button 1: 📸 צלם */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-1">
+            {/* Button 1: 📸 צלם רשימת מרכיבים */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-amber-500/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-2 group"
+              className="p-3 sm:p-4 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-amber-500/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-                <Camera className="w-6 h-6" />
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <h4 className="text-base sm:text-lg font-black tracking-tight text-stone-900">
-                  צלם 📸
+              <div className="w-full">
+                <h4 className="text-xs sm:text-base font-black tracking-tight text-stone-900 leading-tight">
+                  צלם רשימת מרכיבים 📸
                 </h4>
-                <p className="text-xs font-semibold text-stone-600">
-                  צילום רשימת רכיבים / מאכל
+                <p className="text-[10px] sm:text-xs font-semibold text-stone-600 mt-0.5 line-clamp-1">
+                  צילום תווית / גב אריזה
                 </p>
               </div>
-              <span className="text-[10px] font-extrabold bg-amber-100 text-amber-950 px-2 py-0.5 rounded-full">
-                ניתוח AI מיידי
+              <span className="text-[9px] sm:text-[10px] font-extrabold bg-amber-100 text-amber-950 px-2 py-0.5 rounded-full">
+                ניתוח רכיבים מיידי
               </span>
             </button>
 
-            {/* Button 2: 🏷️ סרוק */}
+            {/* Button 2: 🏷️ סרוק ברקוד */}
             <button
               type="button"
               onClick={() => setActiveScanMode('barcode')}
-              className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-emerald-700/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-2 group"
+              className="p-3 sm:p-4 rounded-2xl bg-white hover:bg-stone-100/80 text-stone-900 border-2 border-emerald-700/80 shadow-xs hover:shadow-sm transition-all cursor-pointer transform active:scale-98 flex flex-col items-center justify-center text-center gap-1.5 group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-                <Barcode className="w-6 h-6" />
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                <Barcode className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <h4 className="text-base sm:text-lg font-black tracking-tight text-stone-900">
-                  סרוק 🏷️
+              <div className="w-full">
+                <h4 className="text-xs sm:text-base font-black tracking-tight text-stone-900 leading-tight">
+                  סרוק ברקוד 🏷️
                 </h4>
-                <p className="text-xs font-semibold text-stone-600">
-                  סריקת ברקוד ישראלי חי
+                <p className="text-[10px] sm:text-xs font-semibold text-stone-600 mt-0.5 line-clamp-1">
+                  סריקה חיה של ברקוד
                 </p>
               </div>
-              <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-950 px-2 py-0.5 rounded-full">
+              <span className="text-[9px] sm:text-[10px] font-extrabold bg-emerald-100 text-emerald-950 px-2 py-0.5 rounded-full">
                 מאגר סופרמרקטים
               </span>
             </button>
