@@ -5,6 +5,12 @@
  */
 export function normalizeHebrew(str: string): string {
   if (!str) return '';
+  // Normalize known typos and common misspellings in Hebrew food terms
+  str = (str || '')
+    .replace(/קווטקר|קווקר|קואקר/gi, 'קוואקר')
+    .replace(/תפוציפס|תפוצ'יפס|תפוציפ'ס/gi, "תפוצ'יפס")
+    .replace(/שבולת/gi, 'שיבולת');
+
   return str
     .toLowerCase()
     // Replace Hebrew Geresh, Gershayim, ASCII single/double quotes, typographic quotes with empty string

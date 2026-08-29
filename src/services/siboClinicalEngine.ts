@@ -475,6 +475,131 @@ export function analyzeIngredientsList(
 
 // Extensive dictionary of clinical SIBO dietary rules
 const CLINICAL_SIBO_RULES: ClinicalRule[] = [
+  // --- תפוצ'יפס בטעמים מתובלים (שמנת בצל / ברביקיו / מקסיקני) - RED לניר ---
+  {
+    keywords: [
+      "תפוצ'יפס שמנת בצל",
+      "תפוצ'יפס בצל",
+      "תפוצ'יפס ברביקיו",
+      "תפוצ'יפס מקסיקני",
+      "תפוציפס שמנת בצל",
+      "תפוציפס ברביקיו",
+      "תפוצ'יפס פפריקה",
+      "תפוצ'יפס חריף",
+      "תפוצ׳יפס שמנת בצל",
+      "תפוצ׳יפס ברביקיו"
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'RED',
+    foodNameHe: 'תפוצ׳יפס בטעמים (שמנת בצל / ברביקיו / מקסיקני)',
+    foodNameEn: 'Flavored Tapuchips (Onion / BBQ / Mexican)',
+    verdictHe: 'אור אדום! תפוצ׳יפס בטעמים אסור לניר (מכיל אבקת בצל, אבקת שום ולקטוז). 🔴',
+    explanationHe: 'בניגוד לתפוצ׳יפס טבעי, חטיפי תפוצ׳יפס בטעמים מתובלים כוללים אבקת בצל יבש, אבקת שום, סוכרים מוספים ומוצקי חלב/שמנת (לקטוז). רכיבים אלו עשירים מאוד בפרוקטנים ומתסיסים את חיידקי ה-SIBO במעי הדק.',
+    fodmapTriggers: ['אבקת בצל (פרוקטנים)', 'אבקת שום', 'סוכר ולקטוז'],
+    maxSafePortionHe: '0 גרם (אסור)',
+    safeSubstitutions: [
+      '🥔 תפוצ׳יפס קלאסי בטעם טבעי (מלח בלבד) — מותר וירוק!',
+      '🍿 פופקורן טבעי במלח ים',
+      '🌽 נאצ׳וס/דוריטוס טבעי במלח בלבד'
+    ],
+    cookingTips: ['להעדיף תמיד תפוצ׳יפס טבעי קלאסי (שקית אדומה רגילה ללא תבליני בצל ושום)'],
+    riskScore: 5,
+  },
+  // --- תפוצ'יפס טבעי / קלאסי מלח (עלית / שטראוס) - GREEN לניר ---
+  {
+    keywords: [
+      "תפוצ'יפס טבעי",
+      "תפוצ'יפס בטעם טבעי",
+      "תפוצ'יפס קלאסי",
+      "תפוצ'יפס מלח",
+      "תפוצ'יפס גלים",
+      "תפוצ'יפס xtra",
+      "תפוצ'יפס אקסטרה",
+      "תפוצ'יפס שטראוס",
+      "תפוצ'יפס עלית",
+      "תפוצ'יפס",
+      "תפוציפס",
+      "תפוציפ'ס",
+      "תפוצ׳יפס",
+      "תפוצ׳יפס קלאסי",
+      "תפוצ׳יפס טבעי",
+      "tapuchips",
+      "ציפס תפוח אדמה מלח"
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'תפוצ׳יפס קלאסי בטעם טבעי (מלח בלבד) עלית שטראוס',
+    foodNameEn: 'Tapuchips Classic Salt (Strauss Elite)',
+    verdictHe: 'אור ירוק! תפוצ׳יפס בטעם טבעי (מלח) מתאים ובטוח לניר בסיבו. 🟢',
+    explanationHe: 'תפוצ׳יפס קלאסי בטעם טבעי (כולל גרסאות גלים ו-XTRA מלח) מיוצר מ-3 רכיבים בלבד: תפוחי אדמה, שמן צמחי ומלח ים. הוא 100% ללא שום, ללא בצל, ללא גלוטן, ללא לקטוז וללא סוכרים מוספים, ונחשב דל FODMAP לחלוטין! שימי לב: גרסאות עם תבלינים כמו "שמנת בצל", "ברביקיו" או "מקסיקני" מכילות אבקת בצל ושום ואסורות. מומלץ לצרוך מנה סבירה (שקית אישית עד 50 גרם) בגלל השמן.',
+    fodmapTriggers: ['0 שום', '0 בצל', '0 גלוטן', '0 לקטוז (דל FODMAP לחלוטין)'],
+    maxSafePortionHe: 'שקית אישית עד 50 גרם',
+    safeSubstitutions: [
+      '🥔 תפוצ׳יפס קלאסי / גלים מלח טבעי',
+      '🌽 פריכיות אורז מלא או פריכיות תירס',
+      '🍿 פופקורן טבעי עם מלח ושמן'
+    ],
+    cookingTips: ['לוודא שקונים תפוצ׳יפס בטעם טבעי (מלח) בלבד ולא בטעמי שמנת-בצל/ברביקיו המכילים שום ובצל'],
+    riskScore: 1,
+  },
+  // --- שיבולת שועל / קוואקר (הרדוף אורגני, סוגת, קוואקר, תבואות, שופרסל גרין) ---
+  {
+    keywords: [
+      'קוואקר',
+      'קווטקר',
+      'קווקר',
+      'קואקר',
+      'שיבולת שועל',
+      'שבולת שועל',
+      'פתיתי שיבולת שועל',
+      'דייסת קוואקר',
+      'דייסת שיבולת שועל',
+      'שיבולת שועל להכנה מהירה',
+      'קוואקר להכנה מהירה',
+      'קוואקר עדין',
+      'קוואקר עבה',
+      'קוואקר דק',
+      'קוואקר אורגני',
+      'הרדוף קוואקר',
+      'הרדוף שיבולת שועל',
+      'קוואקר הרדוף',
+      'שיבולת שועל הרדוף',
+      'קוואקר עדין אורגני',
+      'קוואקר עדין אורגני הרדוף',
+      'קוואקר עדין אורגני של הרדוף',
+      'סובין שיבולת שועל',
+      'קוואקר אינסטנט',
+      'שיבולת שועל דקה',
+      'שיבולת שועל עבה',
+      'הרדוף',
+      'oats',
+      'rolled oats',
+      'quick oats',
+      'quaker',
+      'oatmeal',
+      'harduf oats'
+    ],
+    statusPhase1: 'YELLOW',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'שיבולת שועל / קוואקר (הרדוף אורגני / סוגת / Quaker)',
+    foodNameEn: 'Rolled Oats / Quick Oats (Harduf Organic / Quaker)',
+    verdictHe: 'אור צהוב! קוואקר/שיבולת שועל מותר לניר אך ורק במנה מדודה של עד 23 גרם (כ-2 כפות שטוחות). 🟡',
+    explanationHe: 'שיבולת שועל (קוואקר, כולל קוואקר עדין אורגני של הרדוף ושיבולת שועל להכנה מהירה) מכילה שרשראות פרוקטנים (Fructans) וגלקטו-אוליגוסכרידים (GOS). לפי פרוטוקול ד"ר אליסון סיבקר (SSFG) ומחקרי אוניברסיטת מונאש: בשלב 1 קפדני מותרת מנה מדודה בלבד של עד 23 גרם (כ-2 כפות שטוחות יבשות) להכנת דייסה קלה על בסיס מים או חלב שקדים ללא סוכר. מנה רגילה גדולה (מעל 23-30 גרם) עשירה בפרוקטנים שמתסיסים את חיידקי ה-SIBO במעי הדק ועלולה לגרום לנפיחות וגזים. בשלב 2 (שילוב מחדש) ניתן להעלות בהדרגה את המנה עד 45-52 גרם (כחצי כוס).',
+    fodmapTriggers: ['פרוקטנים (Fructans)', 'גלקטנים (GOS) בכמות מעל 23 גרם'],
+    maxSafePortionHe: 'עד 23 גרם (כ-2 כפות שטוחות יבשות) בשלב 1 / עד 50 גרם בשלב 2',
+    safeSubstitutions: [
+      '🍚 דייסת אורז לבן מבושל או פודינג אורז קל (0 פרוקטנים)',
+      '🌾 דייסת קינואה עדינה מבושלת היטב בחלב שקדים',
+      '🥣 פריכיות אורז מלא במתינות',
+      '🥑 ביצים מקושקשות עם עשבי תיבול ותרד לארוחת בוקר מושלמת'
+    ],
+    cookingTips: [
+      'להכין עם מים רותחים או חלב שקדים ללא סוכר במקום חלב פרה רגיל',
+      'מומלץ להשרות 10 דקות במים חמים לפני האכילה כדי להקל על תהליך העיכול',
+      'למתק עם מעט תותים טריים או חצי בננה ירוקה במקום סוכר או סילאן'
+    ],
+    riskScore: 2,
+  },
   // --- קצפת צמחית / קצפת פרווה (ריץ' / השף הלבן צמחית / אלפרו) - GREEN לניר ---
   {
     keywords: [
@@ -1528,15 +1653,37 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     };
   }
 
-  // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES
+  // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES (Precision-ranked)
+  // Check exact token coverage: if a rule has specific modifiers (e.g. 'שמנת בצל'), 
+  // the query MUST contain those modifiers!
+  const normQuery = normalizeHebrew(query);
+  const normClean = normalizeHebrew(cleanName);
+
   for (const rule of CLINICAL_SIBO_RULES) {
-    const matchedKeyword = rule.keywords.find(
-      (kw) =>
-        fuzzyHebrewMatch(cleanName, kw) ||
-        fuzzyHebrewMatch(kw, cleanName) ||
-        fuzzyHebrewMatch(query, kw) ||
-        fuzzyHebrewMatch(kw, query)
-    );
+    const matchedKeyword = rule.keywords.find((kw) => {
+      const normKw = normalizeHebrew(kw);
+      if (!normKw) return false;
+
+      // 1. Exact match
+      if (normKw === normQuery || normKw === normClean) return true;
+
+      // 2. Query contains the entire keyword (e.g. user typed "איפה יש תפוצ'יפס שמנת בצל" -> matches "תפוצ'יפס שמנת בצל")
+      if (normQuery.includes(normKw) || normClean.includes(normKw)) return true;
+
+      // 3. If keyword is multi-word, ALL keyword words must exist in query
+      const kwTokens = normKw.split(' ').filter(t => t.length > 0);
+      if (kwTokens.length > 1) {
+        const allKwInQuery = kwTokens.every(t => normQuery.includes(t) || normClean.includes(t));
+        if (allKwInQuery) return true;
+      }
+
+      // 4. If keyword is single word (e.g. "קוואקר"), query must contain that token
+      if (kwTokens.length === 1 && (normQuery.includes(kwTokens[0]) || normClean.includes(kwTokens[0]))) {
+        return true;
+      }
+
+      return false;
+    });
     if (matchedKeyword) {
       const status = isPhase1 ? rule.statusPhase1 : rule.statusPhase2;
       return {
