@@ -29,6 +29,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { optimizeImageForOcr } from '../utils/imageUtils';
+import { CategoryCarousel, CategoryCarouselItem } from './CategoryCarousel';
 
 interface HungerRescueWizardProps {
   currentPhase: SiboPhase;
@@ -1318,6 +1319,30 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
     };
   }, [chefResult?.suggestedMeals]);
 
+  // Carousel category items
+  const mealCategoryItems: CategoryCarouselItem[] = useMemo(() => {
+    return [
+      { id: 'meat', label: 'בשר ושיפודים', icon: '🍗', count: categoryCounts.meat },
+      { id: 'fish', label: 'דגי ים וסלמון', icon: '🐟', count: categoryCounts.fish },
+      { id: 'bowls', label: 'קומפיר וזודלס', icon: '🥔', count: categoryCounts.bowls },
+      { id: 'wraps', label: 'דפי אורז ולאפה', icon: '🌯', count: categoryCounts.wraps },
+      { id: 'sweet', label: 'סניקרס ומתוקים', icon: '🍫', count: categoryCounts.sweet },
+      { id: 'cheese', label: 'גבינות 0% לקטוז', icon: '🧀', count: categoryCounts.cheese },
+      { id: 'eggs', label: 'ביצים מיוחדות', icon: '🍳', count: categoryCounts.eggs },
+    ];
+  }, [categoryCounts]);
+
+  // Carousel scenario items for location carousel
+  const scenarioItems: CategoryCarouselItem[] = useMemo(() => {
+    return [
+      { id: 'home', label: 'בבית / במטבח', icon: '🏠', count: 35 },
+      { id: 'driving', label: 'בנסיעה / Yellow', icon: '🚗', count: 8 },
+      { id: 'supermarket', label: 'סופרמרקט', icon: '🛒', count: 8 },
+      { id: 'restaurant', label: 'מסעדה / וולט', icon: '🏢', count: 6 },
+      { id: 'gps', label: 'איתור GPS', icon: '📍' },
+    ];
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -1508,106 +1533,36 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
               </button>
             </div>
 
-            {/* Quick Inspiration Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 pt-0.5 text-xs">
-              <span className="text-[11px] font-bold text-stone-400 shrink-0">השראה מהירה:</span>
-              {quickPillPrompts.map((pill, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleExecuteUniversalQuery(pill.text)}
-                  className="px-2.5 py-1 rounded-lg bg-white hover:bg-emerald-100 hover:text-emerald-900 text-stone-700 font-bold transition-all shrink-0 cursor-pointer text-[11px] border border-stone-200/80 shadow-2xs active:scale-95"
-                >
-                  {pill.label}
-                </button>
-              ))}
+            {/* 🎠 Interactive Carousel for Food Categories */}
+            <div className="pt-0.5">
+              <CategoryCarousel
+                items={mealCategoryItems}
+                selectedId={selectedCategory}
+                onSelect={(id) => setSelectedCategory(id as MealCategory)}
+                title="סוג מנה:"
+                showAllOption={true}
+                allLabel="כל המנות"
+                allIcon="🌟"
+                allCount={categoryCounts.all}
+                theme="emerald"
+              />
             </div>
 
-            {/* Quick Location & Mode Filter Buttons */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 border-t border-emerald-200/50">
-              <button
-                type="button"
-                onClick={() => handleSelectScenario('home')}
-                className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'home'
-                    ? 'bg-emerald-700 text-white shadow-xs'
-                    : 'bg-white hover:bg-emerald-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>🏠 בבית / במטבח</span>
-                <span className="text-[10px] bg-black/10 px-1.5 py-0.2 rounded-full">35+</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectScenario('driving')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'driving'
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-white hover:bg-amber-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>🚗 בנסיעה / Yellow</span>
-                <span className="text-[10px] bg-black/10 px-1.5 py-0.2 rounded-full">8+</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectScenario('supermarket')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'supermarket'
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-white hover:bg-indigo-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>🛒 סופר / מכולת</span>
-                <span className="text-[10px] bg-black/10 px-1.5 py-0.2 rounded-full">8+</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectScenario('restaurant')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'restaurant'
-                    ? 'bg-teal-700 text-white shadow-xs'
-                    : 'bg-white hover:bg-teal-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>🏢 מסעדה / וולט</span>
-                <span className="text-[10px] bg-black/10 px-1.5 py-0.2 rounded-full">6+</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveScenario('camera');
-                  cameraInputRef.current?.click();
-                }}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'camera'
-                    ? 'bg-amber-500 text-stone-950 font-black shadow-xs'
-                    : 'bg-white hover:bg-amber-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>📸 צלמי מקרר</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectScenario('gps')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs flex items-center gap-1.5 ${
-                  activeScenario === 'gps'
-                    ? 'bg-rose-600 text-white shadow-xs'
-                    : 'bg-white hover:bg-rose-50 text-stone-700 border border-stone-200'
-                }`}
-              >
-                <span>📍 איתור GPS</span>
-              </button>
+            {/* 🎠 Location & Scenarios Carousel */}
+            <div className="pt-0.5 border-t border-emerald-200/60">
+              <CategoryCarousel
+                items={scenarioItems}
+                selectedId={activeScenario || 'home'}
+                onSelect={(id) => handleSelectScenario(id as ScenarioType)}
+                title="מיקום ותרחיש:"
+                showAllOption={false}
+                theme="teal"
+              />
             </div>
           </div>
 
           {/* Unified Scrollable Results Display */}
-          <div className="space-y-4 animate-fadeIn">
+          <div className="space-y-3.5 animate-fadeIn">
             {/* Loading Spinner */}
             {isLoadingChef && (
               <div className="py-4 text-center space-y-2 bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-xs">
@@ -1624,313 +1579,165 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
             )}
 
             {/* GPS Screen Content */}
-              {activeScenario === 'gps' && !isLoadingChef && (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50 to-amber-50 border-2 border-rose-200 space-y-3 text-right">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center font-black">
-                        📍
-                      </div>
-                      <div>
-                        <h4 className="text-sm sm:text-base font-black text-rose-950">
-                          איתור אוכל בטוח סביבך ב-Google Maps
-                        </h4>
-                        <p className="text-xs text-stone-700 font-medium">
-                          לחיצה על הכפתור תפתח ישירות מקומות קרובים עם אוכל מתאים ל-SIBO:
-                        </p>
-                      </div>
+            {activeScenario === 'gps' && !isLoadingChef && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50 to-amber-50 border-2 border-rose-200 space-y-3 text-right">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center font-black">
+                      📍
                     </div>
-
-                    {isLoadingGps && (
-                      <div className="flex items-center gap-2 text-xs text-stone-600 font-bold py-1.5">
-                        <Loader2 className="w-4 h-4 animate-spin text-rose-600" />
-                        <span>דוגם את המיקום שלך...</span>
-                      </div>
-                    )}
-
-                    {gpsError && (
-                      <div className="text-xs text-rose-700 bg-rose-100 p-2.5 rounded-xl font-bold">
-                        {gpsError}
-                      </div>
-                    )}
-
-                    {/* Google Maps Action Links */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                      <a
-                        href={
-                          gpsCoords
-                            ? `https://www.google.com/maps/search/סופרמרקט/@${gpsCoords.lat},${gpsCoords.lng},15z`
-                            : `https://www.google.com/maps/search/סופרמרקט/`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="py-2.5 px-3 bg-white hover:bg-emerald-50 text-stone-900 font-black text-xs rounded-xl border-2 border-emerald-400 shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 text-center"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-emerald-600" />
-                        <span>🛒 סופרמרקטים קרובים</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
-                      </a>
-
-                      <a
-                        href={
-                          gpsCoords
-                            ? `https://www.google.com/maps/search/שיפודיה+בשרים+על+האש/@${gpsCoords.lat},${gpsCoords.lng},15z`
-                            : `https://www.google.com/maps/search/שיפודיה+בשרים+על+האש/`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="py-2.5 px-3 bg-white hover:bg-rose-50 text-stone-900 font-black text-xs rounded-xl border-2 border-rose-400 shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 text-center"
-                      >
-                        <UtensilsCrossed className="w-4 h-4 text-rose-600" />
-                        <span>🥩 שיפודיות ובשרים על האש</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
-                      </a>
+                    <div>
+                      <h4 className="text-sm sm:text-base font-black text-rose-950">
+                        איתור אוכל בטוח סביבך ב-Google Maps
+                      </h4>
+                      <p className="text-xs text-stone-700 font-medium">
+                        לחיצה על הכפתור תפתח ישירות מקומות קרובים עם אוכל מתאים ל-SIBO:
+                      </p>
                     </div>
                   </div>
 
-                  {/* Waiter Assistant Card */}
-                  <div className="p-4 rounded-2xl bg-white border border-stone-200 space-y-2.5">
+                  {isLoadingGps && (
+                    <div className="flex items-center gap-2 text-xs text-stone-600 font-bold py-1.5">
+                      <Loader2 className="w-4 h-4 animate-spin text-rose-600" />
+                      <span>דוגם את המיקום שלך...</span>
+                    </div>
+                  )}
+
+                  {gpsError && (
+                    <div className="text-xs text-rose-700 bg-rose-100 p-2.5 rounded-xl font-bold">
+                      {gpsError}
+                    </div>
+                  )}
+
+                  {/* Google Maps Action Links */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    <a
+                      href={
+                        gpsCoords
+                          ? `https://www.google.com/maps/search/סופרמרקט/@${gpsCoords.lat},${gpsCoords.lng},15z`
+                          : `https://www.google.com/maps/search/סופרמרקט/`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-2.5 px-3 bg-white hover:bg-emerald-50 text-stone-900 font-black text-xs rounded-xl border-2 border-emerald-400 shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 text-center"
+                    >
+                      <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                      <span>🛒 סופרמרקטים קרובים</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+                    </a>
+
+                    <a
+                      href={
+                        gpsCoords
+                          ? `https://www.google.com/maps/search/שיפודיה+בשרים+על+האש/@${gpsCoords.lat},${gpsCoords.lng},15z`
+                          : `https://www.google.com/maps/search/שיפודיה+בשרים+על+האש/`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-2.5 px-3 bg-white hover:bg-rose-50 text-stone-900 font-black text-xs rounded-xl border-2 border-rose-400 shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 text-center"
+                    >
+                      <UtensilsCrossed className="w-4 h-4 text-rose-600" />
+                      <span>🥩 שיפודיות ובשרים על האש</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Waiter Assistant Card */}
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs sm:text-sm font-black text-stone-900 flex items-center gap-2">
+                      <span>📋 כרטיס הזמנה חכם למלצר / קופאי:</span>
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={copyWaiterScript}
+                      className="text-xs font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedText ? 'הועתק!' : 'העתקי טקסט'}</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-stone-800 bg-stone-50 p-3 rounded-xl border border-stone-200 whitespace-pre-line leading-relaxed font-mono font-medium">
+                    {waiterScript}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Chef Result Meals Display */}
+            {chefResult && (
+              <div className="space-y-3.5 animate-fadeIn">
+                {/* Safety Alert Warnings (if dangerous items were asked) */}
+                {chefResult.cautionWarnings && chefResult.cautionWarnings.length > 0 && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border-2 border-rose-300 space-y-1.5 text-right">
+                    <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
+                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>דגשי בטיחות והחלפות קריטיות:</span>
+                    </div>
+                    <ul className="space-y-1 text-xs text-rose-900 font-medium">
+                      {chefResult.cautionWarnings.map((warn, wIdx) => (
+                        <li key={wIdx} className="leading-relaxed">{warn}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Photo Preview if camera used */}
+                {stagedPhoto && (
+                  <div className="rounded-2xl overflow-hidden border-2 border-amber-300 max-h-40 relative">
+                    <img src={stagedPhoto} alt="מקרר" className="w-full h-full object-cover" />
+                    <div className="absolute bottom-2 right-2 bg-stone-950/80 text-white text-[11px] font-black px-2.5 py-1 rounded-lg backdrop-blur-xs">
+                      📸 התמונה נסרקה בהצלחה
+                    </div>
+                  </div>
+                )}
+
+                {/* Restaurant Order Script (if in restaurant mode) */}
+                {activeScenario === 'restaurant' && (
+                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 space-y-2 text-right">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs sm:text-sm font-black text-stone-900 flex items-center gap-2">
-                        <span>📋 כרטיס הזמנה חכם למלצר / קופאי:</span>
+                      <h4 className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                        <span>📋 כרטיס הזמנה חכם למלצר / משלוח:</span>
                       </h4>
                       <button
                         type="button"
                         onClick={copyWaiterScript}
-                        className="text-xs font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="text-[11px] font-black text-amber-900 bg-amber-200 hover:bg-amber-300 px-3 py-1 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedText ? 'הועתק!' : 'העתקי טקסט'}</span>
                       </button>
                     </div>
-                    <p className="text-xs text-stone-800 bg-stone-50 p-3 rounded-xl border border-stone-200 whitespace-pre-line leading-relaxed font-mono font-medium">
+                    <p className="text-[11px] text-stone-800 bg-white p-3 rounded-xl border border-amber-200 whitespace-pre-line leading-relaxed font-mono">
                       {waiterScript}
                     </p>
                   </div>
+                )}
+
+                {/* 🔀 Full-Width Prominent Meal Shuffle Button (User Request: גדל והבלט לכל רוחב המסך) */}
+                <button
+                  type="button"
+                  onClick={handleShuffleMeals}
+                  className="w-full py-3.5 sm:py-4 px-5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-stone-950 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg border-2 border-amber-300 ring-2 ring-amber-400/30 transition-all cursor-pointer active:scale-98 group"
+                  title="סחרר את רשימת הארוחות והצג רעיונות חדשים ומגוונים"
+                >
+                  <RefreshCw className="w-5 h-5 text-stone-950 group-hover:rotate-180 transition-transform duration-500 shrink-0" />
+                  <span>🔀 סחרר הצעות חדשות! (הצג עוד רעיונות מגוונים) ✨</span>
+                </button>
+
+                {/* Results Count Bar */}
+                <div className="flex items-center justify-between px-1 text-stone-700">
+                  <span className="text-xs sm:text-sm font-black flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-amber-600" />
+                    <span>ארוחות שובע שנבחרו עבורך ({displayedMeals.length}):</span>
+                  </span>
+                  <span className="text-[11px] text-stone-400 font-bold">
+                    לחצי על מצרך כדי לסמן אם יש לך
+                  </span>
                 </div>
-              )}
 
-              {/* Chef Result Meals Display */}
-              {chefResult && (
-                <div className="space-y-4 animate-fadeIn">
-                  {/* Soothing message banner */}
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-100 via-teal-100 to-amber-100 border border-emerald-300 shadow-xs flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 text-base font-black shadow-xs">
-                      💚
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4 className="text-xs sm:text-sm font-black text-emerald-950">
-                        {chefResult.scenarioTitle}
-                      </h4>
-                      <p className="text-xs text-emerald-900 font-bold leading-relaxed">
-                        {chefResult.calmMessage}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Safety Alert Warnings (if dangerous items were asked) */}
-                  {chefResult.cautionWarnings && chefResult.cautionWarnings.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-rose-50 border-2 border-rose-300 space-y-1.5 text-right">
-                      <div className="flex items-center gap-2 text-rose-950 font-black text-xs">
-                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                        <span>דגשי בטיחות והחלפות קריטיות:</span>
-                      </div>
-                      <ul className="space-y-1 text-xs text-rose-900 font-medium">
-                        {chefResult.cautionWarnings.map((warn, wIdx) => (
-                          <li key={wIdx} className="leading-relaxed">{warn}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Photo Preview if camera used */}
-                  {stagedPhoto && (
-                    <div className="rounded-2xl overflow-hidden border-2 border-amber-300 max-h-40 relative">
-                      <img src={stagedPhoto} alt="מקרר" className="w-full h-full object-cover" />
-                      <div className="absolute bottom-2 right-2 bg-stone-950/80 text-white text-[11px] font-black px-2.5 py-1 rounded-lg backdrop-blur-xs">
-                        📸 התמונה נסרקה בהצלחה
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Search and Rich Multi-Category Filter Toolbar */}
-                  <div className="space-y-2 bg-white p-3 rounded-2xl border border-stone-200 shadow-2xs">
-                    {/* Live In-Modal Search Input */}
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={mealSearchQuery}
-                        onChange={(e) => setMealSearchQuery(e.target.value)}
-                        placeholder="חפשי כל מצרך (פרגית, בקר, דניס, תפו&quot;א, לאפה, פנקייק, סניקרס, צ׳יה, גבינה)..."
-                        className="w-full pl-9 pr-9 py-2 bg-stone-50 border border-stone-200 focus:border-emerald-500 focus:bg-white rounded-xl text-xs sm:text-sm font-semibold outline-none transition-all"
-                      />
-                      <Search className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2" />
-                      {mealSearchQuery && (
-                        <button
-                          type="button"
-                          onClick={() => setMealSearchQuery('')}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-xs font-bold bg-stone-200 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Rich Category Filter Pills */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedCategory('all')}
-                        className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer text-xs ${
-                          selectedCategory === 'all'
-                            ? 'bg-emerald-700 text-white shadow-xs'
-                            : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                        }`}
-                      >
-                        🌟 הכל ({categoryCounts.all})
-                      </button>
-
-                      {categoryCounts.meat > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('meat')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'meat'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🍗 בשר, פרגית ושיפודים ({categoryCounts.meat})
-                        </button>
-                      )}
-
-                      {categoryCounts.fish > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('fish')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'fish'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🐟 דגי ים וסלמון ({categoryCounts.fish})
-                        </button>
-                      )}
-
-                      {categoryCounts.bowls > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('bowls')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'bowls'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🥔 קומפיר, זודלס ומרק ({categoryCounts.bowls})
-                        </button>
-                      )}
-
-                      {categoryCounts.wraps > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('wraps')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'wraps'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🌯 דפי אורז, פנקייק ומאפים ({categoryCounts.wraps})
-                        </button>
-                      )}
-
-                      {categoryCounts.sweet > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('sweet')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'sweet'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🍫 סניקרס, צ׳יה ושוקולד ({categoryCounts.sweet})
-                        </button>
-                      )}
-
-                      {categoryCounts.cheese > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('cheese')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'cheese'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🧀 פלטות גבינה 0% לקטוז ({categoryCounts.cheese})
-                        </button>
-                      )}
-
-                      {categoryCounts.eggs > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory('eggs')}
-                          className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs ${
-                            selectedCategory === 'eggs'
-                              ? 'bg-emerald-700 text-white shadow-xs'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                          }`}
-                        >
-                          🍳 ביצים מיוחדות ({categoryCounts.eggs})
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Restaurant Order Script (if in restaurant mode) */}
-                  {activeScenario === 'restaurant' && (
-                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 space-y-2 text-right">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-black text-amber-950 flex items-center gap-1.5">
-                          <span>📋 כרטיס הזמנה חכם למלצר / משלוח:</span>
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={copyWaiterScript}
-                          className="text-[11px] font-black text-amber-900 bg-amber-200 hover:bg-amber-300 px-3 py-1 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-                        >
-                          {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5" />}
-                          <span>{copiedText ? 'הועתק!' : 'העתקי טקסט'}</span>
-                        </button>
-                      </div>
-                      <p className="text-[11px] text-stone-800 bg-white p-3 rounded-xl border border-amber-200 whitespace-pre-line leading-relaxed font-mono">
-                        {waiterScript}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Meal Cards List */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <h4 className="text-xs sm:text-sm font-black text-stone-800 flex items-center gap-1.5">
-                        <Zap className="w-4 h-4 text-amber-600" />
-                        <span>ארוחות שובע שנבחרו עבורך ({displayedMeals.length}):</span>
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={handleShuffleMeals}
-                        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-2xs border border-amber-300 transition-all cursor-pointer active:scale-95 hover:shadow-xs"
-                        title="סחרר את רשימת הארוחות והצג רעיונות חדשים ומגוונים"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5 text-amber-700" />
-                        <span>🔀 סחרר הצעות (הצג חדשות)</span>
-                      </button>
-                    </div>
-
-                    {displayedMeals.length === 0 ? (
+                {displayedMeals.length === 0 ? (
                       <div className="text-center py-8 bg-white rounded-2xl border border-stone-200 space-y-2">
                         <div className="text-3xl">🍲</div>
                         <h5 className="text-sm font-bold text-stone-800">לא נמצאו אופציות תואמות לסינון</h5>
@@ -2022,7 +1829,6 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
                         ))}
                       </div>
                     )}
-                  </div>
 
                   {/* Master Chef Recipe Book Banner */}
                   {onOpenMealSuggestions && (
