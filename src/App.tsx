@@ -301,14 +301,7 @@ export default function App() {
                   setResetCounter((c) => c + 1);
                 }}
                 onOpenShoppingList={() => setIsShoppingListExpanded(true)}
-                onOpenHungerWizard={() => {
-                  setInitialFridgePhoto(null);
-                  setIsHungerWizardOpen(true);
-                }}
-                onOpenHungerWizardWithPhoto={(photo) => {
-                  setInitialFridgePhoto(photo);
-                  setIsHungerWizardOpen(true);
-                }}
+                onOpenHungerWizard={() => setIsHungerWizardOpen(true)}
               />
             )}
           </div>
@@ -505,25 +498,53 @@ export default function App() {
               </p>
             </div>
 
-            {/* Quick Action Links */}
-            <div className="flex items-center gap-2 flex-wrap justify-center">
+            {/* Quick Action Links & Compact Phase Selector */}
+            <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
+              {/* Ultra-compact Phase Toggle */}
+              <div className="inline-flex items-center gap-1 bg-white/90 p-1 rounded-xl border border-stone-300 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => handlePhaseChange('phase1_strict')}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer ${
+                    currentPhase === 'phase1_strict'
+                      ? 'bg-emerald-800 text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                  title="שלב 1: קפדני (הרעבת חיידקים)"
+                >
+                  🛡️ שלב 1: קפדני
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePhaseChange('phase2_semi')}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer ${
+                    currentPhase === 'phase2_semi'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                  title="שלב 2: שילוב מחדש (רגיל)"
+                >
+                  🌱 שלב 2: רגיל
+                </button>
+              </div>
+
               <a
                 href="https://api.whatsapp.com/send?phone=972543200007&text=%D7%94%D7%99%D7%99%20%D7%97%D7%92%D7%99%2C%20%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A9%D7%90%D7%9C%D7%94%2F%D7%93%D7%99%D7%95%D7%95%D7%97%20%D7%A2%D7%9C%20%D7%91%D7%90%D7%92%20%D7%91%D7%A1%D7%95%D7%A8%D7%A7%20SIBO"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
-                <span>דיווח בוואטסאפ (054-3200007)</span>
+                <span>דיווח בוואטסאפ</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => setIsInstallShareOpen(true)}
-                className="px-3.5 py-2 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all"
+                className="px-2.5 py-1.5 bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 rounded-xl font-bold text-xs flex items-center gap-1 transition-all"
               >
                 <Smartphone className="w-3.5 h-3.5 text-teal-600" />
-                <span>התקנה בטלפון 📲</span>
+                <span>התקנה 📲</span>
               </button>
             </div>
           </div>

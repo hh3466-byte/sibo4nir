@@ -19,6 +19,7 @@ import {
   MicOff,
   Cookie,
   Zap,
+  RefreshCw,
 } from 'lucide-react';
 import { SiboRecipe, SIBO_MEAL_SUGGESTIONS, findMatchingRecipes } from '../data/siboMealSuggestions';
 import { SiboPhase } from '../types';
@@ -91,6 +92,14 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Dynamic Shuffling seed so recipes rotate dynamically
+  const [shuffleSeed, setShuffleSeed] = useState<number>(() => Math.floor(Math.random() * 100));
+
+  const handleShuffleRecipes = () => {
+    setShuffleSeed((s) => s + 1);
+    setSelectedRecipe(null);
+  };
+
   // Synchronize initial query and recipe ID when modal opens
   useEffect(() => {
     if (!isOpen) {
@@ -101,6 +110,8 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
       setSpeechError(null);
       return;
     }
+
+    setShuffleSeed((s) => s + 1); // automatically randomize recipe order on each opening
 
     if (initialRecipeId) {
       const found = SIBO_MEAL_SUGGESTIONS.find((r) => r.id === initialRecipeId);
@@ -260,12 +271,20 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
     }
 
     // Sort by Favorites (❤️) and Highest Star Ratings (⭐⭐⭐⭐⭐) to the TOP of the category!
+    // For non-favorites / unrated recipes, randomize order dynamically based on shuffleSeed so Nir always gets fresh rotation!
     return [...list].sort((a, b) => {
       const scoreA = (ratings[a.id] || 0) + (favorites[a.id] ? 10 : 0);
       const scoreB = (ratings[b.id] || 0) + (favorites[b.id] ? 10 : 0);
-      return scoreB - scoreA;
+      if (scoreA !== scoreB) return scoreB - scoreA;
+
+      if (!searchQuery.trim()) {
+        const hashA = ((a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (shuffleSeed + 13)) % 97);
+        const hashB = ((b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (shuffleSeed + 13)) % 97);
+        return hashA - hashB;
+      }
+      return 0;
     });
-  }, [selectedMealType, searchQuery, favorites, ratings]);
+  }, [selectedMealType, searchQuery, favorites, ratings, shuffleSeed]);
 
   if (!isOpen) return null;
 
@@ -421,6 +440,24 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
             allCount={mealCounts.all}
             theme="emerald"
           />
+        </div>
+
+        {/* Shuffle Header & Results Count */}
+        <div className="flex items-center justify-between gap-2 px-1 shrink-0">
+          <span className="text-xs font-black text-stone-600">
+            {selectedRecipe ? 'מתכון נבחר:' : `מתכוני שף (${filteredMeals.length}):`}
+          </span>
+          {!selectedRecipe && (
+            <button
+              type="button"
+              onClick={handleShuffleRecipes}
+              className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl font-black text-xs flex items-center gap-1.5 border border-amber-300 transition-all cursor-pointer active:scale-95 shadow-2xs"
+              title="סחרר את המתכונים והצג רעיונות חדשים ומפתיעים"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-amber-700" />
+              <span>🔀 סחרר מתכונים (עוד רעיונות)</span>
+            </button>
+          )}
         </div>
 
         {/* Content Body: List of Meals or Open Recipe */}

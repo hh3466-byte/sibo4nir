@@ -840,6 +840,46 @@ function synthesizeMealsFromQuery(query: string): {
   };
 }
 
+// 🔀 Smart dynamic shuffle that guarantees category interleaving and a fresh randomized starting dish
+export function shuffleMealsWithDiversity(meals: SuggestedRescueMeal[]): SuggestedRescueMeal[] {
+  if (!meals || meals.length <= 1) return meals;
+  
+  const pool = [...meals];
+  // Shuffle array randomly
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  // Group by categories
+  const groups: Record<string, SuggestedRescueMeal[]> = {};
+  for (const m of pool) {
+    const cat = m.category || 'other';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(m);
+  }
+
+  // Shuffle categories order
+  const categories = Object.keys(groups).sort(() => Math.random() - 0.5);
+
+  // Interleave categories round-robin so the top list features completely different meals (e.g. Fish -> Pancake -> Steak -> Wrap -> Zoodles -> Skewers -> Cheese)
+  const interleaved: SuggestedRescueMeal[] = [];
+  let added = true;
+  let round = 0;
+  while (added) {
+    added = false;
+    for (const cat of categories) {
+      if (groups[cat] && round < groups[cat].length) {
+        interleaved.push(groups[cat][round]);
+        added = true;
+      }
+    }
+    round++;
+  }
+
+  return interleaved.length > 0 ? interleaved : pool;
+}
+
 export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
   currentPhase,
   isOpen,
@@ -880,16 +920,27 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
 
   // Quick Inspiration Pill Prompts with massive culinary diversity
   const quickPillPrompts = [
-    { label: '🍗 שיפודי פרגית / שווארמה', text: 'בא לי שיפודי פרגית או שווארמה ביתית' },
-    { label: '🥩 קציצות בקר / סטייק', text: 'יש לי בשר בקר, קישוא ועשבי תיבול' },
     { label: '🐟 דניס / לברק / סלמון', text: 'בא לי פילה דג ים צרוב או סלמון' },
+    { label: '🥩 קציצות בקר / סטייק', text: 'יש לי בשר בקר, קישוא ועשבי תיבול' },
+    { label: '🥞 פנקייק שקדים ב-3 דקות', text: 'בא לי פנקייק שקדים מתוק וטעים' },
+    { label: '🍗 שיפודי פרגית / שווארמה', text: 'בא לי שיפודי פרגית או שווארמה ביתית' },
     { label: '🥔 תפו"א אפוי / קומפיר', text: 'בא לי תפוח אדמה אפוי חם ומנחם עם שמן זית וגבינה' },
     { label: '🌯 לאפה מדפי אורז', text: 'יש לי דפי אורז ואני רוצה לאפה מגולגלת' },
-    { label: '🥞 פנקייק שקדים ב-3 דקות', text: 'בא לי פנקייק שקדים מתוק וטעים' },
     { label: '🍫 סניקרס SIBO / שוקולד', text: 'בא לי חטיף סניקרס או שוקולד מריר' },
     { label: '🥣 פודינג צ׳יה / שייק', text: 'בא לי פודינג צ׳יה קרמי או שייק' },
     { label: '🧀 פלטת גבינות ואגוזים', text: 'בא לי גבינות קשות מיושנות, אגוזים וזיתים' },
   ];
+
+  // Randomize / Shuffle current meals on demand
+  const handleShuffleMeals = () => {
+    setChefResult((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        suggestedMeals: shuffleMealsWithDiversity(prev.suggestedMeals),
+      };
+    });
+  };
 
   // Reset and load full 35+ scrollable buffet when opening
   useEffect(() => {
@@ -901,7 +952,7 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
           scenarioTitle: 'ניתוח תמונת מקרר / מזווה 📸',
           calmMessage: 'סורק את התמונה ומזהה את כל המצרכים הבטוחים להרכבת ארוחת בזק...',
           prepTimeMinutes: 3,
-          suggestedMeals: HOME_RESCUE_MEALS,
+          suggestedMeals: shuffleMealsWithDiversity(HOME_RESCUE_MEALS),
           safeIngredientsIdentified: ['מזהה רכיבים מתוך התמונה...'],
           quickTip: 'זיהוי מצרכים דלי FODMAP מתוך המקרר מאפשר הרכבת ארוחה משביעה תוך 3 דקות.',
         });
@@ -912,13 +963,13 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
       } else {
         setActiveScenario('home');
         setChefResult({
-          scenarioTitle: 'בופה שובע עשיר ומגוון (35+ אופציות ברשימה מתגלגלת) 🏠',
-          calmMessage: 'ניר, הנה כל 35+ ארוחות הבזק המגוונות ברשימה מתגלגלת: בשרים, שיפודים, דגי ים, זודלס, דפי אורז, פנקייקים וקינוחי צ׳יה.',
+          scenarioTitle: 'בופה שובע עשיר ומגוון (35+ אופציות מסוחררות) 🏠',
+          calmMessage: 'ניר, הנה מבחר ארוחות בזק מגוונות ומסוחררות: דגי ים, פנקייקים, סטייקים, דפי אורז, זודלס, שיפודים וקינוחי צ׳יה.',
           prepTimeMinutes: 3,
-          suggestedMeals: HOME_RESCUE_MEALS,
-          safeIngredientsIdentified: ['פרגית', 'בקר', 'דניס', 'לברק', 'תפו"א', 'קישוא', 'דפי אורז', 'קמח שקדים', 'שוקולד 85%', 'צ׳יה', 'פרמזן'],
+          suggestedMeals: shuffleMealsWithDiversity(HOME_RESCUE_MEALS),
+          safeIngredientsIdentified: ['דניס', 'סלמון', 'בקר', 'פרגית', 'תפו"א', 'קישוא', 'דפי אורז', 'קמח שקדים', 'שוקולד 85%', 'צ׳יה', 'פרמזן'],
           cautionWarnings: [],
-          quickTip: 'גללי חופשי ברשימה המתגלגלת, סנני לפי קטגוריות או דברי במיקרופון!',
+          quickTip: 'לחצי על 🔀 "סחרר הצעות" כדי לקבל מיד רעיונות טעימים חדשים!',
         });
         setStagedPhoto(null);
       }
@@ -1863,14 +1914,20 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
 
                   {/* Meal Cards List */}
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <h4 className="text-xs sm:text-sm font-black text-stone-800 flex items-center gap-1.5">
                         <Zap className="w-4 h-4 text-amber-600" />
                         <span>ארוחות שובע שנבחרו עבורך ({displayedMeals.length}):</span>
                       </h4>
-                      <span className="text-[11px] text-stone-400 font-bold">
-                        לחצי על מצרך כדי לסמן אם יש לך
-                      </span>
+                      <button
+                        type="button"
+                        onClick={handleShuffleMeals}
+                        className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-2xs border border-amber-300 transition-all cursor-pointer active:scale-95 hover:shadow-xs"
+                        title="סחרר את רשימת הארוחות והצג רעיונות חדשים ומגוונים"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 text-amber-700" />
+                        <span>🔀 סחרר הצעות (הצג חדשות)</span>
+                      </button>
                     </div>
 
                     {displayedMeals.length === 0 ? (
