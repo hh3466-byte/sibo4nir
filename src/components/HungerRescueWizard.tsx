@@ -45,6 +45,8 @@ type ScenarioType = 'home' | 'driving' | 'restaurant' | 'supermarket' | 'gps' | 
 
 export type MealCategory =
   | 'all'
+  | 'prep_3min'
+  | 'prep_7min'
   | 'meat'
   | 'steaks'
   | 'fish'
@@ -917,7 +919,13 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
     let list = rawMeals;
 
     if (selectedCategory !== 'all') {
-      list = list.filter((m) => m.category === selectedCategory);
+      if (selectedCategory === 'prep_3min') {
+        list = list.filter((m) => m.prepMinutes <= 3 || m.isQuickNoCook);
+      } else if (selectedCategory === 'prep_7min') {
+        list = list.filter((m) => (m.prepMinutes >= 4 && m.prepMinutes <= 7) || m.timeToMake.includes('7 דקות') || m.timeToMake.includes('6 דקות') || m.timeToMake.includes('5 דקות') || m.timeToMake.includes('4 דקות'));
+      } else {
+        list = list.filter((m) => m.category === selectedCategory);
+      }
     }
 
     if (mealSearchQuery.trim()) {
@@ -935,11 +943,13 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
     return list;
   }, [chefResult?.suggestedMeals, selectedCategory, mealSearchQuery]);
 
-  // Category counts for badges across 14 diverse categories
+  // Category counts for badges across 14 diverse categories + speed filters
   const categoryCounts = useMemo(() => {
     const raw = chefResult?.suggestedMeals || [];
     return {
       all: raw.length,
+      prep_3min: raw.filter((m) => m.prepMinutes <= 3 || m.isQuickNoCook).length,
+      prep_7min: raw.filter((m) => (m.prepMinutes >= 4 && m.prepMinutes <= 7) || m.timeToMake.includes('7 דקות') || m.timeToMake.includes('6 דקות') || m.timeToMake.includes('5 דקות') || m.timeToMake.includes('4 דקות')).length,
       meat: raw.filter((m) => m.category === 'meat').length,
       steaks: raw.filter((m) => m.category === 'steaks').length,
       fish: raw.filter((m) => m.category === 'fish').length,
@@ -957,9 +967,11 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
     };
   }, [chefResult?.suggestedMeals]);
 
-  // Carousel category items with all 14 rich categories
+  // Carousel category items with 3 דקות הכנה, 7 דקות הכנה, and all 14 rich categories
   const mealCategoryItems: CategoryCarouselItem[] = useMemo(() => {
     return [
+      { id: 'prep_3min', label: '3 דקות הכנה', icon: '⏱️', count: categoryCounts.prep_3min },
+      { id: 'prep_7min', label: '7 דקות הכנה', icon: '🍳', count: categoryCounts.prep_7min },
       { id: 'meat', label: 'בשר, פרגית ועוף', icon: '🍗', count: categoryCounts.meat },
       { id: 'steaks', label: 'סטייקים ובשר פרימיום', icon: '🥩', count: categoryCounts.steaks },
       { id: 'fish', label: 'דגי ים, סלמון וטונה', icon: '🐟', count: categoryCounts.fish },
