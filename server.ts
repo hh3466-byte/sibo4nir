@@ -1028,6 +1028,22 @@ ${imageBase64 ? 'זהה מתוך התמונה את כל המצרכים הבטו�
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`SIBO Safe Server running on port ${PORT}`);
+
+    // ⚡ Automated Keep-Alive Self-Pinger: Prevents Render free instances from going to sleep after 15 minutes!
+    const externalUrl = process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL;
+    if (externalUrl) {
+      console.log(`[🚀 Keep-Alive] Initialized self-ping service for: ${externalUrl}`);
+      // Ping every 9 minutes (Render sleeps after 15 minutes of inactivity)
+      setInterval(async () => {
+        try {
+          const pingUrl = `${externalUrl.replace(/\/$/, '')}/api/health`;
+          const res = await fetch(pingUrl, { headers: { 'User-Agent': 'SIBO-Safe-KeepAlive/1.0' } });
+          console.log(`[🚀 Keep-Alive] Self-ping response: ${res.status} at ${new Date().toISOString()}`);
+        } catch (err: any) {
+          console.warn(`[🚀 Keep-Alive] Self-ping notice:`, err?.message || err);
+        }
+      }, 9 * 60 * 1000);
+    }
   });
 }
 

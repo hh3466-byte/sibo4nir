@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { optimizeImageForOcr } from '../utils/imageUtils';
 import { CategoryCarousel, CategoryCarouselItem } from './CategoryCarousel';
+import { SIBO_MEAL_SUGGESTIONS } from '../data/siboMealSuggestions';
 
 interface HungerRescueWizardProps {
   currentPhase: SiboPhase;
@@ -42,12 +43,27 @@ interface HungerRescueWizardProps {
 
 type ScenarioType = 'home' | 'driving' | 'restaurant' | 'supermarket' | 'gps' | 'camera' | 'custom' | null;
 
-export type MealCategory = 'all' | 'meat' | 'fish' | 'bowls' | 'wraps' | 'sweet' | 'cheese' | 'eggs' | 'instant';
+export type MealCategory =
+  | 'all'
+  | 'meat'
+  | 'steaks'
+  | 'fish'
+  | 'bowls'
+  | 'soups'
+  | 'wraps'
+  | 'pancakes'
+  | 'sweet'
+  | 'chia_puddings'
+  | 'cheese'
+  | 'eggs'
+  | 'salads'
+  | 'smoothies'
+  | 'instant';
 
 export interface SuggestedRescueMeal {
   id: string;
   title: string;
-  category: 'meat' | 'fish' | 'bowls' | 'wraps' | 'sweet' | 'cheese' | 'eggs' | 'instant';
+  category: MealCategory;
   timeToMake: string;
   prepMinutes: number;
   ingredients: string[];
@@ -68,407 +84,23 @@ interface ChefResponse {
   matchedFromInput?: string;
 }
 
-// 🏠 Massive Master Catalog of 35+ Creative SIBO-Safe Rescue Meals for Home / Kitchen
-const HOME_RESCUE_MEALS: SuggestedRescueMeal[] = [
-  // --- 🍗 עופות, בשרים, שיפודים ושווארמה (Meat & Poultry) ---
-  {
-    id: 'm-1',
-    title: '🍗 שיפודי פרגית צרובים במחבת פסים ברוטב שמן שום וכמון',
-    category: 'meat',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['180 גרם קוביות פרגית נקייה', 'כף שמן זית מושרה שום (Garlic Oil)', 'חצי כפית כמון', 'פפריקה מתוקה', 'מלח אטלנטי', 'מיץ לימון סחוט'],
-    simpleSteps: ['מתבלים את קוביות הפרגית בשמן שום, כמון, פפריקה ומלח', 'מחממים מחבת פסים לחום גבוה', 'צורבים 2 דקות מכל צד עד להשחמה עסיסית וסוחטים מעט לימון'],
-    satietyReason: 'חלבון עשיר ושומן בריא שמעניקים שובע מסיבי ל-4-5 שעות ללא שום תסיסה חיידקית.',
-    tag: 'עסיסי • חלבון מלא',
-  },
-  {
-    id: 'm-2',
-    title: '🥩 קציצות בקר עסיסיות במחבת עם קישוא מגורר (ללא לחם וללא בצל)',
-    category: 'meat',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['180 גרם בשר בקר טחון טרי', 'חצי קישוא קטן מגורר דק וסחוט מנוזלים (מעניק עסיסיות במקום לחם!)', 'כף שמיר/פטרוזיליה קצוצה', 'כפית שמן שום', 'מלח ופלפל שחור'],
-    simpleSteps: ['מערבבים בקערה את הבקר עם הקישוא המגורר, עשבי התיבול והתבלינים', 'יוצרים 4 קציצות שטוחות', 'צורבים במחבת חמה עם כף שמן זית 2 דקות מכל צד'],
-    satietyReason: 'ברזל, חלבון איכותי ונפח ירקות דל FODMAP שהופכים את הקציצות לרכות ומשביעות במיוחד.',
-    tag: 'בקר עסיסי • 0% גלוטן',
-  },
-  {
-    id: 'm-3',
-    title: '🍗 שווארמה ביתית מהירה מנתחי פרגית וטחינה גולמית',
-    category: 'meat',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['150 גרם רצועות דקות של פרגית / חזה הודו', 'כף שמן זית', 'כמון, כורכום, קורט קינמון ומלח', '2 כפות טחינה גולמית 100%', 'מלפפון חמוץ במלח בלבד'],
-    simpleSteps: ['מקפיצים את רצועות הפרגית במחבת לוהטת עם השמן והתבלינים 3 דקות', 'מעבירים לצלחת, יוצקים מעל טחינה גולמית ואוכלים לצד מלפפון חמוץ במלח'],
-    satietyReason: 'טעם שווארמה אמיתי ללא בצל וללא תבליני שום מסחריים, עם שומן טחינה שמייצב את הסוכר.',
-    tag: 'טעם שווארמה • מפנק',
-  },
-  {
-    id: 'm-4',
-    title: '🥩 מוקפץ בקר אסייתי וזודלס (נודלס קישואים) בשמן שומשום וג׳ינג׳ר',
-    category: 'meat',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['120 גרם רצועות סינטה/שייטל דקות', '1 קישוא חתוך לרצועות נודלס (במקלף/קולפן)', 'כפית שמן שומשום טהור', 'כפית ג׳ינג׳ר טרי מגורר', 'כף רוטב תמרי ללא גלוטן', 'חופן בוטנים קצוצים'],
-    simpleSteps: ['צורבים את הבקר במחבת לוהטת דקה וחצי ומוציאים', 'באותה מחבת מקפיצים את רצועות הקישוא עם ג׳ינג׳ר ותמרי דקה', 'מחזירים את הבקר, מערבבים ומפזרים בוטנים קלויים'],
-    satietyReason: 'ארוחה אסייתית מלאה עם נפח של נודלס קישואים דל פחמימה וחלבון עשיר.',
-    tag: 'אסייתי • ללא גלוטן',
-  },
-  {
-    id: 'm-5',
-    title: '🥩 סטייק אנטרקוט דק (דקה וחצי מכל צד) עם רוזמרין ומלח גס',
-    category: 'meat',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['150-200 גרם נתח אנטרקוט פרוס דק (דקה סטייק)', 'כף שמן זית', 'ענף רוזמרין טרי', 'מלח ים אטלנטי גס ופלפל שחור גרוס'],
-    simpleSteps: ['מחממים מחבת כבדה עד שהיא מעלה עשן קל', 'מניחים את הסטייק עם הרוזמרין וצורבים דקה וחצי מכל צד', 'מניחים לנוח דקה על קרש חיתוך ופורסים לרצועות'],
-    satietyReason: 'חלבון ושומן בקר מרוכזים הנספגים בקלות במעי הדק ומעניקים תחושת שובע עמוקה.',
-    tag: 'פרימיום • שובע ממושך',
-  },
-  {
-    id: 'm-6',
-    title: '🍗 שניצלונים פריכים בציפוי קראנץ׳ פריכיות / קמח שקדים',
-    category: 'meat',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['150 גרם רצועות חזה עוף', '1 ביצה טרופה', '2 פריכיות אורז מרוסקות דק לפירורים (או 2 כפות קמח שקדים)', 'פפריקה, מלח ושמן זית לטיגון'],
-    simpleSteps: ['טובלים את רצועות העוף בביצה ולאחר מכן בפירורי הפריכיות המתובלים', 'מטגנים במחבת עם שמן זית כ-2 דקות מכל צד עד להזהבה פריכה', 'מגישים חם וקראנצ\'י לצד טחינה'],
-    satietyReason: 'תחושת שניצל פריך אמיתי ב-100% התאמה ל-SIBO ללא אף גרם גלוטן.',
-    tag: 'קראנצ\'י • שניצל SIBO',
-  },
-  {
-    id: 'm-7',
-    title: '🍗 רול פסטרמה נתח שלם מגולגל סביב מקלות מלפפון וטחינה',
-    category: 'meat',
-    timeToMake: '1 דקה',
-    prepMinutes: 1,
-    isQuickNoCook: true,
-    ingredients: ['4 פרוסות פסטרמה איכותית נתח שלם (ללא גלוטן/שום/בצל)', '1 מלפפון חתוך למקלות דקים', '2 כפות טחינה גולמית', 'קורט מלח גס'],
-    simpleSteps: ['מורחים מעט טחינה על כל פרוסת פסטרמה', 'מניחים מקל מלפפון במרכז ומגלגלים לרול', 'אוכלים מיד באצבעות'],
-    satietyReason: 'חלבון רזה ושומן צמחי בריא ללא צורך בהדלקת אש או שימוש בסירים.',
-    tag: '1 דקה • ללא בישול',
-  },
-  {
-    id: 'm-8',
-    title: '🍗 כנפי עוף פריכות במחבת בשמן שום, פפריקה מעושנת ולימון',
-    category: 'meat',
-    timeToMake: '6 דקות',
-    prepMinutes: 6,
-    ingredients: ['6 כנפי עוף נקיות חצויות', 'כף שמן זית מושרה שום', 'כפית פפריקה מעושנת', 'מלח ים ומיץ מחצי לימון'],
-    simpleSteps: ['מערבבים את הכנפיים עם השמן והתבלינים', 'מטגנים במחבת מכוסה על אש בינונית-גבוהה 3 דקות מכל צד עד לפריכות שחומה', 'סוחטים לימון וזוללים חם'],
-    satietyReason: 'שומן וחלבון עוף טבעיים המעניקים תחושת ארוחת נחמה פריכה ומפנקת.',
-    tag: 'פריך ומפנק • חם',
-  },
-
-  // --- 🐟 דגים, סלמון ופירות ים (Fish & Seafood) ---
-  {
-    id: 'f-1',
-    title: '🐟 פילה דניס / לברק צרוב על הפלנצ׳ה בעשבי תיבול ושמן זית',
-    category: 'fish',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['פילה דניס/לברק טרי עם העור', 'כף שמן זית כתית מעולה', 'ענף שמיר וטימין', 'מלח אטלנטי ופלח לימון'],
-    simpleSteps: ['מחממים מחבת עם שמן זית', 'מניחים את הדג על צד העור ולוחצים 2 דקות עד שהעור פריך ומוזהב', 'הופכים ל-30 שניות נוספות ומגישים עם לימון'],
-    satietyReason: 'דג ים לבן וקל לעיכול, עשיר בחלבון טהור שאינו מכביד על הקיבה.',
-    tag: 'דג ים פרימיום • קל לעיכול',
-  },
-  {
-    id: 'f-2',
-    title: '🐟 קציצות דגים מהירות במחבת עם כוסברה, קישוא ושמן שום',
-    category: 'fish',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['180 גרם פילה דג לבן טחון/קצוץ דק (מוסר/בקלה/דניס)', 'חצי קישוא קטן מגורר וסחוט', '2 כפות כוסברה ופטרוזיליה קצוצות', 'כפית שמן שום', 'מלח וכמון'],
-    simpleSteps: ['מערבבים את הדג עם הקישוא, עשבי התיבול והתבלינים', 'יוצרים 4 קציצות קטנות', 'צורבים במחבת עם שמן זית כ-2 דקות מכל צד'],
-    satietyReason: 'קציצות נימוחות ועדינות למערכת העיכול עם 0% סוכרים או סיבים מציקים.',
-    tag: 'נימוח • דל FODMAP',
-  },
-  {
-    id: 'f-3',
-    title: '🐟 פילה סלמון אפוי ברוטב חרדל דיז׳ון, מייפל טהור ושמן זית',
-    category: 'fish',
-    timeToMake: '5 דקות',
-    prepMinutes: 5,
-    ingredients: ['פילה סלמון טרי (150 גרם)', 'כפית חרדל דיז׳ון חלק (ללא סוכר)', 'כפית סירופ מייפל טהור 100%', 'כף שמן זית ומלח גס'],
-    simpleSteps: ['מורחים את החרדל, המייפל, השמן והמלח על הסלמון', 'מכניסים לטוסטר אובן / איירפרייר ב-200 מעלות ל-5 דקות', 'מגישים עסיסי ונימוח'],
-    satietyReason: 'אומגה 3 אנטי-דלקתית ושומן איכותי שמזינים את רירית המעי ומשביעים לאורך זמן.',
-    tag: 'אומגה 3 • גורמה',
-  },
-  {
-    id: 'f-4',
-    title: '🐟 טרטר סלמון טרי מהיר עם שמן שומשום, מלפפון וג׳ינג׳ר על פריכיות',
-    category: 'fish',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['80 גרם פילה סלמון טרי חתוך לקוביות קטנות', 'חצי מלפפון קצוץ דק', 'כפית שמן שומשום', 'מעט ג׳ינג׳ר מגורר', 'מלח ים ופריכיות אורז'],
-    simpleSteps: ['מערבבים בקערית את קוביות הסלמון, המלפפון, שמן השומשום והג׳ינג׳ר', 'מניחים כפות גדושות על פריכיות פריכות ואוכלים מיד'],
-    satietyReason: 'מנת סושי גורמה ביתית ללא סוכרים מוספים וללא חומץ אורז מתועש.',
-    tag: 'סושי ביתי • נא וטרי',
-  },
-  {
-    id: 'f-5',
-    title: '🐟 סרדינים איכותיים בשמן זית עם פריכיות אורז ולימון סחוט',
-    category: 'fish',
-    timeToMake: '1 דקה',
-    prepMinutes: 1,
-    isQuickNoCook: true,
-    ingredients: ['קופסת שימורי סרדינים איכותיים בשמן זית כתית', '2-3 פריכיות אורז 100%', 'חצי לימון סחוט', 'מלח ים גס'],
-    simpleSteps: ['פותחים את הקופסה, מניחים סרדינים שלמים על פריכיות האורז', 'סוחטים שפע מיץ לימון טרי ומפזרים מלח גס'],
-    satietyReason: 'פצצת סידן, אומגה 3 ומינרלים שמרגיעים את תחושת הרעב תוך 60 שניות.',
-    tag: 'פצצת סידן • 1 דקה',
-  },
-
-  // --- 🥣 קערות שובע חמות, זודלס ותפוחי אדמה (Warm Bowls & Comfort) ---
-  {
-    id: 'b-1',
-    title: '🥔 "קומפיר SIBO" — תפוח אדמה לוהט במילוי שמן זית, מלח גס ופרמזן',
-    category: 'bowls',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['1 תפוח אדמה בינוני שטוף ומנוקב במזלג', '2 כפות שמן זית כתית מעולה', '30 גרם פרמזן מיושנת מגוררת (0% לקטוז)', 'מלח אטלנטי גס ופלפל'],
-    simpleSteps: ['מבשלים את תפוח האדמה במיקרוגל 4 דקות עד שהוא רך לחלוטין', 'חוצים במרכז ומועכים קלות במזלג', 'יוצקים שפע שמן זית, מפזרים מלח גס והרבה פרמזן שנמסה לתוכו'],
-    satietyReason: 'פחמימה קלה ובטוחה ללא גלוטן יחד עם שומן איכותי וגבינה מיושנת ללא לקטוז.',
-    tag: 'חם ומנחם • קומפיר',
-  },
-  {
-    id: 'b-2',
-    title: '🥣 קערת אורז בסמטי חם עם קוביות עוף, טחינה ועלי בצל ירוק',
-    category: 'bowls',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['1 כוס אורז בסמטי מבושל חם (מהמקרר או מהיר)', '100 גרם קוביות חזה עוף צרוב', '2 כפות טחינה גולמית', '2 כפות עלי בצל ירוק (ירוק בלבד)', 'מלח ולימון'],
-    simpleSteps: ['מחממים את האורז והעוף בקערה', 'יוצקים מעל טחינה גולמית, מיץ לימון ומלח', 'מפזרים עלי בצל ירוק פריכים ומערבבים'],
-    satietyReason: 'ארוחת קערה מלאה, מאוזנת וקלה ביותר לעיכול שמייצבת את הבטן.',
-    tag: 'קערת שובע • אורז בסמטי',
-  },
-  {
-    id: 'b-3',
-    title: '🥣 "זודלס" (נודלס קישואים) ברוטב עגבניות, שמן שום, פרמזן ובזיליקום',
-    category: 'bowls',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['2 קישואים חתוכים לסרטי פסטה במקלף', '3 כפות עגבניות מרוסקות (ללא תוספות)', 'כף שמן זית מושרה שום', 'עלי בזיליקום טריים', 'פרמזן מגוררת ומלח'],
-    simpleSteps: ['מקפיצים את סרטי הקישוא במחבת עם שמן שום דקה וחצי בלבד', 'מוסיפים את העגבניות המרוסקות, מלח ובזיליקום ומבשלים דקה', 'מפזרים פרמזן בנדיבות ואוכלים חם'],
-    satietyReason: 'תחושת פסטה איטלקית עשירה ללא גלוטן וללא תסיסת פחמימות.',
-    tag: 'פסטה SIBO • דל פחמימה',
-  },
-  {
-    id: 'b-4',
-    title: '🥣 מרק כתום זהוב מקישואים וגזר עם חלב קוקוס וג׳ינג׳ר טרי',
-    category: 'bowls',
-    timeToMake: '5 דקות',
-    prepMinutes: 5,
-    ingredients: ['1 גזר פרוס', '1 קישוא חתוך', '3 כפות קרם/חלב קוקוס טהור', 'חצי כפית ג׳ינג׳ר מגורר', 'כפית שמן שום ומלח'],
-    simpleSteps: ['מבשלים את הגזר והקישוא בכוס מים רותחים 4 דקות עד לריכוך', 'טוחנים בבלנדר מוט עם חלב הקוקוס, שמן השום, הג׳ינג׳ר והמלח למרק קטיפתי', 'שותים חם ומנחם'],
-    satietyReason: 'מרק סמיך ומלטף שמחמם את מערכת העיכול ומספק ויטמינים עדינים.',
-    tag: 'מרק חם • קטיפתי',
-  },
-  {
-    id: 'b-5',
-    title: '🥒 צ׳יפס קישואים פריך במחבת עם שמן זית, מלח ים וטימין',
-    category: 'bowls',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['2 קישואים פרוסים לעיגולים דקים', '2 כפות שמן זית כתית מעולה', 'עלי טימין טריים ומלח ים אטלנטי גס'],
-    simpleSteps: ['מחממים שמן זית במחבת רחבה', 'מניחים את פרוסות הקישוא בשכבה אחידה ומטגנים 2 דקות מכל צד עד להזהבה פריכה', 'מוציאים לנייר סופג, ממליחים במלח גס ואוכלים כחטיף'],
-    satietyReason: 'חטיף קראנצ\'י מלוח ובריא שמספק מענה לצורך בנשנוש מלוח.',
-    tag: 'קראנצ\'י • חטיף ירקות',
-  },
-
-  // --- 🥞 דפי אורז, פנקייקים, מאפים וקרפים (Wraps & Grain Alternatives) ---
-  {
-    id: 'w-1',
-    title: '🌯 לאפה מדפי אורז מגולגלת עם נתחי עוף צלוי, טחינה וחסה פריכה',
-    category: 'wraps',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['2 דפי אורז עגולים', '100 גרם נתחי עוף צלוי / פסטרמה', 'עלי חסה פריכים', '2 כפות טחינה גולמית', 'מלח ומיץ לימון'],
-    simpleSteps: ['טובלים דף אורז בקערת מים פושרים 15 שניות ומניחים על משטח עבודה', 'מסדרים במרכז עוף, חסה וטחינה', 'מקפלים את הצדדים ומגלגלים ללאפה הדוקה'],
-    satietyReason: 'מרקם לאפה מענג ורך ללא טיפת קמח חיטה, קל לעיכול ומשביע מאוד.',
-    tag: 'לאפה SIBO • ללא גלוטן',
-  },
-  {
-    id: 'w-2',
-    title: '🍕 "פיצה ויאטנמית" מהירה מדף אורז פריך עם ביצה וגבינה קשה',
-    category: 'wraps',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['1 דף אורז יבש', '1 ביצה טרופה', 'כף עלי בצל ירוק (ירוק בלבד)', '20 גרם פרמזן / גאודה מגוררת', 'כפית שמן שום'],
-    simpleSteps: ['מניחים דף אורז יבש ישירות במחבת חמה על אש בינונית', 'יוצקים מעליו את הביצה הטרופה עם הבצל הירוק ומורחים בעדינות', 'מפזרים גבינה, כשהדף פריך מקפלים לחצי כמו טאקו ואוכלים קראנצ\'י'],
-    satietyReason: 'חטיף קראנצ\'י גבינתי חם וממכר שמוכן תוך 180 שניות.',
-    tag: 'פיצה קראנצ\'ית • להיט',
-  },
-  {
-    id: 'w-3',
-    title: '🥞 פנקייק שקדים ואוורירי ב-3 דקות (0% קמח, 0% סוכר)',
-    category: 'wraps',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['1 ביצה טרייה', '2 כפות גדושות קמח שקדים טהור', 'כפית סירופ מייפל 100%', 'קורט קינמון', 'כפית שמן זית / שמן קוקוס לטיגון', 'תותים טריים בצד'],
-    simpleSteps: ['טורפים היטב בקערית את הביצה עם קמח השקדים, המייפל והקינמון', 'יוצקים למחבת משומנת חמה ומטגנים דקה וחצי מכל צד עד להזהבה תפוחה', 'מגישים עם פרוסות תותים טריים'],
-    satietyReason: 'פנקייק עשיר בחלבון ושומן בריא ללא שום קמחים מעובדים שמרגיע רעב למתוק.',
-    tag: 'פנקייק שקדים • פינוק',
-  },
-  {
-    id: 'w-4',
-    title: '🧀 "טוסט" גאודה ופרמזן על פריכית כפולה בטוסטר עם שמן זית ואורגנו',
-    category: 'wraps',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    ingredients: ['2 פריכיות אורז 100%', 'פרוסת גבינת גאודה מיושנת / פרמזן (0% לקטוז)', 'כפית שמן זית', 'קורט אורגנו ומלח'],
-    simpleSteps: ['מניחים את הגבינה בין 2 הפריכיות, מזלפים שמן זית ואורגנו', 'מכניסים לטוסטר לחיצה / טוסטר אובן לדקה וחצי עד שהגבינה מבעבעת ונמסה', 'אוכלים קראנצ\'י וחם'],
-    satietyReason: 'תחושת טוסט גבינה קראנצ\'י חם ומנחם ללא לקטוז וללא גלוטן.',
-    tag: 'טוסט קראנצ\'י • גבינה נמסה',
-  },
-
-  // --- 🍫 מתוקים בטוחים, פודינג צ׳יה, שייקים ושוקולד (Sweet Satiety) ---
-  {
-    id: 'sw-1',
-    title: '🍫 "סניקרס SIBO" מהיר — פריכית עם חמאת בוטנים, שוקולד מריר 85% ומלח גס',
-    category: 'sweet',
-    timeToMake: '1 דקה',
-    prepMinutes: 1,
-    isQuickNoCook: true,
-    ingredients: ['1-2 פריכיות אורז 100%', 'כף גדושה חמאת בוטנים 100% טבעית', '1-2 קוביות שוקולד מריר 85% מומסות (או מגוררות)', 'גרגרי מלח ים אטלנטי גס'],
-    simpleSteps: ['מורחים את חמאת הבוטנים על הפריכית', 'מזלפים מעל שוקולד מריר מומס ומפזרים כמה גרגרי מלח גס', 'אוכלים מיד או מקפיאים 2 דקות לקראנץ\' מושלם'],
-    satietyReason: 'שילוב מנצח של שומן צמחי, מליחות ומתיקות שסוגר לחלוטין כל חשק למתוק בלי להתסיס.',
-    tag: 'סניקרס SIBO • ממכר',
-  },
-  {
-    id: 'sw-2',
-    title: '🥣 פודינג צ׳יה קרמי עם חלב שקדים, תותים ומייפל טהור',
-    category: 'sweet',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['2 כפות זרעי צ׳יה', 'חצי כוס חלב שקדים טהור ללא סוכר', 'כפית סירופ מייפל טהור 100%', '4 תותים טריים חתוכים'],
-    simpleSteps: ['מערבבים בכוס את זרעי הצ׳יה עם חלב השקדים והמייפל למשך דקה', 'מניחים לעמוד 2 דקות עד להסמכה קרמית', 'מפזרים תותים טריים מעל ואוכלים בכפית'],
-    satietyReason: 'סיבים עדינים מסיסים ואומגה 3 צמחית שממלאים את הקיבה ברוגע ומשביעים לשעות.',
-    tag: 'פודינג צ\'יה • אומגה 3',
-  },
-  {
-    id: 'sw-3',
-    title: '🍫 כדורי אנרגיה משקדים טחונים, חמאת בוטנים וקקאו טהור',
-    category: 'sweet',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['3 כפות קמח שקדים טהור', 'כף גדושה חמאת בוטנים 100%', 'כפית קקאו טהור 100%', 'כפית מייפל טהור'],
-    simpleSteps: ['מערבבים את כל המצרכים בקערית לבצק אחיד', 'מגלגלים ל-3 כדורים קטנים', 'זוללים מיד כחטיף אנרגיה עשיר'],
-    satietyReason: 'חטיף אנרגיה מרוכז בשומנים בריאים ללא תמרים (עתירים בפרוקטוז!) שמתאים ב-100% ל-SIBO.',
-    tag: 'כדורי אנרגיה • ללא תמרים',
-  },
-  {
-    id: 'sw-4',
-    title: '🍓 תותים טריים טבולים בשוקולד מריר 85% מומס ושברי אגוזי מלך',
-    category: 'sweet',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['5 תותים טריים יפים', '2 קוביות שוקולד מריר 85% מומסות במיקרוגל', '3 חצאי אגוזי מלך קצוצים'],
-    simpleSteps: ['טובלים חצי מכל תות בשוקולד המריר החם', 'מפזרים שברי אגוזי מלך קראנצ\'יים', 'אוכלים קינוח מלכותי ובטוח'],
-    satietyReason: 'נוגדי חמצון, ויטמין C ושומן איכותי המספקים הנאה מתוקה ללא עליית סוכר.',
-    tag: 'קינוח גורמה • דל FODMAP',
-  },
-  {
-    id: 'sw-5',
-    title: '🥣 "דגני בוקר SIBO" — קערת חלב שקדים, פריכיות מנופצות וקינמון',
-    category: 'sweet',
-    timeToMake: '1 דקה',
-    prepMinutes: 1,
-    isQuickNoCook: true,
-    ingredients: ['2-3 פריכיות אורז מנופצות ביד לפיסות קטנות', '1 כוס חלב שקדים צונן ללא סוכר', 'כף חמאת בוטנים או חמאת שקדים', 'שפע קינמון טחון'],
-    simpleSteps: ['מניחים את פיסות הפריכיות בקערה', 'יוצקים חלב שקדים קר, מזלפים חמאת בוטנים ומפזרים קינמון', 'אוכלים בכף כמו קורנפלקס קראנצ\'י'],
-    satietyReason: 'מדמה קערת קורנפלקס נוסטלגית בצורה בטוחה לחלוטין ללא סוכר שולחני וללא גלוטן.',
-    tag: 'קורנפלקס SIBO • 1 דקה',
-  },
-  {
-    id: 'sw-6',
-    title: '☕ שוקו שקדים חם מ-100% קקאו טהור עם מייפל וקינמון',
-    category: 'sweet',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['1 כוס חלב שקדים טהור ללא סוכר', 'כפית קקאו טהור 100%', 'כפית סירופ מייפל טהור', 'קורט קינמון'],
-    simpleSteps: ['מחממים חלב שקדים בפינג\'אן או ספל', 'טורפים פנימה קקאו, מייפל וקינמון', 'שותים חם ומנחם'],
-    satietyReason: 'משקה מנחם ומחמם שמספק נוגדי חמצון ומרגיע את הבטן.',
-    tag: 'חם ומנחם • ללא לקטוז',
-  },
-
-  // --- 🧀 פלטות שובע יוקרתיות וגבינות 0% לקטוז (Cheese & Savory Platters) ---
-  {
-    id: 'ch-1',
-    title: '🧀 פלטת גבינות קשות מיושנות (פרמזן, גאודה) עם אגוזי מלך וזיתים',
-    category: 'cheese',
-    timeToMake: '1 דקה',
-    prepMinutes: 1,
-    isQuickNoCook: true,
-    ingredients: ['40 גרם קוביות פרמזן מיושנת או גאודה קשה (0% לקטוז)', '5 חצאי אגוזי מלך', '6 זיתים שחורים טבעיים (ללא שום)', '2 פריכיות אורז'],
-    simpleSteps: ['מסדרים את הגבינות, האגוזים והזיתים על צלחת יפה', 'אוכלים לאט בנחת'],
-    satietyReason: 'שומנים וחלבונים עשירים ללא טיפת לקטוז שמעניקים שובע ארוך טווח.',
-    tag: 'פלטת גבינות • 0% לקטוז',
-  },
-  {
-    id: 'ch-2',
-    title: '🥑 אבוקדו בשל במילוי נתחי עוף צלוי ושמן שום מושרה',
-    category: 'cheese',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['חצי אבוקדו בשל', '80 גרם נתחי עוף צלוי קר או חם', 'כפית שמן זית מושרה שום', 'מלח אטלנטי ולימון'],
-    simpleSteps: ['חוצים אבוקדו ומסירים את הגלעין', 'ממלאים את השקע בנתחי עוף, מזלפים שמן שום וממליחים'],
-    satietyReason: 'שילוב מושלם של שומן צמחי בריא וחלבון עוף טהור שמשתיק את הרעב מיד.',
-    tag: 'אבוקדו ממולא • שומן בריא',
-  },
-  {
-    id: 'ch-3',
-    title: '🥒 סלט מלפפונים צונן בשמן זית כתית, לימון ושבבי פרמזן ענקיים',
-    category: 'cheese',
-    timeToMake: '2 דקות',
-    prepMinutes: 2,
-    isQuickNoCook: true,
-    ingredients: ['2 מלפפונים חתוכים לפרוסות אלכסוניות עבות', '2 כפות שמן זית כתית מעולה', 'מיץ מחצי לימון סחוט', '30 גרם שבבי פרמזן מיושנת בקולפן', 'מלח ים'],
-    simpleSteps: ['מערבבים את המלפפונים עם שמן הזית, הלימון והמלח', 'מפזרים מעל שבבי פרמזן ענקיים ואוכלים פריך'],
-    satietyReason: 'מרענן, קראנצ\'י ומלא מינרלים מרגיעים עם שומן גבינה מלוח וממכר.',
-    tag: 'רענן ופריך • 0% לקטוז',
-  },
-
-  // --- 🍳 מנות ביצים מיוחדות ויצירתיות (Creative Egg Dishes) ---
-  {
-    id: 'eg-1',
-    title: '🍳 חביתת זוקיני מגורר וגבינה קשה (גהי / שמן שום)',
-    category: 'eggs',
-    timeToMake: '4 דקות',
-    prepMinutes: 4,
-    ingredients: ['2 ביצים', 'חצי קישוא קטן מגורר בפומפייה', 'כף שמן זית מושרה שום', '20 גרם פרמזן/גבינה צהובה', 'מלח'],
-    simpleSteps: ['מקפיצים את הקישוא המגורר דקה במחבת עם שמן שום', 'יוצקים מעל את הביצים הטרופות והגבינה', 'מכסים ל-2 דקות ומגישים'],
-    satietyReason: 'מעניק נפח עשיר, סיבים עדינים וטעם מפנק בלי אף גרם גזים.',
-    tag: 'עשיר בירקות • משביע',
-  },
-  {
-    id: 'eg-2',
-    title: '🍳 שקשוקה ביתית בטוחה ל-SIBO מעגבניות טריות, עלי בצל ירוק ושמן שום',
-    category: 'eggs',
-    timeToMake: '5 דקות',
-    prepMinutes: 5,
-    ingredients: ['2 עגבניות טריות מרוסקות', 'כף שמן זית מושרה שום', '2 כפות עלי בצל ירוק (ירוק בלבד)', 'פפריקה מתוקה, כמון ומלח', '2 ביצים טריות'],
-    simpleSteps: ['מבשלים את העגבניות המרוסקות עם שמן השום והתבלינים 2 דקות', 'יוצרים גומות ושוברים פנימה 2 ביצים', 'מכסים ל-3 דקות ומגישים חם לצד פריכיות'],
-    satietyReason: 'שקשוקה חמה ומנחמת ב-100% התאמה ל-SIBO ללא שום וללא בצל.',
-    tag: 'שקשוקה חמה • מפנק',
-  },
-  {
-    id: 'eg-3',
-    title: '🍳 ביצי עין פריכות בשמן זית לוהט על מצע פריכיות שסופגות את החלמון',
-    category: 'eggs',
-    timeToMake: '3 דקות',
-    prepMinutes: 3,
-    ingredients: ['2 ביצים טריות', '1.5 כפות שמן זית', '2 פריכיות אורז', 'מלח ים אטלנטי גס', 'פלפל שחור', 'מלפפון פריך בצד'],
-    simpleSteps: ['מחממים שמן זית היטב במחבת', 'שוברים 2 ביצים לעין פריכה עם תחתית מוזהבת', 'מעבירים מעל הפריכיות כדי שיספגו את החלמון החם'],
-    satietyReason: 'ארוחת נחמה חמה וממכרת שנותנת תחושת שובע ורוגע תוך 180 שניות.',
-    tag: 'חם ומפנק • קל',
-  },
-];
+// 🏠 Massive Master Catalog of 230+ Verified SIBO-Safe Rescue Meals for Home / Kitchen
+export const HOME_RESCUE_MEALS: SuggestedRescueMeal[] = SIBO_MEAL_SUGGESTIONS.map((rec) => {
+  const numMatch = rec.prepTime ? rec.prepTime.match(/\d+/) : null;
+  const prepMinutes = numMatch ? parseInt(numMatch[0], 10) : 5;
+  return {
+    id: rec.id,
+    title: rec.title,
+    category: rec.category as MealCategory,
+    timeToMake: rec.prepTime || '5 דקות',
+    prepMinutes: prepMinutes,
+    ingredients: rec.ingredients,
+    simpleSteps: rec.instructions,
+    satietyReason: rec.benefits && rec.benefits.length > 0 ? rec.benefits.join(' • ') : rec.description,
+    tag: rec.tag,
+    isQuickNoCook: rec.mealType === 'quick' || prepMinutes <= 2,
+  };
+});
 
 // 🚗 Driving & Gas Station Rescue Meals (8+ options)
 const DRIVING_RESCUE_MEALS: SuggestedRescueMeal[] = [
@@ -1222,8 +854,8 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
 
     if (type === 'home') {
       setChefResult({
-        scenarioTitle: 'בופה שובע עשיר בבית (35+ אופציות מגוונות) 🏠',
-        calmMessage: 'ניר, את בבית ליד המטבח! הנה שפע אדיר של ארוחות בזק מגוונות: בשרים, שיפודים, דגי ים, זודלס, דפי אורז, פנקייקים וקינוחי צ׳יה.',
+        scenarioTitle: `בופה שובע עשיר בבית (${HOME_RESCUE_MEALS.length}+ אופציות מגוונות) 🏠`,
+        calmMessage: 'ניר, את בבית ליד המטבח! הנה שפע אדיר של 230+ ארוחות בזק מגוונות ב-14 קטגוריות: בשרים, סטייקים, דגי ים, זודלס, מרקי קולגן, דפי אורז, פנקייקים, קינוחים, גבינות וביצים.',
         prepTimeMinutes: 3,
         suggestedMeals: HOME_RESCUE_MEALS,
         safeIngredientsIdentified: ['פרגית', 'בקר', 'אנטרקוט', 'דניס', 'לברק', 'סלמון', 'תפוח אדמה', 'קישוא', 'דפי אורז', 'קמח שקדים', 'שוקולד 85%', 'צ׳יה', 'פרמזן', 'גאודה', 'חמאת בוטנים', 'ביצים'],
@@ -1303,39 +935,52 @@ export const HungerRescueWizard: React.FC<HungerRescueWizardProps> = ({
     return list;
   }, [chefResult?.suggestedMeals, selectedCategory, mealSearchQuery]);
 
-  // Category counts for badges
+  // Category counts for badges across 14 diverse categories
   const categoryCounts = useMemo(() => {
     const raw = chefResult?.suggestedMeals || [];
     return {
       all: raw.length,
       meat: raw.filter((m) => m.category === 'meat').length,
+      steaks: raw.filter((m) => m.category === 'steaks').length,
       fish: raw.filter((m) => m.category === 'fish').length,
       bowls: raw.filter((m) => m.category === 'bowls').length,
+      soups: raw.filter((m) => m.category === 'soups').length,
       wraps: raw.filter((m) => m.category === 'wraps').length,
+      pancakes: raw.filter((m) => m.category === 'pancakes').length,
       sweet: raw.filter((m) => m.category === 'sweet').length,
+      chia_puddings: raw.filter((m) => m.category === 'chia_puddings').length,
       cheese: raw.filter((m) => m.category === 'cheese').length,
       eggs: raw.filter((m) => m.category === 'eggs').length,
+      salads: raw.filter((m) => m.category === 'salads').length,
+      smoothies: raw.filter((m) => m.category === 'smoothies').length,
       instant: raw.filter((m) => m.category === 'instant' || m.isQuickNoCook).length,
     };
   }, [chefResult?.suggestedMeals]);
 
-  // Carousel category items
+  // Carousel category items with all 14 rich categories
   const mealCategoryItems: CategoryCarouselItem[] = useMemo(() => {
     return [
-      { id: 'meat', label: 'בשר ושיפודים', icon: '🍗', count: categoryCounts.meat },
-      { id: 'fish', label: 'דגי ים וסלמון', icon: '🐟', count: categoryCounts.fish },
-      { id: 'bowls', label: 'קומפיר וזודלס', icon: '🥔', count: categoryCounts.bowls },
+      { id: 'meat', label: 'בשר, פרגית ועוף', icon: '🍗', count: categoryCounts.meat },
+      { id: 'steaks', label: 'סטייקים ובשר פרימיום', icon: '🥩', count: categoryCounts.steaks },
+      { id: 'fish', label: 'דגי ים, סלמון וטונה', icon: '🐟', count: categoryCounts.fish },
+      { id: 'bowls', label: 'קומפיר, זודלס וקערות', icon: '🥔', count: categoryCounts.bowls },
+      { id: 'soups', label: 'מרקי החלמה וקולגן', icon: '🥣', count: categoryCounts.soups },
       { id: 'wraps', label: 'דפי אורז ולאפה', icon: '🌯', count: categoryCounts.wraps },
-      { id: 'sweet', label: 'סניקרס ומתוקים', icon: '🍫', count: categoryCounts.sweet },
+      { id: 'pancakes', label: 'פנקייק ומאפי שקדים', icon: '🥞', count: categoryCounts.pancakes },
+      { id: 'sweet', label: 'סניקרס ושוקולד', icon: '🍫', count: categoryCounts.sweet },
+      { id: 'chia_puddings', label: 'פודינג צ׳יה וקינוחים', icon: '🍮', count: categoryCounts.chia_puddings },
       { id: 'cheese', label: 'גבינות 0% לקטוז', icon: '🧀', count: categoryCounts.cheese },
-      { id: 'eggs', label: 'ביצים מיוחדות', icon: '🍳', count: categoryCounts.eggs },
+      { id: 'eggs', label: 'ביצים ושקשוקות', icon: '🍳', count: categoryCounts.eggs },
+      { id: 'salads', label: 'סלטים וירקות קראנץ׳', icon: '🥗', count: categoryCounts.salads },
+      { id: 'smoothies', label: 'שייקים ומשקאות ריפוי', icon: '🥤', count: categoryCounts.smoothies },
+      { id: 'instant', label: 'נשנושי בזק וטוסטים', icon: '⚡', count: categoryCounts.instant },
     ];
   }, [categoryCounts]);
 
-  // Carousel scenario items for location carousel
+    // Carousel scenario items for location carousel
   const scenarioItems: CategoryCarouselItem[] = useMemo(() => {
     return [
-      { id: 'home', label: 'בבית / במטבח', icon: '🏠', count: 35 },
+      { id: 'home', label: 'בבית / במטבח', icon: '🏠', count: HOME_RESCUE_MEALS.length },
       { id: 'driving', label: 'בנסיעה / Yellow', icon: '🚗', count: 8 },
       { id: 'supermarket', label: 'סופרמרקט', icon: '🛒', count: 8 },
       { id: 'restaurant', label: 'מסעדה / וולט', icon: '🏢', count: 6 },
