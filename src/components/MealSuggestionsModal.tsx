@@ -128,13 +128,18 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
-  // Dynamic Shuffling seed so recipes rotate dynamically
-  const [shuffleSeed, setShuffleSeed] = useState<number>(() => Math.floor(Math.random() * 100));
+  // Dynamic Shuffling seed per category so each category can be shuffled independently!
+  const [categorySeeds, setCategorySeeds] = useState<Record<string, number>>(() => ({
+    all: Math.floor(Math.random() * 100),
+  }));
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleShuffleRecipes = () => {
-    setShuffleSeed((s) => s + 1);
+    setCategorySeeds((prev) => ({
+      ...prev,
+      [selectedMealType]: (prev[selectedMealType] || Math.floor(Math.random() * 100)) + 1,
+    }));
     setSelectedRecipe(null);
     setVisibleCount(15);
     if (scrollContainerRef.current) {
@@ -145,7 +150,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   // Reset pagination when query, category, or shuffle changes
   useEffect(() => {
     setVisibleCount(15);
-  }, [searchQuery, selectedMealType, shuffleSeed]);
+  }, [searchQuery, selectedMealType, categorySeeds]);
 
   // Synchronize initial query and recipe ID when modal opens
   useEffect(() => {
@@ -158,7 +163,10 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
       return;
     }
 
-    setShuffleSeed((s) => s + 1);
+    setCategorySeeds((prev) => ({
+      ...prev,
+      all: (prev.all || 0) + 1,
+    }));
 
     if (initialRecipeId) {
       const found = SIBO_MEAL_SUGGESTIONS.find((r) => r.id === initialRecipeId);
@@ -413,17 +421,31 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
       if (scoreA !== scoreB) return scoreB - scoreA;
 
       if (!searchQuery.trim()) {
-        const hashA = (a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (shuffleSeed + 13)) % 97;
-        const hashB = (b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (shuffleSeed + 13)) % 97;
+        const seed = categorySeeds[selectedMealType] || categorySeeds.all || 0;
+        const hashA = (a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (seed + 13)) % 97;
+        const hashB = (b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (seed + 13)) % 97;
         return hashA - hashB;
       }
       return 0;
     });
-  }, [selectedMealType, searchQuery, favorites, ratings, shuffleSeed]);
+  }, [selectedMealType, searchQuery, favorites, ratings, categorySeeds]);
 
   const displayedMeals = useMemo(() => {
     return filteredMeals.slice(0, visibleCount);
   }, [filteredMeals, visibleCount]);
+
+  const activeCategoryItem = useMemo(() => {
+    if (selectedMealType === 'all') {
+      return { id: 'all', label: 'כל המנות', icon: '👨‍🍳' };
+    }
+    return (
+      categoryItems.find((c) => c.id === selectedMealType) || {
+        id: selectedMealType,
+        label: 'הקטגוריה',
+        icon: '🍲',
+      }
+    );
+  }, [selectedMealType, categoryItems]);
 
   if (!isOpen) return null;
 
@@ -558,28 +580,35 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           />
         </div>
 
-        {/* 🔀 Shuffle Banner & Subheader (Mirrors the intuitive 'I am hungry' layout) */}
+        {/* 🔀 Full-Width Prominent Meal Shuffle Button (User Request: הגדלת כפתור סיחרור לכל רוחב המסך וסיחרור קטגוריה בנפרד) */}
         {!selectedRecipe && (
-          <div className="px-3.5 sm:px-6 space-y-1.5 shrink-0">
+          <div className="px-2.5 sm:px-6 space-y-2 shrink-0">
             <button
               type="button"
               onClick={handleShuffleRecipes}
-              className="w-full py-2 sm:py-2.5 px-4 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-500 hover:to-amber-500 text-amber-950 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-98 border border-amber-400/80"
-              title="סחרר את המתכונים והצג רעיונות חדשים ומפתיעים"
+              className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-500 hover:to-amber-400 text-amber-950 rounded-2xl sm:rounded-3xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg border-2 border-amber-300 ring-2 ring-amber-400/30 transition-all cursor-pointer active:scale-98 group"
+              title={`סחרר את המתכונים ב-"${activeCategoryItem.label}" והצג רעיונות חדשים ומפתיעים`}
             >
-              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-900" />
-              <span>🔀 סחרר הצעות חדשות! (הצג עוד רעיונות מגוונים) ✨</span>
+              <RefreshCw className="w-5 h-5 text-amber-950 group-hover:rotate-180 transition-transform duration-500 shrink-0" />
+              <span className="truncate">
+                🔀 סחרר הצעות ב"{activeCategoryItem.label}"! ({filteredMeals.length} מנות ברולטה) 🎲
+              </span>
             </button>
 
             <div className="flex items-center justify-between gap-2 px-1">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-stone-800">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span>ארוחות שֵׁף שנבחרו עבורך ({filteredMeals.length}):</span>
+              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-stone-800 truncate">
+                <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span className="truncate">
+                  {activeCategoryItem.icon} {activeCategoryItem.label} ({filteredMeals.length} מנות):
+                </span>
                 <span className="text-stone-400 font-normal hidden sm:inline">•</span>
-                <span className="text-stone-500 text-[10px] sm:text-xs font-semibold">
+                <span className="text-stone-500 text-[10px] sm:text-xs font-semibold hidden sm:inline">
                   לחצי על מצרך לסימון
                 </span>
               </div>
+              <span className="text-[10px] sm:text-xs text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full font-bold shrink-0">
+                סיחרור נפרד לקטגוריה ✨
+              </span>
             </div>
           </div>
         )}
