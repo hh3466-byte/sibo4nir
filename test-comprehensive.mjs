@@ -69,6 +69,16 @@ assert(fuzzyHebrewMatch('פיוז תה אפרסק 1.5 ליטר', 'פיוז תה'
 assert(fuzzyHebrewMatch('קוטג׳ 5% תנובה', 'קוטג'), 'Fuzzy matches with gershayim');
 assert(fuzzyHebrewMatch('שמן זית כתית מעולה', 'שמן זית'), 'Fuzzy matches olive oil');
 
+// Semantic collision guards
+assert(!fuzzyHebrewMatch('כרובית', 'כרוב'), 'Semantic guard: כרוב does not match כרובית');
+assert(!fuzzyHebrewMatch('כרוב לבן / ירוק', 'כרובית'), 'Semantic guard: כרובית does not match כרוב לבן');
+assert(!fuzzyHebrewMatch('שום (חי, מבושל, אבקת שום)', 'שומשום'), 'Semantic guard: שומשום does not match שום');
+assert(!fuzzyHebrewMatch('דלורית', 'דלעת'), 'Semantic guard: דלעת does not match דלורית');
+assert(!fuzzyHebrewMatch('דלעת כתומה / טריפוליטאית', 'דלורית'), 'Semantic guard: דלורית does not match דלעת');
+assert(!fuzzyHebrewMatch('חלב פרה רגיל', 'חלבון'), 'Semantic guard: חלבון does not match חלב פרה');
+assert(fuzzyHebrewMatch('כרוב לבן / ירוק', 'כרוב'), 'כרוב matches כרוב לבן');
+assert(fuzzyHebrewMatch('כרובית', 'כרובית'), 'כרובית matches כרובית');
+
 // -----------------------------------------------------------------------------
 // 2. SIBO FOOD DATABASE INTEGRITY
 // -----------------------------------------------------------------------------
@@ -92,7 +102,7 @@ for (const item of SIBO_FOOD_DATABASE) {
   if (!item.id || !item.nameHe || !item.nameEn || !validLights.includes(item.statusPhase1) || !validLights.includes(item.statusPhase2)) {
     allValidItems = false;
   }
-  if (item.nameHe.includes('שום') && !item.nameHe.includes('שמן')) {
+  if (item.id === 'garlic') {
     garlicFound = true;
     assertEqual(item.statusPhase1, 'RED', 'Garlic is RED in Phase 1');
     assertEqual(item.statusPhase2, 'RED', 'Garlic is RED in Phase 2');
@@ -202,6 +212,58 @@ assertEqual(ricePhase2.status, 'GREEN', 'White Rice is GREEN in Phase 2');
 // Test Coffee & Turkish Coffee
 const turkishCoffee = analyzeFoodClinically('קפה שחור טורקי עלית', 'phase1_strict');
 assertEqual(turkishCoffee.status, 'GREEN', 'Pure Turkish Coffee is GREEN for Nir in Phase 1');
+
+// Test Cabbage vs Cauliflower (Nir's Reported Bug)
+const cabbageRes = analyzeFoodClinically('כרוב', 'phase1_strict');
+assertEqual(cabbageRes.status, 'YELLOW', 'Cabbage is YELLOW (75g portion) in Phase 1');
+assert(cabbageRes.foodName.includes('כרוב'), 'Cabbage foodName contains כרוב');
+assert(!cabbageRes.foodName.includes('כרובית'), 'Cabbage does NOT return כרובית');
+
+const cauliflowerRes = analyzeFoodClinically('כרובית', 'phase1_strict');
+assertEqual(cauliflowerRes.status, 'RED', 'Cauliflower is strictly RED');
+assert(cauliflowerRes.foodName.includes('כרובית'), 'Cauliflower returns כרובית');
+
+const brusselsRes = analyzeFoodClinically('כרוב ניצנים', 'phase1_strict');
+assertEqual(brusselsRes.status, 'RED', 'Brussels Sprouts are RED in Phase 1');
+
+// Test Pumpkin vs Butternut Squash (Hagai's Question)
+const pumpkinRes = analyzeFoodClinically('דלעת', 'phase1_strict');
+assertEqual(pumpkinRes.status, 'YELLOW', 'Common Pumpkin is YELLOW in Phase 1');
+assert(pumpkinRes.foodName.includes('דלעת'), 'Pumpkin foodName contains דלעת');
+assert(!pumpkinRes.foodName.includes('דלורית'), 'Pumpkin does NOT return דלורית');
+
+const butternutRes = analyzeFoodClinically('דלורית', 'phase1_strict');
+assertEqual(butternutRes.status, 'RED', 'Butternut Squash is RED in Phase 1');
+
+const pumpkinSeedsRes = analyzeFoodClinically('גרעיני דלעת', 'phase1_strict');
+assertEqual(pumpkinSeedsRes.status, 'GREEN', 'Pumpkin Seeds (Pepitas) are GREEN');
+
+// Test Sesame / Tahini vs Garlic
+const sesameRes = analyzeFoodClinically('שומשום', 'phase1_strict');
+assertEqual(sesameRes.status, 'YELLOW', 'Sesame is YELLOW in Phase 1 (not confused with Garlic!)');
+assert(!sesameRes.foodName.includes('שום / בצל'), 'Sesame is NOT classified as garlic/onion');
+
+// Test Green Beans vs Dried Legumes
+const greenBeansRes = analyzeFoodClinically('שעועית ירוקה', 'phase1_strict');
+assertEqual(greenBeansRes.status, 'GREEN', 'Green Beans are GREEN in Phase 1');
+
+const driedBeansRes = analyzeFoodClinically('שעועית', 'phase1_strict');
+assertEqual(driedBeansRes.status, 'RED', 'Dried Beans (Legumes) are RED in Phase 1');
+
+// Test Regular Milk vs Lactose Free Milk
+const regularMilkRes = analyzeFoodClinically('חלב', 'phase1_strict');
+assertEqual(regularMilkRes.status, 'RED', 'Regular Cow Milk is RED in Phase 1');
+
+const lactFreeMilkRes = analyzeFoodClinically('חלב דל לקטוז', 'phase1_strict');
+assertEqual(lactFreeMilkRes.status, 'GREEN', 'Lactose Free Milk is GREEN');
+
+// Test Soy Sauce vs Soybeans
+const soySauceRes = analyzeFoodClinically('רוטב סויה', 'phase1_strict');
+assertEqual(soySauceRes.status, 'GREEN', 'Naturally Fermented Soy Sauce is GREEN');
+
+// Test Egg Whites & Yolks
+const eggWhiteRes = analyzeFoodClinically('חלבון', 'phase1_strict');
+assertEqual(eggWhiteRes.status, 'GREEN', 'Egg White is GREEN (0 FODMAP)');
 
 // Test Beer & Goldstar Barcodes and Classification
 const goldstar = ISRAELI_SUPERMARKET_CATALOG['7290000185012'];

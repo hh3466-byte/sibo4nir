@@ -1,4 +1,14 @@
 {
+  "20211943": {
+    "barcode": "20211943",
+    "productName": "Пълнозърнест сусамов тахан",
+    "brand": "Maribel",
+    "ingredientsText": "100% млян небелен сусам.",
+    "allergens": "",
+    "categories": "Тахан",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/021/1943/front_en.4.400.jpg",
+    "found": true
+  },
   "20704049": {
     "barcode": "20704049",
     "productName": "copo de leite",
@@ -7,6 +17,36 @@
     "allergens": "",
     "categories": "Semi-skimmed milks, UHT Milks, Cow milks, Lactose-free milk",
     "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/070/4049/front_en.59.400.jpg",
+    "found": true
+  },
+  "20704056": {
+    "barcode": "20704056",
+    "productName": "Leche Desnatada, Sin Lactosa",
+    "brand": "Milbona",
+    "ingredientsText": "cow's skimmed milk, lactase, retinyl acetate (vitamin a), colecalciferol (vitamin d), dl-alpha-tocopheryl acetate (vitamin e), pteroilmonoglutamic acid (folic acid), lactose content: ,lt,0,01g/100 ml concom",
+    "allergens": "milk",
+    "categories": "Skimmed milks, Lactose-free milk",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/070/4056/front_en.46.400.jpg",
+    "found": true
+  },
+  "20840006": {
+    "barcode": "20840006",
+    "productName": "Tahini",
+    "brand": "1001 Delights",
+    "ingredientsText": "en vochtigheid beschermen. Ongeopend, ten minste houdbaar tot ende Voor gebruik goed doorroeren. Na openen gekoeld bewaren bij max Pie de sésame. Ingrédients: 90% graines de sésame moulues, 10% huile de g Em Traces éventuelles de blé, d'œuf, de soja, de lait, de céleri et de moutarde mero de lot: voir ci-dessous. Anvée ouverture à conserver au réfrigérateur à alabri de la chaleur et de l'humidité. Non ouvert, à consommer de préférence",
+    "allergens": "",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/084/0006/front_en.9.400.jpg",
+    "found": true
+  },
+  "22200785": {
+    "barcode": "22200785",
+    "productName": "Tuna Olive Oil",
+    "brand": "Ja",
+    "ingredientsText": "Thunfisch 75.7%, natives Olivenöl extra 23.4%, Speisesalz",
+    "allergens": "kala",
+    "categories": "en:Tuna in olive oil",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/220/0785/front_fi.5.400.jpg",
     "found": true
   },
   "75032814": {
@@ -753,6 +793,48 @@
     "ingredientsText": "100% פרחי כרובית קפואים",
     "categories": "ירקות קפואים"
   },
+  "7290000090107": {
+    "productName": "כרוב ניצנים מובחר סנפרוסט",
+    "brand": "סנפרוסט",
+    "ingredientsText": "100% כרוב ניצנים קפוא מובחר",
+    "categories": "ירקות קפואים"
+  },
+  "7290000090114": {
+    "productName": "שעועית ירוקה עדינה שלמה סנפרוסט",
+    "brand": "סנפרוסט",
+    "ingredientsText": "100% תרמילי שעועית ירוקה עדינה קפואה",
+    "categories": "ירקות קפואים"
+  },
+  "7290000090121": {
+    "productName": "לקט כרוב לבן קצוץ שטוף חסלט / שטראוס",
+    "brand": "חסלט / שטראוס",
+    "ingredientsText": "100% כרוב לבן שטוף וחתוך מוכן למאכל",
+    "categories": "ירקות טריים ארוזים"
+  },
+  "7290000090138": {
+    "productName": "לקט כרוב אדום סגול קצוץ שטוף שטראוס",
+    "brand": "שטראוס",
+    "ingredientsText": "100% כרוב אדום שטוף וחתוך מוכן למאכל",
+    "categories": "ירקות טריים ארוזים"
+  },
+  "7290000090145": {
+    "productName": "קוביות דלעת טרייה קלופה שטראוס / שופרסל",
+    "brand": "שטראוס / שופרסל",
+    "ingredientsText": "100% קוביות דלעת כתומה טרייה קלופה",
+    "categories": "ירקות טריים ארוזים"
+  },
+  "7290000090152": {
+    "productName": "טחינה גולמית 100% שומשום טהור הר ברכה",
+    "brand": "הר ברכה",
+    "ingredientsText": "100% זרעי שומשום טהורים טחונים",
+    "categories": "ממרחים ושמנים"
+  },
+  "7290000090169": {
+    "productName": "רוטב סויה תמרי ללא גלוטן קיקומן",
+    "brand": "Kikkoman קיקומן",
+    "ingredientsText": "מים, פולי סויה, מלח, חומץ כוהלי (מותסס מסורתית)",
+    "categories": "רטבים ותבלינים"
+  },
   "7290000090091": {
     "productName": "בשר טחון טרי 100% שופרסל / רמי לוי",
     "brand": "שופרסל / רמי לוי קצביה",
@@ -1485,6 +1567,308 @@
     "ingredientsText": "100% מיצוי אגוז קוקוס (ללא תוספי סוכר, ללא חומרים משמרים - אור ירוק/צהוב עד 60 מ\"ל)",
     "categories": "תחליפי שמנת"
   },
+  "7290104724886": {
+    "productName": "תפוצ׳יפס גלים טבעי מלח (עלית שטראוס)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן צמחי, מלח (אור ירוק 🟢)",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290104724893": {
+    "productName": "תפוצ׳יפס XTRA טבעי מלח (Tapuchips Xtra)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן צמחי, מלח (אור ירוק 🟢)",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290104724909": {
+    "productName": "תפוצ׳יפס שמנת בצל (Tapuchips Sour Cream & Onion)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן צמחי, מלח, אבקת בצל, אבקת שום, מוצקי חלב, חומרי טעם וריח (אסור ל-SIBO! 🔴)",
+    "allergens": "מכיל בצל, שום ולקטוז",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290104724916": {
+    "productName": "תפוצ׳יפס בטעם ברביקיו (Tapuchips BBQ)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן, תבלינים, אבקת שום, אבקת בצל, סוכר (אסור ל-SIBO! 🔴)",
+    "allergens": "מכיל שום, בצל וסוכר",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290104724923": {
+    "productName": "תפוצ׳יפס מקסיקני (Tapuchips Mexican)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן, אבקת בצל, אבקת שום, פלפל חריף (אסור 🔴)",
+    "allergens": "מכיל בצל ושום",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290104724930": {
+    "productName": "תפוצ׳יפס בטעם קראנץ׳ מלח פלפל",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן, מלח, פלפל שחור (אור ירוק 🟢)",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290008407406": {
+    "productName": "קוואקר עדין אורגני הרדוף 500 גרם (פתיתי שיבולת שועל דקה להכנה מהירה)",
+    "brand": "הרדוף אורגני Harduf / תנובה",
+    "ingredientsText": "100% פתיתי שיבולת שועל אורגניים דקים להכנה מהירה (צהוב ל-SIBO עד 23 גרם)",
+    "allergens": "שיבולת שועל (עלול להכיל גלוטן מזיהום משני)",
+    "categories": "דגני בוקר, קוואקר ומזון אורגני"
+  },
+  "7290008407413": {
+    "productName": "קוואקר עדין אורגני הרדוף 500 גרם (שיבולת שועל דקה מהירה)",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% שיבולת שועל אורגנית טהורה",
+    "categories": "דגני בוקר וקוואקר אורגני"
+  },
+  "7290008407420": {
+    "productName": "שיבולת שועל עבה אורגנית הרדוף 500 גרם (קוואקר עבה)",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% פתיתי שיבולת שועל מלאה אורגנית",
+    "categories": "דגני בוקר וקוואקר אורגני"
+  },
+  "7290008407437": {
+    "productName": "סובין שיבולת שועל אורגני הרדוף 500 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% סובין שיבולת שועל אורגני",
+    "categories": "סובין ודגנים אורגניים"
+  },
+  "7290008407444": {
+    "productName": "קוואקר אורגני להכנה מהירה הרדוף 500 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% פתיתי שיבולת שועל אורגניים מובחרים",
+    "categories": "דגני בוקר וקוואקר אורגני"
+  },
+  "7290008407499": {
+    "productName": "טחינה גולמית אורגנית משומשום מלא הרדוף 500 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% שומשום מלא אורגני טהור (אור ירוק 🟢)",
+    "categories": "טחינה וממרחים אורגניים"
+  },
+  "7290008407512": {
+    "productName": "אורז בסמטי לבן אורגני הרדוף 1 ק״ג",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% אורז בסמטי אורגני מובחר (אור ירוק/צהוב 🟢)",
+    "categories": "אורז ודגנים אורגניים"
+  },
+  "7290008407536": {
+    "productName": "קינואה לבנה אורגנית הרדוף 500 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% קינואה לבנה אורגנית (אור ירוק 🟢)",
+    "categories": "דגנים וקינואה אורגנית"
+  },
+  "7290008407550": {
+    "productName": "כוסמת ירוקה אורגנית הרדוף 500 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% כוסמת ירוקה אורגנית לא קלויה (אור ירוק 🟢)",
+    "categories": "דגנים וכוסמת"
+  },
+  "7290008407567": {
+    "productName": "זרעי צ׳יה אורגניים הרדוף 300 גרם",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% זרעי צ׳יה אורגניים טבעיים (אור ירוק 🟢)",
+    "categories": "זרעים ומזונות על"
+  },
+  "7290008407581": {
+    "productName": "שמן זית כתית מעולה אורגני הרדוף 750 מ״ל",
+    "brand": "הרדוף אורגני Harduf",
+    "ingredientsText": "100% שמן זית ישראלי כתית מעולה בכבישה קרה (אור ירוק 🟢)",
+    "categories": "שמני מאכל אורגניים"
+  },
+  "0030000010204": {
+    "productName": "קוואקר קלאסי שיבולת שועל מלאה Quaker Oats Old Fashioned 1.19kg",
+    "brand": "Quaker Oats קוואקר המקורי",
+    "ingredientsText": "100% Whole Grain Rolled Oats (שיבולת שועל מלאה 100%)",
+    "categories": "דגני בוקר וקוואקר"
+  },
+  "0030000010402": {
+    "productName": "קוואקר 1 דקה להכנה מהירה Quaker Quick 1-Minute Oats",
+    "brand": "Quaker Oats קוואקר",
+    "ingredientsText": "100% פתיתי שיבולת שועל דקה להכנה מהירה בדקה אחת",
+    "categories": "דגני בוקר וקוואקר"
+  },
+  "0030000432709": {
+    "productName": "קוואקר שיבולת שועל ללא גלוטן מוסמך Quaker Gluten Free Rolled Oats",
+    "brand": "Quaker Gluten Free",
+    "ingredientsText": "100% פתיתי שיבולת שועל מלאה ללא גלוטן מוסמכת ומפוקחת (בטוח לצליאק)",
+    "categories": "קוואקר ללא גלוטן"
+  },
+  "7290104723018": {
+    "productName": "שיבולת שועל דקה להכנה מהירה (קוואקר) שופרסל גרין / שופרסל 500 גרם",
+    "brand": "שופרסל / שופרסל גרין",
+    "ingredientsText": "100% פתיתי שיבולת שועל דקה מובחרת",
+    "categories": "דגני בוקר וקוואקר"
+  },
+  "7290005401014": {
+    "productName": "שיבולת שועל דקה אורגנית תבואות 500 גרם (קוואקר אורגני)",
+    "brand": "תבואות Tevuot",
+    "ingredientsText": "100% שיבולת שועל אורגנית דקה",
+    "categories": "דגנים וקוואקר אורגני"
+  },
+  "7290014201019": {
+    "productName": "שיבולת שועל להכנה מהירה ללא גלוטן בר-אל 500 גרם (לצליאק)",
+    "brand": "בר-אל Bar-El ללא גלוטן",
+    "ingredientsText": "100% פתיתי שיבולת שועל טהורה מוסמכת ללא גלוטן (אור ירוק לצליאק 🟢)",
+    "categories": "דגנים ללא גלוטן"
+  },
+  "7290011501022": {
+    "productName": "שיבולת שועל דקה ללא גלוטן גרין לייט 500 גרם (Green Lite Gluten Free)",
+    "brand": "גרין לייט Green Lite",
+    "ingredientsText": "100% שיבולת שועל דקה ללא גלוטן מפוקחת (בטוח לצליאק 🟢)",
+    "categories": "דגנים ללא גלוטן"
+  },
+  "7290105360878": {
+    "productName": "תפוצ׳יפס קלאסי בטעם טבעי 50 גרם (עלית שטראוס)",
+    "brand": "עלית / שטראוס (Tapuchips Natural 50g)",
+    "ingredientsText": "תפוחי אדמה (64%), שמנים צמחיים, מלח (ללא שום, ללא בצל, ללא גלוטן - אור ירוק ל-SIBO! 🟢)",
+    "categories": "חטיפים מלוחים וצ׳יפס"
+  },
+  "7290105360885": {
+    "productName": "תפוצ׳יפס קלאסי בטעם טבעי 70 גרם (עלית שטראוס)",
+    "brand": "עלית / שטראוס (Tapuchips Classic 70g)",
+    "ingredientsText": "תפוחי אדמה (64%), שמנים צמחיים, מלח (אור ירוק ל-SIBO! 🟢)",
+    "categories": "חטיפים מלוחים וצ׳יפס"
+  },
+  "7290105360892": {
+    "productName": "תפוצ׳יפס גלים בטעם טבעי מלח 50 גרם (עלית שטראוס)",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן צמחי, מלח (אור ירוק 🟢)",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290105360908": {
+    "productName": "תפוצ׳יפס XTRA גלי עמוק בטעם טבעי מלח 60 גרם",
+    "brand": "עלית / שטראוס",
+    "ingredientsText": "תפוחי אדמה, שמן צמחי, מלח (אור ירוק 🟢)",
+    "categories": "חטיפים מלוחים"
+  },
+  "7290018249123": {
+    "productName": "אינסטנט פודינג בטעם וניל ללא סוכר סוויטנגו (Sweetango Vanilla Pudding)",
+    "brand": "סוויטנגו Sweetango / מילניום",
+    "ingredientsText": "עמילן מעובד (E1422), ממתיק סוויטנגו (אריתריטול, סטיביול גליקוזיד), חומרי טעם וריח, צבע מאכל טבעי בטא קרוטן (ללא תוספת סוכר, דל FODMAP, מתאים ל-SIBO ולסוכרתיים! 🟢)",
+    "categories": "אפייה, פודינג וקינוחים ללא סוכר"
+  },
+  "7290018249000": {
+    "productName": "תחליף סוכר שקית 250 גרם סוויטנגו (Sweetango Erythritol & Stevia)",
+    "brand": "סוויטנגו Sweetango",
+    "ingredientsText": "אריתריטול, תמצית עלי סטיביה (0 קלוריות, לא מתסיס, בטוח ל-SIBO! 🟢)",
+    "categories": "ממתיקים ותחליפי סוכר"
+  },
+  "7290018249017": {
+    "productName": "תחליף סוכר שקית 500 גרם סוויטנגו (Sweetango)",
+    "brand": "סוויטנגו Sweetango",
+    "ingredientsText": "אריתריטול וסטיביה (אור ירוק 🟢)",
+    "categories": "ממתיקים ותחליפי סוכר"
+  },
+  "7290018249079": {
+    "productName": "שוקולד מריר מעולה ללא תוספת סוכר סוויטנגו (Sweetango Dark Chocolate)",
+    "brand": "סוויטנגו Sweetango",
+    "ingredientsText": "עיסת קקאו, ממתיק סוויטנגו (אריתריטול, סטיביה), חמאת קקאו, לציטין חמניות (אור ירוק 🟢)",
+    "categories": "שוקולד וממתקים ללא סוכר"
+  },
+  "7290015129589": {
+    "productName": "דפי אורז לבן עגולים 22 ס\"מ וילקוניק (Wilconic Rice Paper)",
+    "brand": "וילקוניק Wilconic / מזרח ומערב",
+    "ingredientsText": "קמח אורז לבן (85%), עמילן טפיוקה, מים, מלח ים (100% טבעי, ללא גלוטן, דל תסיסה, מושלם ל-SIBO! 🟢)",
+    "categories": "דפי אורז, נודלס ומוצרים אסיאתיים"
+  },
+  "7290015129503": {
+    "productName": "דפי אורז עגולים 16 ס\"מ וילקוניק (Wilconic Rice Paper 16cm)",
+    "brand": "וילקוניק Wilconic",
+    "ingredientsText": "קמח אורז, טפיוקה, מים, מלח (אור ירוק 🟢)",
+    "categories": "דפי אורז"
+  },
+  "7290015129572": {
+    "productName": "דפי אורז מרובעים וילקוניק 22 ס\"מ (Wilconic)",
+    "brand": "וילקוניק Wilconic",
+    "ingredientsText": "קמח אורז, מים, מלח (אור ירוק 🟢)",
+    "categories": "דפי אורז"
+  },
+  "7290015129596": {
+    "productName": "אטריות אורז רחבות וילקוניק (Wilconic Rice Noodles)",
+    "brand": "וילקוניק Wilconic",
+    "ingredientsText": "100% קמח אורז ומים (אור ירוק 🟢)",
+    "categories": "אטריות אורז"
+  },
+  "7290013145970": {
+    "productName": "קורנפלור טהור 500 גרם (גלעם / Galam Pure Cornflour)",
+    "brand": "גלעם Galam / דגן",
+    "ingredientsText": "100% עמילן תירס טהור (ללא גלוטן, ללא שום, ללא לקטוז, דל FODMAP - אור ירוק ל-SIBO ולצליאק! 🟢)",
+    "categories": "אפייה, קורנפלור ועמילנים"
+  },
+  "7290108350012": {
+    "productName": "קורנפלור מיה 500 גרם (Maya Cornstarch)",
+    "brand": "מיה תעשיות מזון Maya",
+    "ingredientsText": "100% עמילן תירס מובחר (אור ירוק 🟢)",
+    "categories": "אפייה וקורנפלור"
+  },
+  "7290104720017": {
+    "productName": "קורנפלור שופרסל 500 גרם (Shufersal Cornstarch)",
+    "brand": "שופרסל",
+    "ingredientsText": "100% עמילן תירס טהור (אור ירוק 🟢)",
+    "categories": "אפייה וקורנפלור"
+  },
+  "7290013145000": {
+    "productName": "קמח תפוחי אדמה גלעם 500 גרם (Potato Starch)",
+    "brand": "גלעם Galam",
+    "ingredientsText": "100% עמילן תפוחי אדמה טהור (אור ירוק 🟢)",
+    "categories": "אפייה ועמילנים"
+  },
+  "7290005401052": {
+    "productName": "קמח אורז לבן טהור תבואות 500 גרם (White Rice Flour)",
+    "brand": "תבואות Tevuot",
+    "ingredientsText": "100% קמח אורז לבן טהור (אור ירוק 🟢)",
+    "categories": "קמחים ללא גלוטן"
+  },
+  "7290005401069": {
+    "productName": "קמח טפיוקה טהור תבואות 500 גרם (Tapioca Starch)",
+    "brand": "תבואות Tevuot",
+    "ingredientsText": "100% עמילן טפיוקה טהור (אור ירוק 🟢)",
+    "categories": "קמחים ללא גלוטן ועמילנים"
+  },
+  "3073781190595": {
+    "productName": "גבינה מותכת לה ואש קירי 18.5% שומן משולשים (La Vache Qui Rit / The Laughing Cow)",
+    "brand": "לה ואש קירי / בל (La Vache Qui Rit / Bel)",
+    "ingredientsText": "חלב פרה מפוסטר, גבינות (מכיל חלב), חמאה, אבקת מי גבינה, חלבוני חלב, מלחי התכה (פוליפוספטים E452, נתרן פוספטים, חומצת לימון), מלח שולחן (עשיר בלקטוז ומלחי התכה - אסור ל-SIBO בשלב 1 קפדני! 🔴)",
+    "allergens": "מכיל חלב, לקטוז, מוצקי מי גבינה",
+    "categories": "גבינות מותכות וממרחי גבינה"
+  },
+  "3073780965033": {
+    "productName": "גבינה מותכת לה ואש קירי 8 משולשים 128 גרם (La Vache Qui Rit)",
+    "brand": "לה ואש קירי / בל (Bel)",
+    "ingredientsText": "חלב, גבינות, חמאה, אבקת מי גבינה, מלחי התכה (פוספטים) (אסור ל-SIBO 🔴)",
+    "allergens": "מכיל לקטוז ומוצקי חלב",
+    "categories": "גבינות מותכות"
+  },
+  "3073781115338": {
+    "productName": "גבינה מותכת לה ואש קירי 16 משולשים (The Laughing Cow 16 Portions)",
+    "brand": "לה ואש קירי / בל (Bel)",
+    "ingredientsText": "חלב פרה, גבינות, אבקת מי גבינה, מלחי התכה (אסור ל-SIBO 🔴)",
+    "allergens": "מכיל לקטוז",
+    "categories": "גבינות מותכות"
+  },
+  "7290000065006": {
+    "productName": "גבינה מותכת עמק תנובה משולשים (Tnuva Emek Melted Cheese)",
+    "brand": "תנובה Tnuva",
+    "ingredientsText": "גבינה צהובה עמק (40%), מים, חמאה, אבקת חלב, אבקת מי גבינה, מלחי התכה (E452, E339), מלח (עשיר בלקטוז - אסור ל-SIBO 🔴)",
+    "allergens": "מכיל חלב ולקטוז",
+    "categories": "גבינות מותכות"
+  },
+  "7290004123011": {
+    "productName": "גבינה מותכת פרזידנט 8 משולשים (President Processed Cheese)",
+    "brand": "פרזידנט President",
+    "ingredientsText": "גבינות, חמאה, אבקת מי גבינה, מלחי התכה (אסור ל-SIBO 🔴)",
+    "categories": "גבינות מותכות"
+  },
+  "7290000065501": {
+    "productName": "גבינת פרמזן גרנה פדנו מיושנת 0% לקטוז (Grana Padano / Parmesan)",
+    "brand": "תנובה Collection / מחלבות גד",
+    "ingredientsText": "חלב פרה, מלח, אנזים הגבנה (מיושנת 16+ חודשים, 0% לקטוז טבעי - אור ירוק בטוח ל-SIBO! 🟢)",
+    "categories": "גבינות קשות מיושנות"
+  },
+  "7290000065518": {
+    "productName": "גבינת גאודה הולנדית קשה (Gouda Cheese)",
+    "brand": "תנובה Collection / גד",
+    "ingredientsText": "חלב פרה מפוסטר, מלח, אנזים, חומצה לקטית (דלה מאוד בלקטוז - אור ירוק 🟢)",
+    "categories": "גבינות קשות"
+  },
   "7293110003693": {
     "productName": "תה קר בטעם אפרסק (Fuze Tea פיוז תה)",
     "brand": "Fuze Tea / החברה המרכזית למשקאות",
@@ -1674,7 +2058,7 @@
   "8480000107220": {
     "barcode": "8480000107220",
     "productName": "Leche semidesnatada sin lactosa",
-    "brand": "Hacendado",
+    "brand": "Hacendado, MERCADONA",
     "ingredientsText": "semi-skimmed milk, lactase.",
     "allergens": "milk",
     "categories": "Semi-skimmed milks, UHT Milks, Cow milks, Lactose-free milk",
@@ -1765,7 +2149,7 @@
     "barcode": "8008698011065",
     "productName": "MAESTRO VITAL - Pain aux graines tranché",
     "brand": "Schär",
-    "ingredientsText": "maize starch, sourdough 20% (rice flour, water), water, rice flour, sunflower seeds 6.6%, flax seeds 6.6%, vegetable fiber (psyllium), quinoa flour 2.9%, apple extract, sorghum flour 2.6%, yeast, sunflower oil, thickener: hydroxypropyl methylcellulose, chestnut flour 1.0%, iodized salt (salt, potassium iodide), natural flavor",
+    "ingredientsText": "maize starch, sourdough 20% (rice flour, water), water, rice flour, sunflower seeds 6,6%, flax seeds 6,6%, vegetable fiber (psyllium), quinoa flour 2,9%, apple extract, sorghum flour 2,6%, yeast, sunflower oil, thickener: hydroxypropyl methylcellulose, chestnut flour 1,0%, iodized salt (salt, potassium iodide), natural flavor",
     "allergens": "",
     "categories": "Gluten-free sliced breads",
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/869/801/1065/front_en.490.400.jpg",
@@ -2729,6 +3113,386 @@
     "allergens": "",
     "categories": "Dark chocolates",
     "imageUrl": "https://images.openfoodfacts.org/images/products/004/060/002/9780/front_en.5.400.jpg",
+    "found": true
+  },
+  "8076809545488": {
+    "barcode": "8076809545488",
+    "productName": "Coquillettes sans gluten",
+    "brand": "Barilla",
+    "ingredientsText": "white corn flour (65%), yellow corn flour (29,5%), rice flour (5%), water, emulsifier: mono - and diglycerides of vegetable fatty acids,",
+    "allergens": "",
+    "categories": "Cereals and their products, Dry pastas, fr:Coquillettes, fr:Coquillettes sans gluten, fr:Féculents",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/954/5488/front_fr.52.400.jpg",
+    "found": true
+  },
+  "0011150511315": {
+    "barcode": "0011150511315",
+    "productName": "Roundy's, smooth and creamy almond-milk, original",
+    "brand": "Roundy's",
+    "ingredientsText": "Almondmilk (filtered water, almonds), evaporated cane juice, tricalcium phosphate, sea salt, gellan gum, dipotassium phosphate, xanthan gum, sunflower lecithin, vitamin a palmitate, vitamin d2, dl-alpha-tocopherol acetate (vitamin e).",
+    "allergens": "nuts",
+    "categories": "Plant-based milk alternatives",
+    "imageUrl": "",
+    "found": true
+  },
+  "6111184003863": {
+    "barcode": "6111184003863",
+    "productName": "Thon a huile végétale",
+    "brand": "PESCADA",
+    "ingredientsText": "Thon, huile de soja et sel،",
+    "allergens": "poisson, soja",
+    "categories": "Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/611/118/400/3863/front_fr.4.400.jpg",
+    "found": true
+  },
+  "3019081235598": {
+    "barcode": "3019081235598",
+    "productName": "Émietté de thon Le Mariné basilic",
+    "brand": "Petit Navire",
+    "ingredientsText": "Thon (81%), huile d'olive vierge (12%), basilic (1%), arôme naturel, sel, épaississant : gomme guar",
+    "allergens": "poisson",
+    "categories": "Thons à l'huile d'olive, Miettes de thon, Émietté de thon",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/301/908/123/5598/front_fr.62.400.jpg",
+    "found": true
+  },
+  "3263670454017": {
+    "barcode": "3263670454017",
+    "productName": "Thon listao huile d olive",
+    "brand": "Phare d'Eckmühl",
+    "ingredientsText": "THON listao (Katsuwonus pelamis), huile d'olive vierge extra*, sel.",
+    "allergens": "poisson",
+    "categories": "Thons à l'huile d'olive, thons listao",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/326/367/045/4017/front_fr.44.400.jpg",
+    "found": true
+  },
+  "3019082000201": {
+    "barcode": "3019082000201",
+    "productName": "Lot x2 thon olive",
+    "brand": "Petit Navire",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/301/908/200/0201/front_fr.8.400.jpg",
+    "found": true
+  },
+  "8004030950078": {
+    "barcode": "8004030950078",
+    "productName": "Thon entier avec un filet d'huile d'olive",
+    "brand": "Rio mare",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/403/095/0078/front_fr.3.400.jpg",
+    "found": true
+  },
+  "4056489850618": {
+    "barcode": "4056489850618",
+    "productName": "Tonno all'olio di oliva",
+    "brand": "Nixe",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Tuna in olive oil",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/985/0618/front_en.13.400.jpg",
+    "found": true
+  },
+  "3660088112773": {
+    "barcode": "3660088112773",
+    "productName": "Émietté de thon Zanzibar aux pruneaux et épices",
+    "brand": "La belle-iloise",
+    "ingredientsText": "_Thon_ blanc germon (44%), huile d'olive vierge extra, oignons (14%), eau, vinaigre de cidre, pruneaux (3,7%), huile de _ noix_, fécule de manioc, oignons rissolés (0,7%), sel, poudre de tomate, plantes aromatiques, épices (contenant _céleri_, graines de _moutarde_) (0,2%)",
+    "allergens": "céleri, poisson, moutarde, fruits à coque",
+    "categories": "Viandes et dérivés, Rillettes de poissons, Thons à l'huile d'olive, Thons blancs, Emiette",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/366/008/811/2773/front_fr.42.400.jpg",
+    "found": true
+  },
+  "3329150350252": {
+    "barcode": "3329150350252",
+    "productName": "FILETS DE THON A L'HUILE D'OLIVE",
+    "brand": "Nautilus",
+    "ingredientsText": "Thon (poisson), huile d'olive vierge 34%, sel.",
+    "allergens": "poisson",
+    "categories": "Filets de thon, Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/332/915/035/0252/front_fr.26.400.jpg",
+    "found": true
+  },
+  "3019082000065": {
+    "barcode": "3019082000065",
+    "productName": "Thon entier à l'huile d'olive vierge extra",
+    "brand": "PETIT NAVIRE",
+    "ingredientsText": "Thon obèse, huile d'olive vierge extra",
+    "allergens": "",
+    "categories": "Surgelés, Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/301/908/200/0065/front_fr.20.400.jpg",
+    "found": true
+  },
+  "8017596100580": {
+    "barcode": "8017596100580",
+    "productName": "Tonno all'olio extravergine di oliva",
+    "brand": "Eurospin, Ondina",
+    "ingredientsText": "TONNO a pinne gialle (Thunnus albacares), olio extra vergine di oliva, sale.",
+    "allergens": "pesce",
+    "categories": "Tonno pinna gialla, Tonno sott'olio di oliva, Tonno all'olio extravergine di oliva",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/801/759/610/0580/front_en.10.400.jpg",
+    "found": true
+  },
+  "6194029101306": {
+    "barcode": "6194029101306",
+    "productName": "Thon EL Manar",
+    "brand": "El Manar",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Thons à l'huile d'olive",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/619/402/910/1306/front_fr.3.400.jpg",
+    "found": true
+  },
+  "4335619202795": {
+    "barcode": "4335619202795",
+    "productName": "Tuna in extra virgin olive oil",
+    "brand": "Nixe",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Tuna in olive oil",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/433/561/920/2795/front_en.3.400.jpg",
+    "found": true
+  },
+  "8055320190759": {
+    "barcode": "8055320190759",
+    "productName": "Tonno olio di oliva",
+    "brand": "Mare Aperto",
+    "ingredientsText": "TONNO, olio di oliva, sale (0,89%)",
+    "allergens": "pesce",
+    "categories": "Tonno sott'olio di oliva",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/805/532/019/0759/front_it.17.400.jpg",
+    "found": true
+  },
+  "4311501445365": {
+    "barcode": "4311501445365",
+    "productName": "Thunfisch Filets in Olivenöl",
+    "brand": "Edeka",
+    "ingredientsText": "70% Thunfisch, 29% Olivenöl, Speisesalz",
+    "allergens": "Fisch",
+    "categories": "Thunfischfilets, Thunfische in Olivenöl",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/431/150/144/5365/front_de.18.400.jpg",
+    "found": true
+  },
+  "8003294526715": {
+    "barcode": "8003294526715",
+    "productName": "Filetti di tonno all'olio extravergine di oliva biologico",
+    "brand": "ASdoMAR",
+    "ingredientsText": "Tonno a pinne gialle (Thunnus albacares), olio extravergine di oliva, sale",
+    "allergens": "pesce",
+    "categories": "Filetti di tonno, Tonno sott'olio di oliva",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/329/452/6715/front_it.3.400.jpg",
+    "found": true
+  },
+  "8005960512756": {
+    "barcode": "8005960512756",
+    "productName": "Tonno all'olio di oliva",
+    "brand": "Vera marca Rizzoli",
+    "ingredientsText": "Tonno (Thunnus albacares), olio di oliva, sale",
+    "allergens": "pesce",
+    "categories": "Tonno sott'olio di oliva",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/596/051/2756/front_it.3.400.jpg",
+    "found": true
+  },
+  "5051007165143": {
+    "barcode": "5051007165143",
+    "productName": "Tuna Shredded Olive Oil",
+    "brand": "Stockwell & Co.",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "en:Tuna in olive oil",
+    "imageUrl": "",
+    "found": true
+  },
+  "8033256002407": {
+    "barcode": "8033256002407",
+    "productName": "Tonno all'olio di oliva",
+    "brand": "Decò",
+    "ingredientsText": "TONNO a pinne gialle (Thunnus albacares), olio di oliva, sale.",
+    "allergens": "pesce",
+    "categories": "Tonno sott'olio di oliva, Tonno al naturale",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/803/325/600/2407/front_it.10.400.jpg",
+    "found": true
+  },
+  "8004030260160": {
+    "barcode": "8004030260160",
+    "productName": "Tonno all'olio di oliva",
+    "brand": "",
+    "ingredientsText": "Tonno*, olio di oliva, salamoia (acqua, sale). Euthynnus [Katsuwonus] pelamis",
+    "allergens": "pesce",
+    "categories": "Tonno sott'olio di oliva",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/403/026/0160/front_it.13.400.jpg",
+    "found": true
+  },
+  "8002352305002": {
+    "barcode": "8002352305002",
+    "productName": "Tahin purée de sésame bio",
+    "brand": "Damiano",
+    "ingredientsText": "100% graines de sésame décortiquées bio",
+    "allergens": "graines de sésame",
+    "categories": "Purées de sésame",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/235/230/5002/front_fr.42.400.jpg",
+    "found": true
+  },
+  "4000915102871": {
+    "barcode": "4000915102871",
+    "productName": "Houmous Tahini au sésame",
+    "brand": "Bio verde",
+    "ingredientsText": "pois chiches 61%, huile d'olive, huile de tournesol, tahini (purée de _sésame_) 3%, sirop d'agave, jus de citron concentré, persil, ail, sel marin, cumin, paprika.",
+    "allergens": "graines de sésame",
+    "categories": "Houmous",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/400/091/510/2871/front_fr.62.400.jpg",
+    "found": true
+  },
+  "4056489541813": {
+    "barcode": "4056489541813",
+    "productName": "Tahini",
+    "brand": "Eridanous",
+    "ingredientsText": "100% semi di sesamo integrali.",
+    "allergens": "semi di sesamo",
+    "categories": "Semi di cereale, Sesamo, Tahina",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/954/1813/front_it.23.400.jpg",
+    "found": true
+  },
+  "5000362110206": {
+    "barcode": "5000362110206",
+    "productName": "Tahini",
+    "brand": "Cypressa",
+    "ingredientsText": "Roasted Pulped Sesame Seeds",
+    "allergens": "",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/500/036/211/0206/front_en.28.400.jpg",
+    "found": true
+  },
+  "5054269413625": {
+    "barcode": "5054269413625",
+    "productName": "Tesco Tahini",
+    "brand": "Tesco",
+    "ingredientsText": "Roasted Pulped Sesame Seeds",
+    "allergens": "",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/505/426/941/3625/front_en.24.400.jpg",
+    "found": true
+  },
+  "4056489541806": {
+    "barcode": "4056489541806",
+    "productName": "Tahini, Sesammus mit Honig",
+    "brand": "Eridanous",
+    "ingredientsText": "65% gemahlener Sesam, 20% Honig, pflanzliche Öle (Sonnenblume, Sesam, Ölpalme), Maltodextrin, Emulgator: Lecithine; Aroma.",
+    "allergens": "Sesam",
+    "categories": "Tahin",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/954/1806/front_fr.37.400.jpg",
+    "found": true
+  },
+  "4104420177673": {
+    "barcode": "4104420177673",
+    "productName": "Tahin Sesammus",
+    "brand": "Alnatura, Alnatura GmbH",
+    "ingredientsText": "SESAM* geröstet und geschält, SESAM* geröstet und ungeschält *aus biologischer Landwirtschaft\nKann Spuren von Erdnuss, Mandel, Haselnuss und Cashewnuss enthalten.",
+    "allergens": "Sesam",
+    "categories": "Nußbutter, en:White tahini, Nussmuse",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/410/442/017/7673/front_de.81.400.jpg",
+    "found": true
+  },
+  "8480000174413": {
+    "barcode": "8480000174413",
+    "productName": "Pasta de sésamo tahini",
+    "brand": "Hacendado",
+    "ingredientsText": "Semillas de _sésamo_ (100%),",
+    "allergens": "granos de sésamo",
+    "categories": "Salsas, Tahinis, en:groceries",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/848/000/017/4413/front_en.96.400.jpg",
+    "found": true
+  },
+  "00436151": {
+    "barcode": "00436151",
+    "productName": "Tahini",
+    "brand": "Sainsbury's",
+    "ingredientsText": "Sesame Seed (100%).",
+    "allergens": "sesame seeds",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/000/000/043/6151/front_en.3.400.jpg",
+    "found": true
+  },
+  "5000169090336": {
+    "barcode": "5000169090336",
+    "productName": "Houmous",
+    "brand": "Duchy Organic",
+    "ingredientsText": "Cooked chickpeas (48%) (water*, chickpeas), water*, sunflower oil, tahini (14%) (sesame seed paste), concentrated lemon juice, sea salt*, garlic.",
+    "allergens": "sesame seeds",
+    "categories": "Hummus",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/500/016/909/0336/front_en.24.400.jpg",
+    "found": true
+  },
+  "5000169251201": {
+    "barcode": "5000169251201",
+    "productName": "Tahini",
+    "brand": "Waitrose & Partners",
+    "ingredientsText": "Sesame seeds",
+    "allergens": "sesame seeds",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/500/016/925/1201/front_en.34.400.jpg",
+    "found": true
+  },
+  "8402001035265": {
+    "barcode": "8402001035265",
+    "productName": "Tahini",
+    "brand": "Hacendado",
+    "ingredientsText": "Semillas de sesamo",
+    "allergens": "granos de sésamo",
+    "categories": "Tahinis blancos",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/840/200/103/5265/front_es.20.400.jpg",
+    "found": true
+  },
+  "5030343834807": {
+    "barcode": "5030343834807",
+    "productName": "Authentic Tahini",
+    "brand": "Belazu",
+    "ingredientsText": "SESAME SEEDS (SESAME).",
+    "allergens": "sesame seeds",
+    "categories": "Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/503/034/383/4807/front_en.3.400.jpg",
+    "found": true
+  },
+  "3270160866410": {
+    "barcode": "3270160866410",
+    "productName": "CHoux-fleurs sauce tahini",
+    "brand": "Picard",
+    "ingredientsText": "Eau, chou-fleur 23,9%, huile de tournesol, oignon, pâte de SÉSAME 10,2%, huile d'olive vierge extra, sel, ail, curry (curcuma, piment rouge, poivre, gingembre, noix de muscade, fenugrec, fenouil, cumin, coriandre, cannelle, clou de girofle, graine de MOUTARDE, graine de carvi, cardamome, ail), persil 1%, cumin, curcuma, acidifiant: acide citrique, paprika, gingembre, poivre. Peut contenir des traces de: gluten, oeuf, soja, lait, fruits à coque.",
+    "allergens": "gluten, sesame seeds",
+    "categories": "Frozen foods, Meals",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/327/016/086/6410/front_en.3.400.jpg",
+    "found": true
+  },
+  "5201049211401": {
+    "barcode": "5201049211401",
+    "productName": "Macedonian Tahini",
+    "brand": "Filos, Haitoglou",
+    "ingredientsText": "100% DRCENÁ SEZAMOVÁ SEMENA",
+    "allergens": "sezamová semena",
+    "categories": "en:Tahini",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/520/104/921/1401/front_en.16.400.jpg",
+    "found": true
+  },
+  "8002352100577": {
+    "barcode": "8002352100577",
+    "productName": "Tahin",
+    "brand": "Damiano",
+    "ingredientsText": "",
+    "allergens": "",
+    "categories": "Purées de sésame",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/800/235/210/0577/front_fr.3.400.jpg",
+    "found": true
+  },
+  "7290000572109": {
+    "barcode": "7290000572109",
+    "productName": "Tehina",
+    "brand": "ACHVA",
+    "ingredientsText": "Graines de _sésame_ broyées 100 %.",
+    "allergens": "graines de sésame",
+    "categories": "Purées de sésame, Pâtes de sésame",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/729/000/057/2109/front_fr.6.400.jpg",
     "found": true
   }
 }

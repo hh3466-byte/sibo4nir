@@ -23,8 +23,21 @@ export function normalizeHebrew(str: string): string {
 }
 
 /**
+ * Known distinct Hebrew food pairs where one word is a substring of the other,
+ * but they are completely DIFFERENT foods with different nutritional / SIBO profiles!
+ * E.g., 'כרוב' (cabbage) vs 'כרובית' (cauliflower), 'שום' (garlic) vs 'שומשום' (sesame).
+ */
+const SEMANTIC_COLLISION_PAIRS: Array<{ wordA: string; wordB: string }> = [
+  { wordA: 'כרוב', wordB: 'כרובית' },
+  { wordA: 'שום', wordB: 'שומשום' },
+  { wordA: 'דלעת', wordB: 'דלורית' },
+  { wordA: 'חלב', wordB: 'חלבון' },
+  { wordA: 'חלב', wordB: 'חלמון' },
+];
+
+/**
  * Fuzzy check if target string contains the query under normalized Hebrew matching.
- * Uses whole-word boundary matching for short words to prevent false positives (e.g. 'מש' inside 'להשתמש').
+ * Uses whole-word boundary matching and explicit semantic collision guards.
  */
 export function fuzzyHebrewMatch(target: string, query: string): boolean {
   if (!target || !query) return false;
@@ -39,23 +52,50 @@ export function fuzzyHebrewMatch(target: string, query: string): boolean {
   const targetTokens = normTarget.split(' ').filter((t) => t.length > 0);
   const queryTokens = normQuery.split(' ').filter((t) => t.length > 0);
 
-  // If one of the strings is a short token (<= 3 chars), require whole-token match
-  if (normTarget.length <= 3) {
+  // 1. Guard against distinct Hebrew foods that share substring roots
+  for (const pair of SEMANTIC_COLLISION_PAIRS) {
+    const queryHasA = queryTokens.includes(pair.wordA);
+    const queryHasB = queryTokens.includes(pair.wordB) || normQuery.includes(pair.wordB);
+    const targetHasA = targetTokens.includes(pair.wordA);
+    const targetHasB = targetTokens.includes(pair.wordB) || normTarget.includes(pair.wordB);
+
+    // If query specifically asks for A and target is B (without A as independent token)
+    if (queryHasA && !queryHasB && targetHasB && !targetHasA) {
+      return false;
+    }
+    // If query specifically asks for B and target is A (without B)
+    if (queryHasB && !queryHasA && targetHasA && !targetHasB) {
+      return false;
+    }
+  }
+
+  // 2. Exact token match (e.g. query 'כרוב' inside 'כרוב לבן טרי')
+  if (queryTokens.length === 1 && targetTokens.includes(normQuery)) {
+    return true;
+  }
+  if (targetTokens.length === 1 && queryTokens.includes(normTarget)) {
+    return true;
+  }
+
+  // 3. Short token protection: In Hebrew, most root nouns are 3-4 letters
+  // (שום, בצל, כרוב, דלעת, גזר, חלב, תה, ביצה, עוף, אורז, דג).
+  // Require whole-token match if either side is <= 4 characters to prevent false positives.
+  if (normTarget.length <= 4) {
     return queryTokens.includes(normTarget);
   }
-  if (normQuery.length <= 3) {
+  if (normQuery.length <= 4) {
     return targetTokens.includes(normQuery);
   }
 
-  // Substring match for longer strings
+  // 4. Substring match for longer strings (>= 5 chars)
   if (normTarget.includes(normQuery) || normQuery.includes(normTarget)) {
     return true;
   }
 
-  // Tokenized word matching (all search words must exist in target)
+  // 5. Tokenized multi-word matching (all search words must exist in target)
   if (queryTokens.length > 1) {
     const allTokensMatch = queryTokens.every((token) =>
-      token.length <= 3 ? targetTokens.includes(token) : normTarget.includes(token)
+      token.length <= 4 ? targetTokens.includes(token) : normTarget.includes(token)
     );
     if (allTokensMatch) return true;
   }

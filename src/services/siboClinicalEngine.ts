@@ -257,6 +257,45 @@ export function getSmartCategoricalSubstitutions(query: string): string[] {
     ];
   }
 
+  // Cabbage (כרוב לבן, כרוב אדום)
+  if (q.includes('כרוב') && !q.includes('כרובית') && !q.includes('ניצנים')) {
+    return [
+      '🥬 חסה ערבית או אייסברג פריכה (אור ירוק חופשי)',
+      '🥬 בוק צ׳וי / כרוב סיני וומבוק (דל FODMAP מעולה לסיבו)',
+      '🥬 עלי תרד בייבי טריים או מוקפצים',
+      '🥒 מלפפון ירוק קלוף',
+      '🥕 גזר טרי מגורר'
+    ];
+  }
+
+  // Pumpkin & Squash (דלעת, דלורית)
+  if (q.includes('דלעת') || q.includes('דלורית')) {
+    return [
+      '🎃 דלעת יפנית קבוצ׳ה (0 FODMAP מותרת חופשי)',
+      '🥕 גזר מבושל ורך (0 FODMAP)',
+      '🥒 קישוא / זוקיני מבושל בשמן זית',
+      '🥔 תפוח אדמה אפוי'
+    ];
+  }
+
+  // Green Beans (שעועית ירוקה / צהובה)
+  if (q.includes('שעועית ירוקה') || q.includes('שעועית צהובה') || q.includes('שעועית עדינה')) {
+    return [
+      '🥒 קישואים מבושלים בשמן זית',
+      '🥕 גזר טרי או אפוי',
+      '🥬 עלי תרד בייבי'
+    ];
+  }
+
+  // Sesame & Tahini (שומשום, טחינה)
+  if (q.includes('שומשום') || q.includes('טחינה')) {
+    return [
+      '🫒 שמן זית כתית מעולה',
+      '🥜 חמאת בוטנים טבעית 100% ללא סוכר',
+      '🌻 גרעיני דלעת או חמניה טבעיים (עד 2 כפות)'
+    ];
+  }
+
   // 10. High FODMAP Vegetables (כרובית, פטריות, ארטישוק, כרוב ניצנים, אספרגוס)
   if (
     q.includes('כרובית') ||
@@ -510,6 +549,411 @@ export function analyzeIngredientsList(
 
 // Extensive dictionary of clinical SIBO dietary rules
 const CLINICAL_SIBO_RULES: ClinicalRule[] = [
+  // --- כרוב לבן / ירוק / סגול / אדום / סלט כרוב (Cabbage) - YELLOW Phase 1 (עד 75 גרם), GREEN Phase 2 ---
+  {
+    keywords: [
+      'כרוב',
+      'כרוב לבן',
+      'כרוב ירוק',
+      'כרוב אדום',
+      'כרוב סגול',
+      'סלט כרוב',
+      'סלט כרוב לבן',
+      'סלט כרוב אדום',
+      'כרוב קצוץ',
+      'כרוב מבושל',
+      'כרוב מאודה',
+      'cabbage',
+      'white cabbage',
+      'red cabbage'
+    ],
+    statusPhase1: 'YELLOW',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'כרוב לבן / ירוק / סגול (טרי או מבושל)',
+    foodNameEn: 'Common Cabbage (White / Red)',
+    verdictHe: 'אור צהוב! כרוב מותר לניר אך ורק בכמות מדודה של עד 75 גרם (כ-3/4 כוס קצוצה). 🟡',
+    explanationHe: 'כרוב לבן, ירוק או אדום טרי/מבושל מותר במינון מדוד של עד 75 גרם לארוחה (כ-3/4 כוס). כמות גדולה מזה (מעל 100 גרם) עשירה בסורביטול (בכרוב לבן) או בפרוקטנים/GOS (בכרוב אדום) שעלולים להתסיס את חיידקי ה-SIBO. מומלץ לקצוץ דק דק ולבשל או לעסות עם שמן זית ומלח לריכוך הסיבים.',
+    fodmapTriggers: ['סורביטול (Sorbitol במנות מעל 75 גרם)', 'פרוקטנים במנות גדולות'],
+    maxSafePortionHe: 'עד 75 גרם (כ-3/4 כוס קצוצה)',
+    safeSubstitutions: [
+      '🥬 חסה ערבית או אייסברג פריכה (אור ירוק חופשי)',
+      '🥬 בוק צ׳וי / כרוב סיני וומבוק (דל FODMAP מעולה לסיבו)',
+      '🥬 עלי תרד בייבי טריים או מוקפצים',
+      '🥒 מלפפון ירוק קלוף'
+    ],
+    cookingTips: [
+      'להקפיד על מדידת הכמות: לא לעבור 3/4 כוס (75 גרם) לארוחה',
+      'בישול, אידוי או הקפצה קלה של הכרוב מרככים את הסיבים ומקלים משמעותית על העיכול של ניר'
+    ],
+    riskScore: 2,
+  },
+  // --- בוק צ׳וי / כרוב סיני / וומבוק (Bok Choy / Chinese Cabbage) - GREEN לניר ---
+  {
+    keywords: [
+      'בוק צוי',
+      'בוק צ׳וי',
+      'בוקצוי',
+      'כרוב סיני',
+      'וומבוק',
+      'פאק צוי',
+      'פאק צ׳וי',
+      'bok choy',
+      'pak choi',
+      'chinese cabbage',
+      'wombok'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'בוק צ׳וי / כרוב סיני וומבוק',
+    foodNameEn: 'Bok Choy / Chinese Cabbage (Wombok)',
+    verdictHe: 'אור ירוק! בוק צ׳וי וכרוב סיני בטוחים ומצוינים לניר בסיבו. 🟢',
+    explanationHe: 'כרוב סיני (Wombok) ובוק צ׳וי הם מירקות העלים הבטוחים והמומלצים ביותר ל-SIBO. הם דלי FODMAP במיוחד, עדינים מאוד למערכת העיכול ואינם מייצרים גזים ותסיסה חיידקית. מותרים חופשי גם בשלב 1 וגם בשלב 2.',
+    fodmapTriggers: ['0 FODMAP משמעותי (דל תסיסה לחלוטין)'],
+    maxSafePortionHe: 'עד 75-100 גרם (כ-1 כוס עלים קצוצים)',
+    safeSubstitutions: [
+      '🥬 עלי תרד בייבי טריים או מאודים',
+      '🥒 קישואים מבושלים בשמן זית',
+      '🥬 עלי חסה פריכים'
+    ],
+    cookingTips: [
+      'להקפיץ קלות בווק עם שמן זית, טיפת שמן שומשום וג׳ינג׳ר טרי',
+      'להוסיף למרק עוף צח בסיום הבישול'
+    ],
+    riskScore: 1,
+  },
+  // --- כרוב ניצנים (Brussels Sprouts) - RED Phase 1, YELLOW Phase 2 ---
+  {
+    keywords: [
+      'כרוב ניצנים',
+      'כרובי ניצנים',
+      'כרוב ניצנים קפוא',
+      'כרוב ניצנים סנפרוסט',
+      'ניצני כרוב',
+      'brussels sprouts'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'YELLOW',
+    foodNameHe: 'כרוב ניצנים',
+    foodNameEn: 'Brussels Sprouts',
+    verdictHe: 'אור אדום! כרוב ניצנים עתיר פרוקטנים ואסור לניר בשלב 1. 🔴',
+    explanationHe: 'כרוב ניצנים עשיר ביותר בפרוקטנים (Fructans) וגורם לתסיסה עוצמתית ולגזים במעי הדק. בשלב 1 הקפדני הוא אסור לחלוטין. בשלב 2 מותרת כמות מזערית של עד 2 יחידות קטנות בלבד (עד 38 גרם).',
+    fodmapTriggers: ['פרוקטנים בריכוז גבוה (Fructans)'],
+    maxSafePortionHe: '0 גרם בשלב 1 / עד 38 גרם בשלב 2 (כ-2 יחידות קטנות בלבד מבושלות)',
+    safeSubstitutions: [
+      '🥦 ברוקולי (פרחים בלבד עד 75 גרם)',
+      '🥒 שעועית ירוקה עדינה (עד 75 גרם)',
+      '🥒 קישוא מבושל בשמן זית'
+    ],
+    cookingTips: [
+      'להימנע לחלוטין בשלב 1',
+      'בשלב 2: לבשל במים רותחים ולסנן היטב להפחתת תסיסה'
+    ],
+    riskScore: 5,
+  },
+  // --- כרובית (Cauliflower) - RED Phase 1, RED Phase 2 ---
+  {
+    keywords: [
+      'כרובית',
+      'פרחי כרובית',
+      'כרובית אפויה',
+      'כרובית קפואה',
+      'כרובית סנפרוסט',
+      'אורז כרובית',
+      'מרק כרובית',
+      'כרובית מטוגנת',
+      'cauliflower'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'RED',
+    foodNameHe: 'כרובית',
+    foodNameEn: 'Cauliflower',
+    verdictHe: 'אור אדום! כרובית אסור לחלוטין לניר בסיבו. 🛑',
+    explanationHe: 'כרובית עשירה ביותר בסוכר כוהלי מניטול (Mannitol) הגורם לתסיסה חיידקית עזה, גזים וכאבי בטן בחולי סיבו. אסורה לחלוטין גם בשלב 1 וגם בשלב 2. שימו לב: ״אורז כרובית״ המשווק כדיאטטי אסור לחלוטין בסיבו!',
+    fodmapTriggers: ['מניטול בריכוז גבוה (Mannitol)'],
+    maxSafePortionHe: '0 גרם (אסור לחלוטין)',
+    safeSubstitutions: [
+      '🥦 ברוקולי (פרחים בלבד בכמות קטנה עד 75 גרם)',
+      '🥕 גזר מבושל ורך',
+      '🥒 קישוא / זוקיני מגורר כמו נודלס'
+    ],
+    cookingTips: [
+      'להימנע לחלוטין מכל מאכל או מרק המכיל כרובית',
+      'להחליף אורז כרובית באורז בסמטי לבן (במידה מדודה) או בקישואים מגוררים'
+    ],
+    riskScore: 5,
+  },
+  // --- דלעת כתומה / טריפוליטאית / יפנית קבוצ'ה (Pumpkin) - YELLOW Phase 1 (עד 75 גרם), GREEN Phase 2 ---
+  {
+    keywords: [
+      'דלעת',
+      'דלעת כתומה',
+      'דלעת טריפוליטאית',
+      'דלעת יפנית',
+      'קבוצה',
+      'קבוצ׳ה',
+      'מרק דלעת',
+      'דלעת אפויה',
+      'דלעת מבושלת',
+      'pumpkin',
+      'kabocha'
+    ],
+    statusPhase1: 'YELLOW',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'דלעת (כתומה / טריפוליטאית / יפנית קבוצ׳ה)',
+    foodNameEn: 'Pumpkin (Common / Kabocha)',
+    verdictHe: 'אור צהוב! דלעת מותרת לניר במנה מדודה של עד 75 גרם (כ-1/2 כוס מבושלת). 🟡',
+    explanationHe: 'דלעת כתומה רגילה מכילה מעט פרוקטנים ו-GOS, ולכן בטוחה בשלב 1 במנה מדודה של עד חצי כוס (75 גרם מבושלת). דלעת יפנית (קבוצ׳ה) נחשבת לנטולת FODMAP לחלוטין ומותרת חופשי! דלעת קלה לעיכול, עשירה בבטא-קרוטן ומרגיעה את רירית המעי.',
+    fodmapTriggers: ['פרוקטנים / GOS במנות גדולות מעל 100 גרם (בדלעת כתומה)'],
+    maxSafePortionHe: 'עד 75 גרם (כ-1/2 כוס מבושלת) / קבוצ׳ה יפנית חופשי',
+    safeSubstitutions: [
+      '🎃 דלעת יפנית קבוצ׳ה (0 FODMAP)',
+      '🥕 גזר מבושל ורך (0 FODMAP)',
+      '🥒 קישוא מבושל בשמן זית'
+    ],
+    cookingTips: [
+      'לבשל במרק עדין עם גזר, ג׳ינג׳ר טרי וקרם קוקוס טהור',
+      'לאפות בתנור עם שמן זית, מלח גס וענף רוזמרין'
+    ],
+    riskScore: 2,
+  },
+  // --- דלורית (Butternut Squash) - RED Phase 1, YELLOW Phase 2 ---
+  {
+    keywords: [
+      'דלורית',
+      'דלורית אפויה',
+      'מרק דלורית',
+      'דלורית בתנור',
+      'butternut',
+      'butternut squash'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'YELLOW',
+    foodNameHe: 'דלורית (Butternut Squash)',
+    foodNameEn: 'Butternut Squash',
+    verdictHe: 'אור אדום! דלורית עשירה ב-GOS ופרוקטנים ואסורה לניר בשלב 1. 🔴',
+    explanationHe: 'בניגוד לדלעת רגילה ודלעת קבוצ׳ה, דלורית (Butternut Squash) עשירה מאוד ב-GOS ובפרוקטנים מתסיסים. בשלב 1 היא אסורה לחלוטין. בשלב 2 מותרת כמות קטנה בלבד של עד 45 גרם (כרבע כוס קוביות מבושלות).',
+    fodmapTriggers: ['גלקטנים (GOS)', 'פרוקטנים (Fructans)'],
+    maxSafePortionHe: '0 גרם בשלב 1 / עד 45 גרם בשלב 2 (כ-1/4 כוס קוביות מבושלות)',
+    safeSubstitutions: [
+      '🎃 דלעת יפנית קבוצ׳ה (0 FODMAP ומותרת חופשי!)',
+      '🎃 דלעת כתומה רגילה (עד חצי כוס מבושלת)',
+      '🥕 גזר מבושל'
+    ],
+    cookingTips: [
+      'להחליף דלורית בדלעת יפנית (קבוצ׳ה) בכל מתכון של מרק כתום או אנטיפסטי'
+    ],
+    riskScore: 5,
+  },
+  // --- גרעיני דלעת (Pumpkin Seeds / Pepitas) - GREEN לניר ---
+  {
+    keywords: [
+      'גרעיני דלעת',
+      'זרעי דלעת',
+      'גרעיני דלעת טבעיים',
+      'גרעיני דלעת קלופים',
+      'pumpkin seeds',
+      'pepitas'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'גרעיני דלעת טבעיים (Pepitas)',
+    foodNameEn: 'Pumpkin Seeds (Pepitas)',
+    verdictHe: 'אור ירוק! גרעיני דלעת בטוחים ומצוינים לניר (עד 2 כפות). 🟢',
+    explanationHe: 'גרעיני דלעת טבעיים (לא קלויים וללא מלח מוסף תעשייתי) דלי FODMAP במנה של עד 2 כפות (כ-23-30 גרם). הם עשירים באבץ, מגנזיום, חומצות שומן בריאות וחלבון, ומהווים חטיף משביע ומזין ללא תסיסה.',
+    fodmapTriggers: ['דל FODMAP במנה של עד 2 כפות'],
+    maxSafePortionHe: 'עד 2 כפות (כ-23-30 גרם לארוחה/חטיף)',
+    safeSubstitutions: [
+      '🌻 גרעיני חמניה טבעיים (עד 2 כפות)',
+      '🥜 אגוזי מלך (עד 10 חצאים)'
+    ],
+    cookingTips: [
+      'לפזר על סלט ירוק עם שמן זית ולימון',
+      'לאכול כחטיף בריא בין הארוחות'
+    ],
+    riskScore: 1,
+  },
+  // --- שומשום וטחינה גולמית (Sesame Seeds & Tahini) - YELLOW Phase 1, GREEN Phase 2 ---
+  {
+    keywords: [
+      'שומשום',
+      'סומסום',
+      'טחינה',
+      'טחינה גולמית',
+      'טחינה מוכנה',
+      'זרעי שומשום',
+      'שומשום מלא',
+      'sesame',
+      'tahini'
+    ],
+    statusPhase1: 'YELLOW',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'שומשום / טחינה גולמית טהורה',
+    foodNameEn: 'Sesame Seeds / Pure Tahini',
+    verdictHe: 'אור צהוב! שומשום וטחינה מותרים לניר בכמות מדודה (1-2 כפות) ללא שום. 🟡',
+    explanationHe: 'שומשום טבעי וטחינה גולמית 100% שומשום טהור (כמו הר ברכה או ירושלים) בטוחים במנה מדודה של 1 כף שומשום או 1-2 כפות טחינה מוכנה עם מים, לימון ומלח. שימו לב: אסור לחלוטין להוסיף שום או אבקת שום לטחינה! בכמויות גדולות שומשום מכיל GOS ופרוקטנים.',
+    fodmapTriggers: ['גלקטנים (GOS) בכמויות גדולות מעל 2 כפות טחינה גולמית'],
+    maxSafePortionHe: 'עד 1 כף שומשום / עד 1-2 כפות טחינה גולמית מוכנה',
+    safeSubstitutions: [
+      '🫒 שמן זית כתית מעולה',
+      '🥜 חמאת בוטנים טבעית 100% ללא סוכר',
+      '🌻 גרעיני דלעת או חמניה טבעיים'
+    ],
+    cookingTips: [
+      'להכין טחינה ביתית עם מים קרים, מיץ לימון סחוט, מלח ומעט פטרוזיליה קצוצה — ללא שום כלל!',
+      'להימנע מסלטי טחינה תעשייתיים מוכנים שמכילים שום כתוש וחומרים משמרים'
+    ],
+    riskScore: 2,
+  },
+  // --- שעועית ירוקה עדינה / שעועית צהובה (Green Beans) - GREEN לניר ---
+  {
+    keywords: [
+      'שעועית ירוקה',
+      'שעועית צהובה',
+      'שעועית ירוקה עדינה',
+      'שעועית עדינה',
+      'שעועית ירוקה סנפרוסט',
+      'שעועית ירוקה חתוכה',
+      'תרמילי שעועית',
+      'green beans',
+      'french beans',
+      'string beans'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'שעועית ירוקה עדינה / שעועית צהובה (תרמילים)',
+    foodNameEn: 'Green Beans (French / String Beans)',
+    verdictHe: 'אור ירוק! שעועית ירוקה עדינה בטוחה ומצוינת לניר בסיבו (עד 75 גרם). 🟢',
+    explanationHe: 'שעועית ירוקה (תרמילים ירוקים טריים או קפואים של סנפרוסט) אינה נחשבת לקטנייה יבשה אלא לירק ירוק עדין. במנה של עד 75-85 גרם (כ-12-15 תרמילים) היא דלת FODMAP לחלוטין, קלה לעיכול ואינה מתסיסה. (להבדיל משעועית יבשה לבנה/אדומה שהיא קטנייה אסורה).',
+    fodmapTriggers: ['סורביטול בכמות מוגזמת בלבד (מעל 120 גרם)'],
+    maxSafePortionHe: 'עד 75-85 גרם (כ-12-15 תרמילים לארוחה)',
+    safeSubstitutions: [
+      '🥒 קישואים מבושלים בשמן זית',
+      '🥕 גזר טרי או אפוי',
+      '🥬 עלי תרד בייבי'
+    ],
+    cookingTips: [
+      'לבשל במים רותחים מומלחים 4-5 דקות עד לריכוך פריך (אל-דנטה)',
+      'להקפיץ עם שמן זית, מלח גס ומעט מיץ לימון'
+    ],
+    riskScore: 1,
+  },
+  // --- רוטב סויה מסורתי / תמרי (Soy Sauce / Tamari) - GREEN לניר ---
+  {
+    keywords: [
+      'רוטב סויה',
+      'סויה קיקומן',
+      'סויה תמרי',
+      'רוטב סויה ללא גלוטן',
+      'רוטב תמרי',
+      'קיקומן',
+      'kikkoman',
+      'soy sauce',
+      'tamari'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'רוטב סויה מסורתי / רוטב תמרי ללא גלוטן (קיקומן / San-J)',
+    foodNameEn: 'Soy Sauce / Tamari (Naturally Fermented)',
+    verdictHe: 'אור ירוק! רוטב סויה מותסס מסורתי מותר ובטוח לניר (עד 2 כפות). 🟢',
+    explanationHe: 'רוטב סויה מסורתי (כמו קיקומן או תמרי) עובר חודשים של תסיסה טבעית פעילה. תהליך התסיסה מפרק לחלוטין את החלבונים (כולל גלוטן) ואת הפחמימות המתסיסות (פרוקטנים וגלקטנים). במנה של עד 2 כפות לארוחה הוא נחשב דל FODMAP לחלוטין ומשדרג תבשילים ומוקפצים.',
+    fodmapTriggers: ['דל FODMAP מאוד (הסוכרים פורקו בתסיסה)'],
+    maxSafePortionHe: 'עד 2 כפות לארוחה (כ-40 גרם)',
+    safeSubstitutions: [
+      '🫒 שמן זית כתית מעולה',
+      '🍋 מיץ לימון סחוט טבעי',
+      '🍏 חומץ תפוחים טבעי'
+    ],
+    cookingTips: [
+      'להעדיף תמרי (Tamari) או רוטב סויה ללא גלוטן של קיקומן עם הפקק הכחול/ירוק',
+      'להימנע מרוטב טריאקי או רטבי סויה מתוקים שמכילים תוספת סירופ תירס/סוכר ושום'
+    ],
+    riskScore: 1,
+  },
+  // --- חלבון וחלמון ביצה (Egg White & Yolk) - GREEN לניר ---
+  {
+    keywords: [
+      'חלבון ביצה',
+      'חלמון ביצה',
+      'חלבון',
+      'חלמון',
+      'חלבון ביצה מבושל',
+      'egg white',
+      'egg yolk'
+    ],
+    statusPhase1: 'GREEN',
+    statusPhase2: 'GREEN',
+    foodNameHe: 'חלבון ביצה וחלמון (ביצים)',
+    foodNameEn: 'Egg White & Egg Yolk',
+    verdictHe: 'אור ירוק! ביצים (חלבון וחלמון) מכילות 0 FODMAP ובטוחות לחלוטין לניר. 🟢',
+    explanationHe: 'חלבון ביצה (אלבומין טהור) וחלמון ביצה מורכבים מחלבון ושומן איכותיים בלבד ללא שום פחמימות או סוכרים מתסיסים (0 גרם FODMAP). הם קלים מאוד לעיכול, משביעים ואינם יכולים להזין חיידקי SIBO כלל.',
+    fodmapTriggers: ['0 פחמימות / 0 FODMAP'],
+    maxSafePortionHe: 'חופשי (1-4 ביצים לארוחה)',
+    safeSubstitutions: [
+      '🍗 חזה עוף צלוי',
+      '🐟 פילה סלמון טרי',
+      '🥩 בשר בקר טחון איכותי'
+    ],
+    cookingTips: [
+      'להכין חביתה או ביצה קשה עם שמן זית ומלח',
+      'חלבון ביצה מבושל קל במיוחד לעיכול במצבי רגישות בטנית'
+    ],
+    riskScore: 1,
+  },
+  // --- ארטישוק ירושלמי (Jerusalem Artichoke) - RED Phase 1, RED Phase 2 ---
+  {
+    keywords: [
+      'ארטישוק ירושלמי',
+      'טופפינמבור',
+      'חמנית הפקעות',
+      'jerusalem artichoke',
+      'sunchoke'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'RED',
+    foodNameHe: 'ארטישוק ירושלמי (טופפינמבור)',
+    foodNameEn: 'Jerusalem Artichoke (Sunchoke)',
+    verdictHe: 'אור אדום בוהק! ארטישוק ירושלמי עשיר באינולין ואסור בתכלית האיסור לניר. 🛑',
+    explanationHe: 'ארטישוק ירושלמי הוא המזון העשיר ביותר בטבע באינולין (Inulin) — שרשראות פרוקטן ארוכות המהוות את המצע המתסיס החזק ביותר הידוע לחיידקי SIBO. צריכתו גורמת לייצור גזים אלים ונפיחות קשה. אסור לחלוטין בכל שלבי הטיפול!',
+    fodmapTriggers: ['אינולין טהור (Inulin / Fructans) בריכוז שיא'],
+    maxSafePortionHe: '0 גרם (אסור לחלוטין)',
+    safeSubstitutions: [
+      '🥔 תפוח אדמה מבושל או אפוי',
+      '🥕 גזר מבושל',
+      '🍠 בטטה כתומה בכמות מדודה (עד 1/2 כוס)'
+    ],
+    cookingTips: [
+      'להימנע לחלוטין ממרקים או תבשילים המכילים ארטישוק ירושלמי'
+    ],
+    riskScore: 5,
+  },
+  // --- ארטישוק רגיל (Globe Artichoke) - RED Phase 1, RED Phase 2 ---
+  {
+    keywords: [
+      'ארטישוק',
+      'ארטישוק רגיל',
+      'לבבות ארטישוק',
+      'תחתיות ארטישוק',
+      'artichoke',
+      'globe artichoke'
+    ],
+    statusPhase1: 'RED',
+    statusPhase2: 'RED',
+    foodNameHe: 'ארטישוק רגיל / תחתיות ארטישוק',
+    foodNameEn: 'Globe Artichoke',
+    verdictHe: 'אור אדום! ארטישוק עשיר בפרוקטנים ופרוקטוז ואסור לניר בסיבו. 🛑',
+    explanationHe: 'ארטישוק עשיר בשילוב כפול של פרוקטנים ופרוקטוז חופשי שמתסיסים במהירות במעי הדק ומעוררים נפיחות וכאב. אסור בשלבי הטיפול הפעילים בסיבו.',
+    fodmapTriggers: ['פרוקטנים (Fructans)', 'פרוקטוז עודף'],
+    maxSafePortionHe: '0 גרם (אסור)',
+    safeSubstitutions: [
+      '🌴 לבבות דקל משומרים שטופים היטב',
+      '🥒 קישוא מבושל בשמן זית',
+      '🥕 גזר טרי או מבושל'
+    ],
+    cookingTips: [
+      'להחליף תחתיות ארטישוק בקישואים עגולים ממולאים או בלבבות דקל'
+    ],
+    riskScore: 5,
+  },
   // --- קורנפלור / עמילן תירס / עמילן טפיוקה (גלעם, סוגת, מיה) - GREEN לניר ---
   {
     keywords: [
@@ -1758,6 +2202,89 @@ export function detectConversationalAdvisoryQuery(query: string, phase: SiboPhas
 }
 
 /**
+ * Calculate match score between a database item and user query.
+ * Prioritizes exact matches, whole-token matches, and guards against semantic collisions.
+ */
+function scoreDbFoodMatch(item: SiboFoodItem, query: string, cleanName: string): number {
+  const normQ = normalizeHebrew(query);
+  const normC = normalizeHebrew(cleanName);
+  const normHe = normalizeHebrew(item.nameHe);
+  const normEn = (item.nameEn || '').toLowerCase();
+  const qEn = query.toLowerCase();
+
+  if (!normQ && !normC) return 0;
+
+  // Semantic collision check: if fuzzyHebrewMatch returns false due to collision guard, score is 0!
+  if (normHe && normQ && !fuzzyHebrewMatch(item.nameHe, query) && !fuzzyHebrewMatch(item.nameHe, cleanName)) {
+    return 0;
+  }
+
+  // Exact Hebrew match
+  if (normHe === normQ || normHe === normC) return 1000;
+  // Exact English match
+  if (normEn && (normEn === qEn || normEn === normC)) return 950;
+
+  const qTokens = normQ.split(' ').filter(Boolean);
+  const heTokens = normHe.split(' ').filter(Boolean);
+
+  // Specific high-priority clinical disambiguations:
+  // 1. Regular milk vs Lactose-free milk
+  if (normQ === 'חלב') {
+    if (item.id === 'cow_milk' || normHe.includes('חלב פרה רגיל')) return 950;
+    if (normHe.includes('דל לקטוז') || normHe.includes('ללא לקטוז')) return 300;
+  }
+
+  // 2. Dried beans (שעועית יבשה) vs Green beans (שעועית ירוקה)
+  if (normQ === 'שעועית') {
+    if (item.id === 'dried_beans' || normHe.includes('שעועית יבשה')) return 950;
+    if (item.id === 'green_beans' || normHe.includes('שעועית ירוקה')) return 300;
+  }
+
+  // 3. Apple (תפוח עץ) vs Potato (תפוח אדמה)
+  if (normQ === 'תפוח') {
+    if (item.id === 'apple' || normHe.includes('תפוח עץ')) return 950;
+    if (item.id === 'potato' || normHe.includes('תפוח אדמה')) return 200;
+  }
+
+  // If query is a single word and matches target token exactly
+  if (qTokens.length === 1 && heTokens.includes(qTokens[0])) {
+    // If target starts with the query token (e.g. 'כרוב לבן' starts with 'כרוב')
+    if (heTokens[0] === qTokens[0]) return 900;
+    return 800;
+  }
+
+  // All query tokens are in target tokens
+  if (qTokens.length > 1 && qTokens.every((t) => heTokens.includes(t))) {
+    return 850;
+  }
+
+  // Fuzzy match
+  if (fuzzyHebrewMatch(item.nameHe, cleanName) || fuzzyHebrewMatch(item.nameHe, query)) {
+    return 500;
+  }
+  if (item.nameEn && (fuzzyHebrewMatch(item.nameEn, cleanName) || fuzzyHebrewMatch(item.nameEn, query))) {
+    return 400;
+  }
+
+  return 0;
+}
+
+export function findBestDbFoodMatch(query: string, cleanName: string): SiboFoodItem | null {
+  let bestItem: SiboFoodItem | null = null;
+  let bestScore = 0;
+
+  for (const item of SIBO_FOOD_DATABASE) {
+    const score = scoreDbFoodMatch(item, query, cleanName);
+    if (score > bestScore) {
+      bestScore = score;
+      bestItem = item;
+    }
+  }
+
+  return bestScore >= 400 ? bestItem : null;
+}
+
+/**
  * Find clinical SIBO analysis for any given query or food item
  */
 export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_strict'): FoodAnalysisResult {
@@ -1784,15 +2311,8 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     return analyzeIngredientsList(ingredientsMatch[1].trim(), cleanName, phase);
   }
 
-  // 1. Direct search in SIBO_FOOD_DATABASE with Hebrew fuzzy normalization
-  const dbMatch = SIBO_FOOD_DATABASE.find((item) => {
-    return (
-      fuzzyHebrewMatch(item.nameHe, cleanName) ||
-      fuzzyHebrewMatch(item.nameEn, cleanName) ||
-      fuzzyHebrewMatch(item.nameHe, query) ||
-      fuzzyHebrewMatch(item.nameEn, query)
-    );
-  });
+  // 1. Direct scored search in SIBO_FOOD_DATABASE with collision protection
+  const dbMatch = findBestDbFoodMatch(query, cleanName);
 
   if (dbMatch) {
     const status = isPhase1 ? dbMatch.statusPhase1 : dbMatch.statusPhase2;
@@ -1834,34 +2354,41 @@ export function analyzeFoodClinically(query: string, phase: SiboPhase = 'phase1_
     };
   }
 
-  // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES (Precision-ranked)
-  // Check exact token coverage: if a rule has specific modifiers (e.g. 'שמנת בצל'), 
-  // the query MUST contain those modifiers!
+  // 2. Keyword & semantic matching in CLINICAL_SIBO_RULES (Precision-ranked & token-safe)
   const normQuery = normalizeHebrew(query);
   const normClean = normalizeHebrew(cleanName);
+  const qTokens = normQuery.split(' ').filter(Boolean);
+  const cTokens = normClean.split(' ').filter(Boolean);
 
   for (const rule of CLINICAL_SIBO_RULES) {
     const matchedKeyword = rule.keywords.find((kw) => {
       const normKw = normalizeHebrew(kw);
       if (!normKw) return false;
 
+      // Semantic collision guard: e.g. שום cannot match שומשום, כרוב cannot match כרובית
+      if (!fuzzyHebrewMatch(normKw, normQuery) && !fuzzyHebrewMatch(normQuery, normKw)) {
+        return false;
+      }
+
       // 1. Exact match
       if (normKw === normQuery || normKw === normClean) return true;
 
-      // 2. Query contains the entire keyword (e.g. user typed "איפה יש תפוצ'יפס שמנת בצל" -> matches "תפוצ'יפס שמנת בצל")
+      const kwTokens = normKw.split(' ').filter(Boolean);
+
+      // 2. Single word keyword (e.g. "שום", "קוואקר", "סוויטנגו"):
+      // MUST appear as a whole token in query or cleanName!
+      // This strictly prevents "שומשום" from triggering "שום", or "כרובית" from triggering "כרוב"!
+      if (kwTokens.length === 1) {
+        return qTokens.includes(kwTokens[0]) || cTokens.includes(kwTokens[0]);
+      }
+
+      // 3. Multi-word keyword (e.g. "תפוצ'יפס שמנת בצל", "רוטב סויה", "שעועית ירוקה"):
+      // All keyword tokens must appear in query
+      const allKwInQuery = kwTokens.every((t) => qTokens.includes(t) || cTokens.includes(t));
+      if (allKwInQuery) return true;
+
+      // 4. Query contains the exact multi-word phrase
       if (normQuery.includes(normKw) || normClean.includes(normKw)) return true;
-
-      // 3. If keyword is multi-word, ALL keyword words must exist in query
-      const kwTokens = normKw.split(' ').filter(t => t.length > 0);
-      if (kwTokens.length > 1) {
-        const allKwInQuery = kwTokens.every(t => normQuery.includes(t) || normClean.includes(t));
-        if (allKwInQuery) return true;
-      }
-
-      // 4. If keyword is single word (e.g. "קוואקר"), query must contain that token
-      if (kwTokens.length === 1 && (normQuery.includes(kwTokens[0]) || normClean.includes(kwTokens[0]))) {
-        return true;
-      }
 
       return false;
     });

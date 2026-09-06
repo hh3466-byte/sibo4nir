@@ -319,23 +319,29 @@ export default function App() {
           />
         )}
 
-        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 180+ RECIPE BOOK */}
+        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 233+ RECIPE BOOK */}
         {activeTab === 'recipe' && (
           <div className="space-y-4">
-            <div className="p-4 sm:p-5 bg-stone-900 text-white rounded-3xl shadow-sm border border-stone-800 flex items-center justify-between gap-3">
+            <div
+              onClick={() => setIsMealSuggestionsOpen(true)}
+              className="p-4 sm:p-5 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white rounded-3xl shadow-md border-2 border-emerald-500/40 flex items-center justify-between gap-3 cursor-pointer hover:shadow-lg transition-all active:scale-98 group"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-xl shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform shadow-inner">
                   🍲
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white">ספר המתכונים של שף דלה פופו (180+ מנות)</h3>
-                  <p className="text-xs text-stone-300 font-medium">50 קלות ומהירות • 45 בוקר • 45 צהריים • 45 ערב</p>
+                  <h3 className="text-base sm:text-lg font-black text-white">ספר המתכונים של שף דלה פופו (233+ מנות)</h3>
+                  <p className="text-xs text-emerald-100 font-medium">100% ללא שום וללא בצל • תפריטים מלאים ומדויקים ל-SIBO</p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setIsMealSuggestionsOpen(true)}
-                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-black text-xs shadow-xs transition-colors cursor-pointer shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMealSuggestionsOpen(true);
+                }}
+                className="px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-950 rounded-xl font-black text-xs shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 פתחי ספר מתכונים 📖
               </button>

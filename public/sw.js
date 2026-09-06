@@ -1,5 +1,5 @@
-// SIBO Safe PWA Service Worker - Ultra-fast instant offline-first startup
-const CACHE_NAME = 'sibo-safe-v4';
+// SIBO Safe PWA Service Worker - Ultra-fast instant offline-first startup with Network-First Navigation
+const CACHE_NAME = 'sibo-safe-v5';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -25,7 +25,10 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
+          .map((name) => {
+            console.log('[SW] Clearing old cache:', name);
+            return caches.delete(name);
+          })
       );
     }).then(() => self.clients.claim())
   );
@@ -39,12 +42,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-While-Revalidate for navigation (HTML) and static assets
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
+  // 1. Navigation requests (HTML documents): Always Network-First so app updates show immediately!
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          if (networkResponse && networkResponse.status === 200) {
             const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache);
@@ -54,13 +57,27 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           // If offline and requesting navigation, return cached root or index
-          if (event.request.mode === 'navigate') {
-            return caches.match('/') || caches.match('/index.html');
-          }
-          return cachedResponse;
-        });
+          return caches.match(event.request) || caches.match('/index.html') || caches.match('/');
+        })
+    );
+    return;
+  }
 
-      // If we have a cached version, return it immediately for 0ms cold-start!
+  // 2. Static assets & media: Cache with Network Revalidation
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
       return cachedResponse || fetchPromise;
     })
   );
