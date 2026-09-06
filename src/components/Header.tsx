@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       id: 'recipe',
-      label: 'מתכונים וארוחות (233+) 🍲',
+      label: 'מתכונים וארוחות (530+) 🍲',
       activeColor: 'bg-emerald-800 text-white shadow-xs font-black',
       inactiveColor: 'bg-white text-stone-800 hover:bg-stone-100 font-bold border border-stone-200',
     },

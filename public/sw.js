@@ -1,5 +1,5 @@
 // SIBO Safe PWA Service Worker - Ultra-fast instant offline-first startup with Network-First Navigation
-const CACHE_NAME = 'sibo-safe-v6';
+const CACHE_NAME = 'sibo-safe-v7';
 const PRECACHE_URLS = [
   '/',
   '/index.html',

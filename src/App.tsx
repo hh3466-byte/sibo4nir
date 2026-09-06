@@ -319,7 +319,7 @@ export default function App() {
           />
         )}
 
-        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 233+ RECIPE BOOK */}
+        {/* TAB 3: MEAL & RECIPE CHECKER & MASTER 533+ RECIPE BOOK */}
         {activeTab === 'recipe' && (
           <div className="space-y-4">
             <div
@@ -331,7 +331,7 @@ export default function App() {
                   🍲
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white">ספר המתכונים של שף דלה פופו (233+ מנות)</h3>
+                  <h3 className="text-base sm:text-lg font-black text-white">ספר המתכונים של שף דלה פופו (533 מנות)</h3>
                   <p className="text-xs text-emerald-100 font-medium">100% ללא שום וללא בצל • תפריטים מלאים ומדויקים ל-SIBO</p>
                 </div>
               </div>

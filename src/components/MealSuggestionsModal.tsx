@@ -449,7 +449,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
                 </span>
               </div>
               <p className="text-[10px] sm:text-xs text-stone-500 font-medium truncate">
-                233 מתכוני שֵׁף ל-SIBO — לחצי על מצרך לסימון אם יש לך
+                533 מתכוני שֵׁף ל-SIBO — לחצי על מצרך לסימון אם יש לך
               </p>
             </div>
           </div>
@@ -917,7 +917,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
         {/* Modal Footer */}
         <div className="px-3.5 py-2 sm:px-6 sm:py-2.5 border-t border-stone-200 bg-stone-50/80 flex items-center justify-between text-[10px] sm:text-xs text-stone-500 shrink-0">
           <div className="flex items-center gap-1.5 truncate">
-            <span className="truncate">🍽️ 233 מתכוני שֵׁף מדורגים ל-SIBO • מתכונים שדירגת ⭐ או סימנת ב-❤️ בראש הרשימה</span>
+            <span className="truncate">🍽️ 533 מתכוני שֵׁף מדורגים ל-SIBO • מתכונים שדירגת ⭐ או סימנת ב-❤️ בראש הרשימה</span>
           </div>
           <button
             onClick={onClose}
