@@ -266,66 +266,144 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
     }
   };
 
-  const quickPills = [
-    '⚡ קלות ומהירות',
-    '🍫 מתוקים וקינוחים',
-    '🍓 ארטיק תות',
-    '🍮 פודינג צ׳יה',
-    '🥞 פנקייק',
-    '🍗 שיפודים ופרגית',
-    '🥩 קציצות בקר',
-    '🐟 סלמון',
-    '🥔 קומפיר',
-    '🍲 מרק',
-  ];
-
-  // Counts by meal type
+  // Counts by all categories and meal types
   const favoritesCount = useMemo(() => {
     return Object.values(favorites).filter(Boolean).length;
   }, [favorites]);
 
-  const mealCounts = useMemo(() => {
+  const categoryCounts = useMemo(() => {
+    const raw = SIBO_MEAL_SUGGESTIONS;
     return {
-      all: SIBO_MEAL_SUGGESTIONS.length,
+      all: raw.length,
       favorites: favoritesCount,
-      quick: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'quick').length,
-      breakfast: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'breakfast').length,
-      lunch: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'lunch').length,
-      dinner: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dinner').length,
-      dessert: SIBO_MEAL_SUGGESTIONS.filter((m) => m.mealType === 'dessert').length,
+      prep_3min: raw.filter((m) => {
+        const num = m.prepTime ? m.prepTime.match(/\d+/) : null;
+        return num && parseInt(num[0], 10) <= 3;
+      }).length,
+      prep_7min: raw.filter((m) => {
+        const num = m.prepTime ? m.prepTime.match(/\d+/) : null;
+        const val = num ? parseInt(num[0], 10) : 5;
+        return (
+          (val >= 4 && val <= 7) ||
+          m.prepTime.includes('7 דקות') ||
+          m.prepTime.includes('6 דקות') ||
+          m.prepTime.includes('5 דקות') ||
+          m.prepTime.includes('4 דקות')
+        );
+      }).length,
+      meat: raw.filter((m) => m.category === 'meat').length,
+      steaks: raw.filter((m) => m.category === 'steaks').length,
+      fish: raw.filter((m) => m.category === 'fish').length,
+      bowls: raw.filter((m) => m.category === 'bowls').length,
+      soups: raw.filter((m) => m.category === 'soups').length,
+      wraps: raw.filter((m) => m.category === 'wraps').length,
+      pancakes: raw.filter((m) => m.category === 'pancakes').length,
+      sweet: raw.filter((m) => m.category === 'sweet').length,
+      chia_puddings: raw.filter((m) => m.category === 'chia_puddings').length,
+      cheese: raw.filter((m) => m.category === 'cheese').length,
+      eggs: raw.filter((m) => m.category === 'eggs').length,
+      salads: raw.filter((m) => m.category === 'salads').length,
+      smoothies: raw.filter((m) => m.category === 'smoothies').length,
+      instant: raw.filter((m) => m.category === 'instant').length,
+      breakfast: raw.filter((m) => m.mealType === 'breakfast').length,
+      lunch: raw.filter((m) => m.mealType === 'lunch').length,
+      dinner: raw.filter((m) => m.mealType === 'dinner').length,
+      dessert: raw.filter(
+        (m) =>
+          m.mealType === 'dessert' ||
+          m.category === 'sweet' ||
+          m.category === 'chia_puddings'
+      ).length,
     };
   }, [favoritesCount]);
+
+  const categoryItems = useMemo(
+    () => [
+      { id: 'favorites', label: 'אהבתי', icon: '❤️', count: categoryCounts.favorites },
+      { id: 'prep_3min', label: '3 דקות הכנה', icon: '⏱️', count: categoryCounts.prep_3min },
+      { id: 'prep_7min', label: '7 דקות הכנה', icon: '🍳', count: categoryCounts.prep_7min },
+      { id: 'meat', label: 'בשר ופרגיות', icon: '🍗', count: categoryCounts.meat },
+      { id: 'steaks', label: 'סטייקים ובקר', icon: '🥩', count: categoryCounts.steaks },
+      { id: 'fish', label: 'דגי ים וסלמון', icon: '🐟', count: categoryCounts.fish },
+      { id: 'bowls', label: 'קומפיר וקערות', icon: '🥔', count: categoryCounts.bowls },
+      { id: 'soups', label: 'מרקים ותבשילים', icon: '🥣', count: categoryCounts.soups },
+      { id: 'wraps', label: 'דפי אורז ולאפה', icon: '🌯', count: categoryCounts.wraps },
+      { id: 'pancakes', label: 'פנקייק שקדים', icon: '🥞', count: categoryCounts.pancakes },
+      { id: 'sweet', label: 'סניקרס ושוקולד', icon: '🍫', count: categoryCounts.sweet },
+      { id: 'chia_puddings', label: 'פודינג צ׳יה', icon: '🍮', count: categoryCounts.chia_puddings },
+      { id: 'cheese', label: 'גבינות 0% לקטוז', icon: '🧀', count: categoryCounts.cheese },
+      { id: 'eggs', label: 'ביצים ושקשוקה', icon: '🍳', count: categoryCounts.eggs },
+      { id: 'salads', label: 'סלטים קראנץ׳', icon: '🥗', count: categoryCounts.salads },
+      { id: 'smoothies', label: 'שייקים וריפוי', icon: '🥤', count: categoryCounts.smoothies },
+      { id: 'instant', label: 'נשנושי בזק', icon: '⚡', count: categoryCounts.instant },
+      { id: 'breakfast', label: 'ארוחות בוקר', icon: '☀️', count: categoryCounts.breakfast },
+      { id: 'lunch', label: 'ארוחות צהריים', icon: '🍽️', count: categoryCounts.lunch },
+      { id: 'dinner', label: 'ארוחות ערב', icon: '🌙', count: categoryCounts.dinner },
+      { id: 'dessert', label: 'קינוחים ומתוק', icon: '🍓', count: categoryCounts.dessert },
+    ],
+    [categoryCounts]
+  );
 
   // Filter and sort meals: rated/favorite meals float to the top of the category!
   const filteredMeals = useMemo(() => {
     let list = SIBO_MEAL_SUGGESTIONS;
 
-    if (selectedMealType === 'favorites') {
-      list = list.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
-    } else if (selectedMealType !== 'all') {
-      list = list.filter((m) => m.mealType === selectedMealType);
-    }
+    const filterBySelected = (items: SiboRecipe[]) => {
+      if (selectedMealType === 'all') return items;
+      if (selectedMealType === 'favorites') {
+        return items.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
+      }
+      if (selectedMealType === 'prep_3min') {
+        return items.filter((m) => {
+          const num = m.prepTime ? m.prepTime.match(/\d+/) : null;
+          return num && parseInt(num[0], 10) <= 3;
+        });
+      }
+      if (selectedMealType === 'prep_7min') {
+        return items.filter((m) => {
+          const num = m.prepTime ? m.prepTime.match(/\d+/) : null;
+          const val = num ? parseInt(num[0], 10) : 5;
+          return (
+            (val >= 4 && val <= 7) ||
+            m.prepTime.includes('7 דקות') ||
+            m.prepTime.includes('6 דקות') ||
+            m.prepTime.includes('5 דקות') ||
+            m.prepTime.includes('4 דקות')
+          );
+        });
+      }
+      if (['breakfast', 'lunch', 'dinner'].includes(selectedMealType)) {
+        return items.filter((m) => m.mealType === selectedMealType);
+      }
+      if (selectedMealType === 'dessert') {
+        return items.filter(
+          (m) =>
+            m.mealType === 'dessert' ||
+            m.category === 'sweet' ||
+            m.category === 'chia_puddings'
+        );
+      }
+      return items.filter((m) => m.category === selectedMealType);
+    };
 
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       const matched = findMatchingRecipes(q, 200);
       if (matched.length > 0) {
-        if (selectedMealType === 'favorites') {
-          list = matched.filter((m) => favorites[m.id] || (ratings[m.id] && ratings[m.id] > 0));
-        } else if (selectedMealType === 'all') {
-          list = matched;
-        } else {
-          list = matched.filter((m) => m.mealType === selectedMealType);
-        }
+        list = filterBySelected(matched);
       } else {
-        list = list.filter(
-          (m) =>
-            m.title.toLowerCase().includes(q) ||
-            m.description.toLowerCase().includes(q) ||
-            m.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
-            m.tag.toLowerCase().includes(q)
+        list = filterBySelected(
+          list.filter(
+            (m) =>
+              m.title.toLowerCase().includes(q) ||
+              m.description.toLowerCase().includes(q) ||
+              m.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
+              m.tag.toLowerCase().includes(q)
+          )
         );
       }
+    } else {
+      list = filterBySelected(list);
     }
 
     // Sort by Favorites (❤️) and Highest Star Ratings (⭐⭐⭐⭐⭐) to the TOP of the category!
@@ -460,54 +538,22 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
             </div>
           )}
 
-          {/* Quick Ingredient & Dish Filters - Horizontal Scrollable Row */}
-          <div className="flex items-center gap-1.5 text-xs overflow-x-auto pb-1 no-scrollbar shrink-0">
-            <span className="text-stone-400 font-bold text-[11px] shrink-0">חיפוש מהיר:</span>
-            {quickPills.map((pill) => {
-              const cleanWord = pill.replace(/^[^\s]+\s*/, '');
-              const isActive = searchQuery.includes(cleanWord);
-              return (
-                <button
-                  key={pill}
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery(cleanWord);
-                    if (selectedRecipe) setSelectedRecipe(null);
-                  }}
-                  className={`px-2.5 py-1 rounded-xl font-bold transition-all shrink-0 cursor-pointer text-xs whitespace-nowrap ${
-                    isActive
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                  }`}
-                >
-                  {pill}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
-        {/* 🎠 Category Carousel for Meal Types */}
+        {/* 🎠 Category Carousel for Meal Types & Dietary Categories */}
         <div className="px-3.5 sm:px-6 shrink-0">
           <CategoryCarousel
-            items={[
-              { id: 'favorites', label: 'אהבתי', icon: '❤️', count: favoritesCount },
-              { id: 'quick', label: 'קלות ומהירות', icon: '⚡', count: mealCounts.quick },
-              { id: 'breakfast', label: 'ארוחות בוקר', icon: '🍳', count: mealCounts.breakfast },
-              { id: 'lunch', label: 'ארוחות צהריים', icon: '☀️', count: mealCounts.lunch },
-              { id: 'dinner', label: 'ארוחות ערב', icon: '🌙', count: mealCounts.dinner },
-              { id: 'dessert', label: 'מתוקים וקינוחים', icon: '🍫', count: mealCounts.dessert },
-            ]}
+            items={categoryItems}
             selectedId={selectedMealType}
             onSelect={(id) => {
-              setSelectedMealType(id as any);
+              setSelectedMealType(id);
               setSelectedRecipe(null);
             }}
-            title="סינון סוג ארוחה:"
+            title="סינון לפי סוג מנה / קטגוריה:"
             showAllOption={true}
-            allLabel="כל המתכונים"
+            allLabel="כל המנות"
             allIcon="👨‍🍳"
-            allCount={mealCounts.all}
+            allCount={categoryCounts.all}
             theme="emerald"
           />
         </div>
