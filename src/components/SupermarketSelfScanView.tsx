@@ -84,31 +84,26 @@ export const SupermarketSelfScanView: React.FC<SupermarketSelfScanViewProps> = (
         </button>
       )}
 
-      {/* 1. FIRST SECTION: לשלוח למישהו לקנות בסופר */}
+      {/* 1. FIRST SECTION: לשלוח את עַבְּדַלְּלָה מֵחֲמוּדָה לקניות בסופר */}
       {!analysisResult && !isLoading && activeScanMode === 'idle' && (
         <button
           type="button"
           onClick={onOpenShoppingList}
-          className="w-full p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white hover:bg-emerald-50/40 text-stone-900 border-2 border-emerald-600/70 shadow-xs hover:shadow-md transition-all text-right cursor-pointer transform active:scale-98 space-y-2 group"
+          className="w-full p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white hover:bg-emerald-50/40 text-stone-900 border-2 border-emerald-600/70 shadow-xs hover:shadow-md transition-all text-center cursor-pointer transform active:scale-98 space-y-3 group"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-0.5">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-black">
-                <span>אפשרות 1: שולחת מישהו אחר</span>
-              </div>
-              <h3 className="text-base sm:text-xl font-black text-stone-950 flex items-center gap-2 group-hover:text-emerald-900 transition-colors">
-                <span>לשלוח למישהו לקנות בסופר 📋</span>
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 font-medium max-w-lg">
-                סמני מה חסר לך במקרר (מתוך 500+ מוצרים ומותגים בטוחים) ושלחי ישירות לוואטסאפ של הקונה!
-              </p>
+          <div className="flex flex-col items-center justify-center text-center space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] sm:text-xs font-black">
+              <span>אפשרות 1: שולחת את עַבְּדַלְּלָה מֵחֲמוּדָה</span>
             </div>
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-emerald-50 group-hover:bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl sm:text-2xl shrink-0 border border-emerald-200 shadow-2xs group-hover:scale-105 transition-transform">
-              📱
-            </div>
+            <h3 className="text-lg sm:text-2xl md:text-2xl font-black text-stone-950 flex items-center justify-center gap-2 group-hover:text-emerald-900 transition-colors tracking-tight">
+              <span>לשלוח את עַבְּדַלְּלָה מֵחֲמוּדָה לקניות בסופר 📋</span>
+            </h3>
+            <p className="text-xs sm:text-sm text-stone-600 font-medium max-w-lg mx-auto">
+              סמני מה חסר לך במקרר (מתוך 500+ מוצרים ומותגים בטוחים) ושלחי ישירות לוואטסאפ של עַבְּדַלְּלָה!
+            </p>
           </div>
 
-          <div className="pt-2 border-t border-stone-100 w-full flex items-center justify-between gap-2 text-stone-700">
+          <div className="pt-2.5 border-t border-stone-100 w-full flex flex-col sm:flex-row items-center justify-between gap-2 text-stone-700">
             <div className="text-xs text-stone-500 font-medium">
               {selectedShoppingCount > 0 ? (
                 <span className="font-bold text-emerald-800">
