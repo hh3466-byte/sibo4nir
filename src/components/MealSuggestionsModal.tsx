@@ -22,7 +22,16 @@ import {
 } from 'lucide-react';
 import { SiboRecipe, SIBO_MEAL_SUGGESTIONS, findMatchingRecipes } from '../data/siboMealSuggestions';
 import { SiboPhase } from '../types';
-import { CategoryCarousel } from './CategoryCarousel';
+// High-entropy 32-bit FNV-1a PRNG for true, rich, non-repeating roulette shuffling
+function getSeededScore(id: string, seed: number): number {
+  let h = 0x811c9dc5;
+  const s = `${id}_${seed}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
 
 interface MealSuggestionsModalProps {
   isOpen: boolean;
@@ -130,15 +139,18 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
 
   // Dynamic Shuffling seed per category so each category can be shuffled independently!
   const [categorySeeds, setCategorySeeds] = useState<Record<string, number>>(() => ({
-    all: Math.floor(Math.random() * 100),
+    all: Math.floor(Math.random() * 1000),
   }));
+  const [isShuffling, setIsShuffling] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleShuffleRecipes = () => {
+    setIsShuffling(true);
+    setTimeout(() => setIsShuffling(false), 500);
     setCategorySeeds((prev) => ({
       ...prev,
-      [selectedMealType]: (prev[selectedMealType] || Math.floor(Math.random() * 100)) + 1,
+      [selectedMealType]: (prev[selectedMealType] || Math.floor(Math.random() * 1000)) + 1,
     }));
     setSelectedRecipe(null);
     setVisibleCount(15);
@@ -422,9 +434,9 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
 
       if (!searchQuery.trim()) {
         const seed = categorySeeds[selectedMealType] || categorySeeds.all || 0;
-        const hashA = (a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (seed + 13)) % 97;
-        const hashB = (b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) * (seed + 13)) % 97;
-        return hashA - hashB;
+        const scoreHashA = getSeededScore(a.id, seed);
+        const scoreHashB = getSeededScore(b.id, seed);
+        return scoreHashA - scoreHashB;
       }
       return 0;
     });
@@ -580,34 +592,30 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
           />
         </div>
 
-        {/* 🔀 Full-Width Prominent Meal Shuffle Button (User Request: הגדלת כפתור סיחרור לכל רוחב המסך וסיחרור קטגוריה בנפרד) */}
+        {/* 🔀 Single Full-Width Prominent Meal Shuffle Button */}
         {!selectedRecipe && (
-          <div className="px-2.5 sm:px-6 space-y-2 shrink-0">
+          <div className="px-2.5 sm:px-6 space-y-1.5 shrink-0">
             <button
               type="button"
               onClick={handleShuffleRecipes}
-              className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-500 hover:to-amber-400 text-amber-950 rounded-2xl sm:rounded-3xl font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg border-2 border-amber-300 ring-2 ring-amber-400/30 transition-all cursor-pointer active:scale-98 group"
-              title={`סחרר את המתכונים ב-"${activeCategoryItem.label}" והצג רעיונות חדשים ומפתיעים`}
+              className="w-full py-3.5 sm:py-4 px-3 sm:px-4 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-500 hover:to-amber-400 text-amber-950 rounded-2xl sm:rounded-3xl font-black text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg border-2 border-amber-300 ring-2 ring-amber-400/20 transition-all cursor-pointer active:scale-98 group select-none"
+              title={`סחרר והגרל מנות חדשות ב-${activeCategoryItem.label}`}
             >
-              <RefreshCw className="w-5 h-5 text-amber-950 group-hover:rotate-180 transition-transform duration-500 shrink-0" />
-              <span className="truncate">
-                🔀 סחרר הצעות ב"{activeCategoryItem.label}"! ({filteredMeals.length} מנות ברולטה) 🎲
+              <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 text-amber-950 shrink-0 transition-transform duration-500 ${isShuffling ? 'rotate-180' : 'group-hover:rotate-180'}`} />
+              <span className="whitespace-nowrap font-black">
+                🎲 סחרר מנות ברולטה: {activeCategoryItem.label} ({filteredMeals.length}) 🔀
               </span>
             </button>
 
-            <div className="flex items-center justify-between gap-2 px-1">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-stone-800 truncate">
+            <div className="flex items-center justify-between gap-2 px-1 text-stone-600 text-[11px] sm:text-xs">
+              <div className="flex items-center gap-1.5 font-bold truncate">
                 <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span className="truncate">
-                  {activeCategoryItem.icon} {activeCategoryItem.label} ({filteredMeals.length} מנות):
-                </span>
-                <span className="text-stone-400 font-normal hidden sm:inline">•</span>
-                <span className="text-stone-500 text-[10px] sm:text-xs font-semibold hidden sm:inline">
-                  לחצי על מצרך לסימון
+                  {activeCategoryItem.icon} מנות מובילות ב{activeCategoryItem.label} ({filteredMeals.length}):
                 </span>
               </div>
-              <span className="text-[10px] sm:text-xs text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full font-bold shrink-0">
-                סיחרור נפרד לקטגוריה ✨
+              <span className="text-[10px] sm:text-xs text-stone-400 font-medium shrink-0">
+                לחצי על מצרך לסימון
               </span>
             </div>
           </div>
