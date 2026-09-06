@@ -628,12 +628,14 @@ export const SiboShoppingListView: React.FC<SiboShoppingListViewProps> = ({
 
       {/* 🎠 Interactive Category Carousel (קרוסלת קטגוריות חכמה עם חיצים ללא גלילה מעייפת) */}
       <CategoryCarousel
-        items={SIBO_CATEGORIES.map((cat) => ({
-          id: cat.id,
-          label: cat.label.split('(')[0].trim(),
-          icon: cat.icon,
-          count: allItems.filter((i) => i.category === cat.id).length,
-        })).concat(
+        items={(
+          SIBO_CATEGORIES.map((cat) => ({
+            id: cat.id as string,
+            label: cat.label.split('(')[0].trim(),
+            icon: cat.icon,
+            count: allItems.filter((i) => i.category === cat.id).length,
+          })) as { id: string; label: string; icon: string; count: number }[]
+        ).concat(
           customItems.length > 0
             ? [{ id: 'custom', label: 'מוצרים שלי', icon: '✨', count: customItems.length }]
             : []

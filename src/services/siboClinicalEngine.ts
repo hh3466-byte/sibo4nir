@@ -1,5 +1,5 @@
 import { SIBO_FOOD_DATABASE } from '../data/siboDatabase';
-import { FoodAnalysisResult, SiboPhase, TrafficLightStatus } from '../types';
+import { FoodAnalysisResult, SiboPhase, TrafficLightStatus, SiboFoodItem } from '../types';
 import { normalizeHebrew, fuzzyHebrewMatch } from '../utils/textUtils';
 
 interface ClinicalRule {

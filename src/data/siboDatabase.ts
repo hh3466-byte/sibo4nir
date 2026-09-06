@@ -854,6 +854,7 @@ export const SIBO_FOOD_DATABASE: SiboFoodItem[] = [
     statusPhase2: 'GREEN',
     safePortionHe: 'חופשי',
     fodmapGroup: '0 FODMAP',
+    notesHe: 'עשבי תיבול טריים ויבשים בטוחים לחלוטין בכל שלבי ה-SIBO ומעשירים את הטעם ללא כל תסיסה.',
     alternativesHe: ['שמן זית', 'חומץ תפוחים', 'מיץ לימון סחוט'],
     popular: true,
   },

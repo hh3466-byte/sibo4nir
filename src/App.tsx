@@ -510,7 +510,7 @@ export default function App() {
               <div className="inline-flex items-center gap-1 bg-white/90 p-1 rounded-xl border border-stone-300 shadow-2xs">
                 <button
                   type="button"
-                  onClick={() => handlePhaseChange('phase1_strict')}
+                  onClick={() => setCurrentPhase('phase1_strict')}
                   className={`px-2 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer ${
                     currentPhase === 'phase1_strict'
                       ? 'bg-emerald-800 text-white shadow-xs'
@@ -522,9 +522,9 @@ export default function App() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePhaseChange('phase2_semi')}
+                  onClick={() => setCurrentPhase('phase2_moderate')}
                   className={`px-2 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer ${
-                    currentPhase === 'phase2_semi'
+                    currentPhase === 'phase2_moderate'
                       ? 'bg-amber-600 text-white shadow-xs'
                       : 'text-stone-600 hover:text-stone-900'
                   }`}

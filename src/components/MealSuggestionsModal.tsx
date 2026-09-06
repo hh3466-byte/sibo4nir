@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { SiboRecipe, SIBO_MEAL_SUGGESTIONS, findMatchingRecipes } from '../data/siboMealSuggestions';
 import { SiboPhase } from '../types';
+import { CategoryCarousel } from './CategoryCarousel';
 // High-entropy 32-bit FNV-1a PRNG for true, rich, non-repeating roulette shuffling
 function getSeededScore(id: string, seed: number): number {
   let h = 0x811c9dc5;
@@ -48,9 +49,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
   initialSearchQuery = null,
   initialRecipeId = null,
 }) => {
-  const [selectedMealType, setSelectedMealType] = useState<
-    'all' | 'favorites' | 'quick' | 'breakfast' | 'lunch' | 'dinner' | 'dessert'
-  >('all');
+  const [selectedMealType, setSelectedMealType] = useState<string>('all');
   const [selectedRecipe, setSelectedRecipe] = useState<SiboRecipe | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -403,7 +402,7 @@ export const MealSuggestionsModal: React.FC<MealSuggestionsModalProps> = ({
             m.category === 'chia_puddings'
         );
       }
-      return items.filter((m) => m.category === selectedMealType);
+      return items.filter((m) => (m.category as string) === selectedMealType);
     };
 
     if (searchQuery.trim()) {
