@@ -46,4 +46,10 @@ next-env.d.ts
 # supabase cli – קבצים מקומיים
 supabase/.temp/
 supabase/.branches/
+
+# vercel cli
+.vercel
+.env*
+
+# קובץ דוגמה בלי סודות – כן נכנס ל-git (חייב להיות אחרון)
 !.env.example
