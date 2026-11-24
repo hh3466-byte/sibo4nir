@@ -6,10 +6,11 @@
 - **Google Places Photos API** — כיסוי רחב לכל מקום. לכל place: geocode ל-place_id אמיתי, ואז משוך תמונה.
 - **ספרייה מבוקרת שלנו** — לתמונות הדגל של המסלולים המובחרים (איכות עריכתית).
 
-## Cache פעם-אחת (קריטי לעלות)
-- כל תמונה נמשכת **פעם אחת**, נשמרת ב-Supabase Storage, ומשם מוגשת מה-CDN. אין קריאה חוזרת ל-Google על אותה תמונה.
-- טבלה: `place_id → storage_path, source, attribution, fetched_at`.
+## Cache פעם-אחת + ריבוי תמונות (קריטי לעלות)
+- לכל מקום, טברנה ומלון מושכים **עד 5–6 תמונות אמיתיות** מ-Google Places Photos API **פעם אחת**, שומרים ב-Supabase Storage (`place-photos`), ומשם מגישים מה-CDN. אין קריאה חוזרת ל-Google על פריט שכבר נשמר במטמון.
+- סכמה: `place_photos` (`place_id → storage_path, photo_paths text[], source, attribution, fetched_at`) וכן `storage_path, photo_paths text[], attribution` בטבלאות `tavernas` ו-`hotels`.
 - שמור ייחוס/מקור לפי תנאי Google Places והצג אותו היכן שנדרש.
+- בממשק: כל מקום, טברנה ומלון מציגים את `photoUrls[]` בקרוסלה מסתובבת (~3.5 שניות + נקודות וחצים); אם יש תמונה אחת בלבד — תצוגה סטטית ללא סיבוב.
 
 ## נפילה
 - אם אין תמונה למקום — fallback לתמונת דגל של האי/האזור מהספרייה שלנו, לא גרדיאנט ריק.

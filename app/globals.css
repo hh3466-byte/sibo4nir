@@ -210,7 +210,7 @@ h1, h2, h3 {
   position: absolute;
   width: min(380px, calc(100% - 32px));
   max-width: 380px;
-  max-height: 72%;
+  max-height: min(86%, 560px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -222,8 +222,47 @@ h1, h2, h3 {
   z-index: 12;
   animation: tmoPopFromMap 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.tmo-stop-modal-media { position: relative; height: 150px; flex-shrink: 0; background: var(--ink2); overflow: hidden; }
-.tmo-stop-modal-media img { width: 100%; height: 150px; object-fit: cover; display: block; }
+.tmo-stop-modal-media { position: relative; height: 130px; flex-shrink: 0; background: var(--ink2); overflow: hidden; }
+.tmo-photo-slide {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.tmo-photo-slide.is-active { opacity: 1; }
+.tmo-photo-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 1.7rem; height: 1.7rem; border-radius: 999px; border: 0;
+  background: rgba(11, 30, 40, 0.62); color: var(--paper);
+  font-size: 1.1rem; line-height: 1; cursor: pointer; z-index: 3;
+}
+.tmo-photo-nav:hover { background: var(--ink); }
+.tmo-photo-prev { right: 0.45rem; }
+.tmo-photo-next { left: 0.45rem; }
+.tmo-photo-dots {
+  position: absolute; bottom: 0.45rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 0.3rem; z-index: 3;
+}
+.tmo-dot {
+  width: 6px; height: 6px; border-radius: 999px; border: 0; padding: 0; cursor: pointer;
+  background: rgba(251, 248, 241, 0.5); transition: background 0.2s, transform 0.2s;
+}
+.tmo-dot.is-active { background: var(--brass); transform: scale(1.25); }
+
+/* בקרי קרוסלת אופציות (מלונות / טברנות) */
+.tmo-opt-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
+.tmo-opt-head .sub-title { margin-bottom: 0; }
+.tmo-opt-controls { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+.tmo-opt-arrow {
+  width: 1.45rem; height: 1.45rem; border-radius: 999px; border: 1px solid rgba(11, 30, 40, 0.16);
+  background: var(--paper); color: var(--ink); font-size: 0.95rem; line-height: 1; cursor: pointer;
+}
+.tmo-opt-arrow:hover { border-color: var(--brass); color: var(--brass-d); }
+.tmo-opt-count { font-size: 0.72rem; opacity: 0.65; min-width: 1.8rem; text-align: center; }
+.tmo-opt-dots { display: flex; justify-content: center; gap: 0.35rem; margin-top: 0.45rem; }
+.tmo-opt-dot {
+  width: 6px; height: 6px; border-radius: 999px; border: 0; padding: 0; cursor: pointer;
+  background: rgba(11, 30, 40, 0.2); transition: background 0.2s, width 0.2s;
+}
+.tmo-opt-dot.is-active { background: var(--brass); width: 16px; }
 .tmo-stop-close {
   position: absolute; top: 0.65rem; left: 0.65rem;
   width: 2rem; height: 2rem; border-radius: 999px; border: 0;

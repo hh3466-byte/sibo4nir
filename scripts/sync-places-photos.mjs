@@ -1,11 +1,14 @@
-// מסנכרן geocode ותמונות אמיתיות מ-Google Places API (New) ל-Supabase Storage (cache פעם אחת, שמירת ייחוס).
-// לעולם לא מדפיס מפתחות. עובד מול Supabase test בלבד.
+// מסנכרן עד 5 תמונות אמיתיות מ-Google Places API (New) ל-Supabase Storage (cache פעם אחת, שמירת ייחוס).
+// לעולם לא מדפיס מפתחות ולא דורס קואורדינטות עגינה במים. עובד מול Supabase test בלבד.
 // שימוש: node scripts/sync-places-photos.mjs
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import pg from "pg";
 import { createClient } from "@supabase/supabase-js";
+
+const MAX_PHOTOS = 5;
+const CONCURRENCY = 5;
 
 const root = process.cwd();
 const env = Object.fromEntries(
@@ -22,7 +25,6 @@ const GKEY = env.GOOGLE_PLACES_API_KEY;
 if (!GKEY) throw new Error("חסר GOOGLE_PLACES_API_KEY ב-.env.local");
 if (!env.SUPABASE_DB_PASSWORD_TEST) throw new Error("חסר SUPABASE_DB_PASSWORD_TEST");
 
-// שליפת service_role בזיכרון בלבד (לא נכתב לקובץ ולא מודפס) לצורך יצירת bucket והעלאת תמונות ל-Storage
 const rawKeys = execSync(`npx --yes supabase projects api-keys --remote=${REF} -o json`, {
   encoding: "utf8",
   stdio: ["ignore", "pipe", "ignore"],
@@ -64,7 +66,7 @@ async function searchPlace(textQuery) {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": GKEY,
-      "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.photos",
+      "X-Goog-FieldMask": "places.id,places.displayName,places.photos",
     },
     body: JSON.stringify({ textQuery, maxResultCount: 1 }),
   });
@@ -74,117 +76,140 @@ async function searchPlace(textQuery) {
 }
 
 async function fetchAndUploadPhoto(photoObj, storagePath) {
-  const url = `https://places.googleapis.com/v1/${photoObj.name}/media?maxWidthPx=1200`;
+  const url = `https://places.googleapis.com/v1/${photoObj.name}/media?maxWidthPx=1000`;
   const res = await fetch(url, { headers: { "X-Goog-Api-Key": GKEY }, redirect: "follow" });
   if (!res.ok) return null;
   const ct = res.headers.get("content-type") || "image/jpeg";
   const buf = Buffer.from(await res.arrayBuffer());
   const { error } = await sb.storage.from(BUCKET).upload(storagePath, buf, { contentType: ct, upsert: true });
   if (error) throw new Error("העלאה ל-Storage נכשלה: " + error.message);
-  const attrs = (photoObj.authorAttributions || []).map((a) => a.displayName).filter(Boolean);
   return {
     storagePath,
-    attribution: attrs.length ? `Google Places · ${attrs.join(", ")}` : "Google Places",
+    authors: (photoObj.authorAttributions || []).map((a) => a.displayName).filter(Boolean),
   };
 }
 
-let stats = { placesFetched: 0, placesCached: 0, tavernasFetched: 0, hotelsFetched: 0, geocoded: 0, fallbacks: 0 };
+async function fetchMultiple(found, prefix) {
+  const photoObjs = (found?.photos || []).slice(0, MAX_PHOTOS);
+  const paths = [];
+  const authors = new Set();
+  for (let i = 0; i < photoObjs.length; i++) {
+    const sp = i === 0 ? `${prefix}.jpg` : `${prefix}-${i + 1}.jpg`;
+    const up = await fetchAndUploadPhoto(photoObjs[i], sp);
+    if (up) {
+      paths.push(up.storagePath);
+      up.authors.forEach((a) => authors.add(a));
+    }
+  }
+  const attr = authors.size ? `Google Places · ${[...authors].slice(0, 3).join(", ")}` : "Google Places";
+  return { paths, attribution: attr };
+}
+
+async function runPool(items, worker) {
+  let idx = 0;
+  const runners = Array.from({ length: Math.min(CONCURRENCY, items.length) }, async () => {
+    while (idx < items.length) {
+      const cur = items[idx++];
+      await worker(cur);
+    }
+  });
+  await Promise.all(runners);
+}
+
+const stats = { placesSynced: 0, placesCached: 0, tavernasSynced: 0, tavernasCached: 0, hotelsSynced: 0, hotelsCached: 0, totalPhotos: 0, fallbacks: 0 };
 
 try {
-  // 1. מקומות (places)
-  const places = (await pgClient.query("select id, lat, lon, approx from places where not hidden")).rows;
-  const existingPhotos = new Set((await pgClient.query("select place_id from place_photos")).rows.map((r) => r.place_id));
+  // 1. מקומות (places) — רק מקומות פעילים במסלול או ב-seed
+  const activeRoute = (await pgClient.query("select stops from routes where not hidden order by days desc limit 1")).rows[0];
+  const activePlaceIds = new Set(activeRoute?.stops || []);
+  const places = (await pgClient.query("select id from places where not hidden")).rows.filter((p) => activePlaceIds.has(p.id));
+  const existingPlaceMap = new Map(
+    (await pgClient.query("select place_id, photo_paths from place_photos")).rows.map((r) => [r.place_id, r.photo_paths || []]),
+  );
 
-  for (const p of places) {
-    if (existingPhotos.has(p.id)) {
+  await runPool(places, async (p) => {
+    const existing = existingPlaceMap.get(p.id) || [];
+    if (existing.length >= 2) {
       stats.placesCached++;
-      continue;
+      return;
     }
     const q = placeQueries.get(p.id) || `${p.id} Cyclades Greece`;
     const found = await searchPlace(q);
-
-    // לעולם לא דורסים קואורדינטות עגינה במים בקואורדינטות מרכז-עיר מ-Google Places! שומרים רק google_place_id.
-    if (found?.id) {
-      await pgClient.query("update places set google_place_id=$1 where id=$2", [found.id, p.id]);
+    if (found?.id) await pgClient.query("update places set google_place_id=$1 where id=$2", [found.id, p.id]);
+    const { paths, attribution } = await fetchMultiple(found, `places/${p.id}`);
+    if (paths.length > 0) {
+      await pgClient.query(
+        `insert into place_photos(place_id, google_place_id, storage_path, photo_paths, source, attribution)
+         values($1,$2,$3,$4,'google_places',$5)
+         on conflict (place_id) do update set google_place_id=excluded.google_place_id, storage_path=excluded.storage_path, photo_paths=excluded.photo_paths, source=excluded.source, attribution=excluded.attribution, fetched_at=now()`,
+        [p.id, found.id, paths[0], paths, attribution],
+      );
+      stats.placesSynced++;
+      stats.totalPhotos += paths.length;
+    } else {
+      stats.fallbacks++;
     }
-
-    const photoObj = found?.photos?.[0];
-    if (photoObj) {
-      const uploaded = await fetchAndUploadPhoto(photoObj, `places/${p.id}.jpg`);
-      if (uploaded) {
-        await pgClient.query(
-          `insert into place_photos(place_id, google_place_id, storage_path, source, attribution)
-           values($1,$2,$3,'google_places',$4)
-           on conflict (place_id) do update set google_place_id=excluded.google_place_id, storage_path=excluded.storage_path, source=excluded.source, attribution=excluded.attribution, fetched_at=now()`,
-          [p.id, found.id, uploaded.storagePath, uploaded.attribution],
-        );
-        stats.placesFetched++;
-        continue;
-      }
-    }
-    // נפילה לתמונת דגל מקומית
-    const idx = (places.indexOf(p) % 8) + 1;
-    await pgClient.query(
-      `insert into place_photos(place_id, google_place_id, storage_path, source, attribution)
-       values($1,$2,$3,'curated','Take Me Out') on conflict (place_id) do nothing`,
-      [p.id, found?.id ?? null, `/img/e${idx}.jpg`],
-    );
-    stats.fallbacks++;
-  }
+  });
 
   // 2. טברנות
-  const tavernas = (await pgClient.query("select id, place_id, name, storage_path from tavernas where not hidden")).rows;
-  for (const t of tavernas) {
-    if (t.storage_path) continue;
+  const tavernas = (await pgClient.query("select id, place_id, name, photo_paths from tavernas where not hidden")).rows.filter((t) =>
+    activePlaceIds.has(t.place_id),
+  );
+  await runPool(tavernas, async (t) => {
+    if ((t.photo_paths || []).length >= 2) {
+      stats.tavernasCached++;
+      return;
+    }
     const q = tavernaQueries.get(`${t.place_id}|${t.name}`) || `${t.name} Cyclades Greece`;
     const found = await searchPlace(q);
-    const photoObj = found?.photos?.[0];
-    if (photoObj) {
-      const uploaded = await fetchAndUploadPhoto(photoObj, `tavernas/${t.id}.jpg`);
-      if (uploaded) {
-        await pgClient.query(
-          "update tavernas set google_place_id=$1, storage_path=$2, source='google_places', attribution=$3, fetched_at=now() where id=$4",
-          [found.id, uploaded.storagePath, uploaded.attribution, t.id],
-        );
-        stats.tavernasFetched++;
-        continue;
-      }
+    const { paths, attribution } = await fetchMultiple(found, `tavernas/${t.id}`);
+    if (paths.length > 0) {
+      await pgClient.query(
+        "update tavernas set google_place_id=$1, storage_path=$2, photo_paths=$3, source='google_places', attribution=$4, fetched_at=now() where id=$5",
+        [found.id, paths[0], paths, attribution, t.id],
+      );
+      stats.tavernasSynced++;
+      stats.totalPhotos += paths.length;
+    } else {
+      const idx = (t.id % 8) + 1;
+      await pgClient.query(
+        "update tavernas set storage_path=$1, photo_paths=$2, source='curated', attribution='Take Me Out', fetched_at=now() where id=$3",
+        [`/img/e${idx}.jpg`, [`/img/e${idx}.jpg`], t.id],
+      );
+      stats.fallbacks++;
     }
-    const idx = (t.id % 8) + 1;
-    await pgClient.query(
-      "update tavernas set google_place_id=$1, storage_path=$2, source='curated', attribution='Take Me Out', fetched_at=now() where id=$3",
-      [found?.id ?? null, `/img/e${idx}.jpg`, t.id],
-    );
-    stats.fallbacks++;
-  }
+  });
 
   // 3. מלונות
-  const hotels = (await pgClient.query("select id, place_id, name, storage_path from hotels where not hidden")).rows;
-  for (const h of hotels) {
-    if (h.storage_path) continue;
+  const hotels = (await pgClient.query("select id, place_id, name, photo_paths from hotels where not hidden")).rows.filter((h) =>
+    activePlaceIds.has(h.place_id),
+  );
+  await runPool(hotels, async (h) => {
+    if ((h.photo_paths || []).length >= 2) {
+      stats.hotelsCached++;
+      return;
+    }
     const q = hotelQueries.get(`${h.place_id}|${h.name}`) || `${h.name} Cyclades Greece`;
     const found = await searchPlace(q);
-    const photoObj = found?.photos?.[0];
-    if (photoObj) {
-      const uploaded = await fetchAndUploadPhoto(photoObj, `hotels/${h.id}.jpg`);
-      if (uploaded) {
-        await pgClient.query(
-          "update hotels set google_place_id=$1, storage_path=$2, source='google_places', attribution=$3, fetched_at=now() where id=$4",
-          [found.id, uploaded.storagePath, uploaded.attribution, h.id],
-        );
-        stats.hotelsFetched++;
-        continue;
-      }
+    const { paths, attribution } = await fetchMultiple(found, `hotels/${h.id}`);
+    if (paths.length > 0) {
+      await pgClient.query(
+        "update hotels set google_place_id=$1, storage_path=$2, photo_paths=$3, source='google_places', attribution=$4, fetched_at=now() where id=$5",
+        [found.id, paths[0], paths, attribution, h.id],
+      );
+      stats.hotelsSynced++;
+      stats.totalPhotos += paths.length;
+    } else {
+      const idx = (h.id % 8) + 1;
+      await pgClient.query(
+        "update hotels set storage_path=$1, photo_paths=$2, source='curated', attribution='Take Me Out', fetched_at=now() where id=$3",
+        [`/img/e${idx}.jpg`, [`/img/e${idx}.jpg`], h.id],
+      );
+      stats.fallbacks++;
     }
-    const idx = (h.id % 8) + 1;
-    await pgClient.query(
-      "update hotels set google_place_id=$1, storage_path=$2, source='curated', attribution='Take Me Out', fetched_at=now() where id=$3",
-      [found?.id ?? null, `/img/e${idx}.jpg`, h.id],
-    );
-    stats.fallbacks++;
-  }
+  });
 
-  console.log("סיכום סנכרון תמונות ו-geocode:", JSON.stringify(stats));
+  console.log("סיכום סנכרון ריבוי תמונות:", JSON.stringify(stats));
 } finally {
   await pgClient.end();
 }

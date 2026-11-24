@@ -19,6 +19,7 @@ export type Place = {
   dwellMin: number;
   desc: string;
   photoUrl: string;
+  photoUrls: string[];
   photoAttribution: string;
 };
 
@@ -28,6 +29,7 @@ export type Taverna = {
   name: string;
   note: string;
   photoUrl: string;
+  photoUrls: string[];
   photoAttribution: string;
 };
 
@@ -37,6 +39,7 @@ export type Hotel = {
   name: string;
   priceEurCents: number;
   photoUrl: string;
+  photoUrls: string[];
   photoAttribution: string;
 };
 
@@ -69,6 +72,17 @@ function resolvePhotoUrl(storagePath: string | null | undefined, supabaseUrl: st
   if (storagePath.startsWith("/") || storagePath.startsWith("http")) return storagePath;
   if (!supabaseUrl) return `/img/e${(fallbackIdx % 8) + 1}.jpg`;
   return `${supabaseUrl}/storage/v1/object/public/place-photos/${storagePath}`;
+}
+
+function resolvePhotoUrls(
+  photoPaths: string[] | null | undefined,
+  storagePath: string | null | undefined,
+  supabaseUrl: string | undefined,
+  fallbackIdx: number,
+): string[] {
+  const list = Array.isArray(photoPaths) && photoPaths.length > 0 ? photoPaths : storagePath ? [storagePath] : [];
+  if (list.length === 0) return [resolvePhotoUrl(null, supabaseUrl, fallbackIdx)];
+  return list.map((p) => resolvePhotoUrl(p, supabaseUrl, fallbackIdx));
 }
 
 async function fromSupabase() {
@@ -161,6 +175,7 @@ export async function getGeoData(): Promise<GeoData> {
 
   const places: Place[] = placeRows.map((p, idx) => {
     const ph = photoByPlace.get(p.id);
+    const urls = resolvePhotoUrls(ph?.photo_paths, ph?.storage_path, supabaseUrl, idx);
     return {
       id: p.id,
       name: p.name,
@@ -173,28 +188,37 @@ export async function getGeoData(): Promise<GeoData> {
       approx: p.approx,
       dwellMin: p.dwell_min,
       desc: p.description ?? "",
-      photoUrl: resolvePhotoUrl(ph?.storage_path, supabaseUrl, idx),
+      photoUrl: urls[0],
+      photoUrls: urls,
       photoAttribution: ph?.attribution ?? "",
     };
   });
 
-  const tavernas: Taverna[] = tavernaRows.map((t, idx) => ({
-    id: t.id,
-    placeId: t.place_id,
-    name: t.name,
-    note: t.note ?? "",
-    photoUrl: resolvePhotoUrl(t.storage_path, supabaseUrl, idx + 2),
-    photoAttribution: t.attribution ?? "",
-  }));
+  const tavernas: Taverna[] = tavernaRows.map((t, idx) => {
+    const urls = resolvePhotoUrls(t.photo_paths, t.storage_path, supabaseUrl, idx + 2);
+    return {
+      id: t.id,
+      placeId: t.place_id,
+      name: t.name,
+      note: t.note ?? "",
+      photoUrl: urls[0],
+      photoUrls: urls,
+      photoAttribution: t.attribution ?? "",
+    };
+  });
 
-  const hotels: Hotel[] = hotelRows.map((h, idx) => ({
-    id: h.id,
-    placeId: h.place_id,
-    name: h.name,
-    priceEurCents: h.price_eur_cents,
-    photoUrl: resolvePhotoUrl(h.storage_path, supabaseUrl, idx + 4),
-    photoAttribution: h.attribution ?? "",
-  }));
+  const hotels: Hotel[] = hotelRows.map((h, idx) => {
+    const urls = resolvePhotoUrls(h.photo_paths, h.storage_path, supabaseUrl, idx + 4);
+    return {
+      id: h.id,
+      placeId: h.place_id,
+      name: h.name,
+      priceEurCents: h.price_eur_cents,
+      photoUrl: urls[0],
+      photoUrls: urls,
+      photoAttribution: h.attribution ?? "",
+    };
+  });
 
   const route: FlagshipRoute = {
     id: routeRow.id,

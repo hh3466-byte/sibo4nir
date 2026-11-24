@@ -359,7 +359,13 @@
       "place_id": "kythnos-kolona",
       "name": "Kolona Beach Bar & Taverna",
       "query": "Kolona Beach Kythnos Taverna Greece",
-      "note": "צהריים מול לשון החול הכפולה"
+      "note": "צהריים מול לשון החול הכפולה — דגים על הגריל וסלט יווני טרי"
+    },
+    {
+      "place_id": "kythnos-kolona",
+      "name": "Byzantio Merichas",
+      "query": "Byzantio Taverna Merichas Kythnos Greece",
+      "note": "תמנון צלוי ומזטים מקומיים בקרבת המפרץ"
     },
     {
       "place_id": "kythnos-loutra",
@@ -368,16 +374,82 @@
       "note": "דגים טריים על המזח בלוטרה"
     },
     {
+      "place_id": "kythnos-loutra",
+      "name": "Arapis Taverna",
+      "query": "Arapis Taverna Loutra Kythnos Greece",
+      "note": "טברנת דגים מסורתית על קו המים בלוטרה"
+    },
+    {
+      "place_id": "kythnos-loutra",
+      "name": "Sofrano",
+      "query": "Sofrano Loutra Kythnos Greece",
+      "note": "מזטים יווניים, יין לבן ושולחנות מול המרינה"
+    },
+    {
+      "place_id": "kolimbithres",
+      "name": "Kolymbithres Taverna",
+      "query": "Kolymbithres Taverna Paros Greece",
+      "note": "דגים טריים ומנות ים ממש מעל סלעי הגרניט"
+    },
+    {
+      "place_id": "kolimbithres",
+      "name": "Vigla Restaurant",
+      "query": "Vigla Restaurant Kolymbithres Paros Greece",
+      "note": "צהריים משפחתיים מול נוף מפרץ נאוסה"
+    },
+    {
       "place_id": "naoussa",
       "name": "Sigi Ikthios",
       "query": "Sigi Ikthios Naoussa Paros Greece",
-      "note": "דגים ומזטים במרינת נאוסה"
+      "note": "דגים ומזטים בנמל הדייגים הישן של נאוסה"
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Tsachpinis Ouzeri",
+      "query": "Tsachpinis Ouzeri Naoussa Paros Greece",
+      "note": "אוזרי קלאסי עם קלאמרי ודגה מקומית על המים"
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Barbarossa Paros",
+      "query": "Barbarossa Restaurant Naoussa Paros Greece",
+      "note": "ארוחת ערב חגיגית של דגים ופירות ים על הרציף"
     },
     {
       "place_id": "portara",
       "name": "To Elliniko",
       "query": "To Elliniko Restaurant Naxos Greece",
-      "note": "מטבח יווני ביתי בעיר העתיקה"
+      "note": "מטבח יווני ביתי וגבינות נאקסוס בעיר העתיקה"
+    },
+    {
+      "place_id": "portara",
+      "name": "Meze²",
+      "query": "Meze2 Naxos Greece",
+      "note": "דגים טריים ומזטים על הטיילת מול הנמל"
+    },
+    {
+      "place_id": "portara",
+      "name": "Scirocco Naxos",
+      "query": "Scirocco Restaurant Naxos Greece",
+      "note": "מנות קיקלדיות מסורתיות באווירה משפחתית"
+    },
+    {
+      "place_id": "koufonisia-port",
+      "name": "Captain Nikolas",
+      "query": "Captain Nikolas Koufonisia Greece",
+      "note": "דגה מקומית טרייה מול המפרץ"
+    },
+    {
+      "place_id": "koufonisia-port",
+      "name": "Neo Remezzo",
+      "query": "Neo Remezzo Koufonisia Greece",
+      "note": "ערב של דגים על הגריל ואוזו מעל הנמל"
+    },
+    {
+      "place_id": "koufonisia-port",
+      "name": "Finikas Taverna",
+      "query": "Finikas Taverna Koufonisia Greece",
+      "note": "טברנה נינוחה על החול עם מנות ביתיות"
     },
     {
       "place_id": "pori",
@@ -386,16 +458,76 @@
       "note": "טברנה על החול, רגליים במים"
     },
     {
+      "place_id": "pori",
+      "name": "Mikres Kyklades",
+      "query": "Mikres Kyklades Koufonisia Greece",
+      "note": "מזטים ודגים טריים ליד חוף פורי"
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Octopus Tree",
+      "query": "Octopus Tree Restaurant Ios Greece",
+      "note": "תמנונים צלויים ודגה מקומית ממש על המזח"
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Katogi Ios",
+      "query": "Katogi Restaurant Ios Greece",
+      "note": "טאפאס יווני חם ונעים בסמטאות חורה"
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Cantina del Mar",
+      "query": "Cantina del Mar Ios Greece",
+      "note": "ארוחת ערב רגועה מול השקיעה במפרץ"
+    },
+    {
+      "place_id": "sifnos-chrysopigi",
+      "name": "Apokofto Taverna",
+      "query": "Apokofto Taverna Sifnos Greece",
+      "note": "קדירות סיפנוס ודגים על החוף ליד המנזר"
+    },
+    {
+      "place_id": "sifnos-chrysopigi",
+      "name": "Chrysopigi Taverna",
+      "query": "Chrysopigi Taverna Sifnos Greece",
+      "note": "צהריים מול הסלעים והמים הצלולים"
+    },
+    {
       "place_id": "sifnos-vathi",
       "name": "Tsikali",
       "query": "Tsikali Taverna Vathi Sifnos Greece",
-      "note": "קדירות מקומיות על שפת המים"
+      "note": "קדירות מקומיות ודגים על שפת המים"
+    },
+    {
+      "place_id": "sifnos-vathi",
+      "name": "Manolis Taverna",
+      "query": "Manolis Taverna Vathi Sifnos Greece",
+      "note": "טברנה משפחתית ותיקה עם שולחנות על החול"
+    },
+    {
+      "place_id": "sifnos-vathi",
+      "name": "Okyalos Vathi",
+      "query": "Okyalos Restaurant Vathi Sifnos Greece",
+      "note": "מטבח ים תיכוני עכשווי מול מפרץ ואתי"
     },
     {
       "place_id": "serifos-livadi",
       "name": "Kalis",
       "query": "Kalis Taverna Livadi Serifos Greece",
-      "note": "דגה מקומית במפרץ ליבאדי"
+      "note": "דגה מקומית ומזטים במפרץ ליבאדי"
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Takis Taverna",
+      "query": "Takis Taverna Livadi Serifos Greece",
+      "note": "טברנת דגים אהובה ממש על רציף ליבאדי"
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Yacht Club Serifos",
+      "query": "Yacht Club Serifos Livadi Greece",
+      "note": "ארוחת ערב אלגנטית מול הסירות העוגנות"
     }
   ],
   "hotels": [
@@ -406,10 +538,34 @@
       "price_eur": 125
     },
     {
+      "place_id": "kythnos-loutra",
+      "name": "Porto Klaras",
+      "query": "Porto Klaras Hotel Loutra Kythnos Greece",
+      "price_eur": 115
+    },
+    {
+      "place_id": "kythnos-loutra",
+      "name": "Meltemi Hotel Loutra",
+      "query": "Meltemi Hotel Loutra Kythnos Greece",
+      "price_eur": 105
+    },
+    {
       "place_id": "naoussa",
       "name": "Kalypso Hotel Paros",
       "query": "Kalypso Hotel Naoussa Paros Greece",
       "price_eur": 160
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Cove Paros",
+      "query": "Cove Paros Hotel Naoussa Greece",
+      "price_eur": 240
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Paliomylos Spa Hotel",
+      "query": "Paliomylos Spa Hotel Naoussa Paros Greece",
+      "price_eur": 150
     },
     {
       "place_id": "koufonisia-port",
@@ -418,10 +574,34 @@
       "price_eur": 130
     },
     {
+      "place_id": "koufonisia-port",
+      "name": "Anna Studios",
+      "query": "Anna Studios Koufonisia Greece",
+      "price_eur": 95
+    },
+    {
+      "place_id": "koufonisia-port",
+      "name": "Keros Art Hotel",
+      "query": "Keros Art Hotel Koufonisia Greece",
+      "price_eur": 145
+    },
+    {
       "place_id": "ios-port",
       "name": "Ios Palace Hotel",
       "query": "Ios Palace Hotel Greece",
       "price_eur": 165
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Liostasi Hotel",
+      "query": "Liostasi Hotel Ios Greece",
+      "price_eur": 260
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Yialos Ios Hotel",
+      "query": "Yialos Ios Hotel Greece",
+      "price_eur": 115
     },
     {
       "place_id": "sifnos-vathi",
@@ -430,10 +610,34 @@
       "price_eur": 220
     },
     {
+      "place_id": "sifnos-vathi",
+      "name": "Aerides Boutique Rooms",
+      "query": "Aerides Boutique Rooms Vathi Sifnos Greece",
+      "price_eur": 140
+    },
+    {
+      "place_id": "sifnos-vathi",
+      "name": "Vathi Blue Suites",
+      "query": "Vathi Blue Suites Sifnos Greece",
+      "price_eur": 130
+    },
+    {
       "place_id": "serifos-livadi",
       "name": "Coco-Mat Eco Residences Serifos",
       "query": "Coco-Mat Eco Residences Serifos Greece",
       "price_eur": 190
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Rizes Hotel Serifos",
+      "query": "Rizes Hotel Serifos Greece",
+      "price_eur": 155
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Alexandros by the Beach",
+      "query": "Alexandros by the Beach Serifos Greece",
+      "price_eur": 120
     }
   ],
   "flagship_routes": [
