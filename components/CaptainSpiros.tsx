@@ -89,6 +89,32 @@ function mrsYes(): string {
   return MRS_YES[Math.floor(Math.random() * MRS_YES.length)];
 }
 
+type Tone = "playful" | "brief" | "anxious" | "warm";
+
+/** זיהוי טון הלקוח — ספירוס מתאים את השנינות לפי איך שמדברים אליו */
+function detectTone(qRaw: string): Tone {
+  const s = qRaw.toLowerCase();
+  if (/מפחד|דאג|חושש|מסוכן|קשה לי|לא בטוח|בטוח\?|חוששת|מתוח/.test(s)) return "anxious";
+  const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(qRaw);
+  if (emoji || /חחח|חח|וואו|סבבה|אחלה|יאללה|כיף|מגניב|אדיר/.test(s) || /!\s*$/.test(qRaw.trim())) return "playful";
+  const words = qRaw.trim().split(/\s+/).length;
+  if (words <= 2 || /^(כמה|מחיר|מתי|איפה|מה המרחק)/.test(s)) return "brief";
+  return "warm";
+}
+
+/** אישור גברת ספירוס לפי טון — שומר על הזוג החמוד אבל מכוון את עוצמת ההומור */
+const MRS_YES_PLAYFUL = [
+  "חחח כן, הוא בעניינים היום! 😄",
+  "בדיוק, תראו אותו 😎",
+  "כן כן — פעם ב-100 שנה 😘",
+  "אמר משהו חכם, רשמו את התאריך! 🎉",
+];
+function mrsYesByTone(tone: Tone): string {
+  if (tone === "brief") return "כן.";
+  if (tone === "playful") return MRS_YES_PLAYFUL[Math.floor(Math.random() * MRS_YES_PLAYFUL.length)];
+  return mrsYes();
+}
+
 /** אישור גברת ספירוס למסלול — "גם אשתו של ספירוס מסכימה" */
 const MRS_APPROVE = [
   "ואני מאשרת. מסלול יפה — גם אני הייתי טסה לשם. 💙",
@@ -103,8 +129,9 @@ function mrsApprove(): string {
 /** תשובות הזוג — ספירוס עונה, וגברת ספירוס מאשרת מאחורה או נותנת לו בראש ומתקנת */
 function spirosReply(qRaw: string): Msg[] {
   const q = qRaw.toLowerCase();
+  const tone = detectTone(qRaw);
   const has = (...w: string[]) => w.some((x) => q.includes(x));
-  const pair = (s: string): Msg[] => [{ from: "spiros", text: s }, { from: "mrs", text: mrsYes() }];
+  const pair = (s: string): Msg[] => [{ from: "spiros", text: s }, { from: "mrs", text: mrsYesByTone(tone) }];
 
   // שאלות על כמה המסלול קשוח/בטיחותי/נוח → גברת ספירוס ניגשת קדימה ומרגיעה, ספירוס מגבה
   if (has("קשוח", "קשה", "מפחיד", "בטוח", "בטיחות", "סוער", "גלים", "מסוכן", "נוח", "להקיא", "בחיל", "פחד", "ים גבוה", "רגוע מספיק", "תינוק"))
