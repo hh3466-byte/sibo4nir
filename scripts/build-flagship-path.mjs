@@ -21,10 +21,10 @@ const client = new pg.Client({
 await client.connect();
 try {
   const places = new Map((await client.query("select id,lon,lat from places")).rows.map((p) => [p.id, [p.lon, p.lat]]));
-  const routes = (await client.query("select id,stops from routes")).rows;
+  const routes = (await client.query("select id,stops from routes where not hidden")).rows;
   let totalLand = 0, totalCross = 0;
   for (const r of routes) {
-    const built = buildRoute(r.stops.map((id) => places.get(id)), polys);
+    const built = buildRoute(r.stops.map((id) => places.get(id)), polys, 0.0025, r.stops);
     const v = validate(built.legs, polys);
     totalLand += v.inLand; totalCross += v.crossings;
     console.log(`${r.id}: ${built.legs.length} מקטעים, ${built.legs.reduce((s, l) => s + l.length, 0)} נקודות | דגימות ${v.samples}, על יבשה ${v.inLand}, חציות מדויקות ${v.crossings}`);

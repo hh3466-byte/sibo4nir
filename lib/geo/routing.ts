@@ -1,4 +1,4 @@
-// ניתוב מים — נתיב שלא חוצה יבשה. לפי docs/specs/water-routing.md.
+// ניתוב מים — נתיב שלא חוצה יבשה (מול קו חוף OSM ברזולוציה גבוהה). לפי docs/specs/water-routing.md.
 // קובץ טהור (בלי תלות ב-DOM/Next) כדי שיעבוד גם בסקריפטים ב-Node.
 export type LngLat = [number, number];
 export type Ring = LngLat[];
@@ -7,6 +7,25 @@ type BBox = [number, number, number, number]; // minLon, minLat, maxLon, maxLat
 export type Land = { ring: Ring; bb: BBox; off: Ring };
 
 const KX = Math.cos((37 * Math.PI) / 180); // קנה מידה אורכי ב-37°
+
+/** מרחק במיילים ימיים (Haversine) בין שתי נקודות lon/lat */
+export function haversineNm(a: LngLat, b: LngLat): number {
+  const R = 3440.065; // רדיוס כדור הארץ במיילים ימיים
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b[1] - a[1]);
+  const dLon = toRad(b[0] - a[0]);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[1])) * Math.cos(toRad(b[1])) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+/** אורך מצטבר של נתיב במיילים ימיים */
+export function pathLengthNm(path: LngLat[]): number {
+  let sum = 0;
+  for (let i = 1; i < path.length; i++) sum += haversineNm(path[i - 1], path[i]);
+  return sum;
+}
 
 function bboxOf(ring: Ring): BBox {
   let a = 1e9, b = 1e9, c = -1e9, d = -1e9;
@@ -77,9 +96,12 @@ export function segHitsLand(a: LngLat, b: LngLat, land: Land): boolean {
 }
 
 /** יוצר מבני יבשה עם קו היסט (offset) החוצה כלפי הים במרחק margin (מעלות) */
-export function prepareLand(polys: Ring[], margin = 0.006): Land[] {
+export function prepareLand(polys: Ring[], margin = 0.0025): Land[] {
   return polys.map((poly) => {
-    const ring = poly[0][0] === poly[poly.length - 1][0] && poly[0][1] === poly[poly.length - 1][1] ? poly : [...poly, poly[0]];
+    const ring =
+      poly[0][0] === poly[poly.length - 1][0] && poly[0][1] === poly[poly.length - 1][1]
+        ? poly
+        : [...poly, poly[0]];
     const open = ring.slice(0, -1);
     let area = 0;
     for (let i = 0; i < open.length; i++) {
@@ -87,7 +109,7 @@ export function prepareLand(polys: Ring[], margin = 0.006): Land[] {
       const [x2, y2] = open[(i + 1) % open.length];
       area += x1 * KX * y2 - x2 * KX * y1;
     }
-    const sign = area > 0 ? 1 : -1; // CCW → החוצה הוא צד ימין
+    const sign = area > 0 ? 1 : -1;
     const off: Ring = [];
     for (let i = 0; i < open.length; i++) {
       const p = open[(i - 1 + open.length) % open.length];
@@ -101,7 +123,13 @@ export function prepareLand(polys: Ring[], margin = 0.006): Land[] {
       const n2 = [(e2[1] / l2) * sign, (-e2[0] / l2) * sign];
       let bx = n1[0] + n2[0], by = n1[1] + n2[1];
       const bl = Math.hypot(bx, by);
-      if (bl < 1e-6) { bx = n1[0]; by = n1[1]; } else { bx /= bl; by /= bl; }
+      if (bl < 1e-6) {
+        bx = n1[0];
+        by = n1[1];
+      } else {
+        bx /= bl;
+        by /= bl;
+      }
       off.push([v[0] + (bx * margin) / KX, v[1] + by * margin]);
     }
     return { ring, bb: bboxOf(ring), off };
@@ -109,20 +137,25 @@ export function prepareLand(polys: Ring[], margin = 0.006): Land[] {
 }
 
 export function onLand(p: LngLat, lands: Land[]): boolean {
-  return lands.some((l) => p[0] >= l.bb[0] && p[0] <= l.bb[2] && p[1] >= l.bb[1] && p[1] <= l.bb[3] && inPoly(p, l.ring));
+  return lands.some(
+    (l) => p[0] >= l.bb[0] && p[0] <= l.bb[2] && p[1] >= l.bb[1] && p[1] <= l.bb[3] && inPoly(p, l.ring),
+  );
 }
 
 /** אם הנקודה על יבשה — דוחף אותה לקצה הקרוב + margin ימי */
-export function avoid(p: LngLat, lands: Land[], margin = 0.006): LngLat {
+export function avoid(p: LngLat, lands: Land[], margin = 0.0025): LngLat {
   let cur = p;
-  for (let k = 0; k < 8 && onLand(cur, lands); k++) {
+  for (let k = 0; k < 10 && onLand(cur, lands); k++) {
     const land = lands.find((l) => inPoly(cur, l.ring))!;
     let best: LngLat = land.ring[0];
     let bd = Infinity;
     for (let i = 1; i < land.ring.length; i++) {
       const q = nearSeg(cur, land.ring[i - 1], land.ring[i]);
       const d = dist(cur, q);
-      if (d < bd) { bd = d; best = q; }
+      if (d < bd) {
+        bd = d;
+        best = q;
+      }
     }
     const dx = (best[0] - cur[0]) * KX, dy = best[1] - cur[1];
     const l = Math.hypot(dx, dy) || 1;
@@ -142,7 +175,10 @@ function firstBlock(a: LngLat, b: LngLat, lands: Land[]): Land | null {
       const x = segT(a, b, land.ring[i - 1], land.ring[i]);
       if (x !== null && x < t) t = x;
     }
-    if (t < bt) { bt = t; best = land; }
+    if (t < bt) {
+      bt = t;
+      best = land;
+    }
   }
   return best;
 }
@@ -151,20 +187,29 @@ function nearestIdx(p: LngLat, ring: Ring) {
   let bi = 0, bd = Infinity;
   for (let i = 0; i < ring.length; i++) {
     const d = dist(p, ring[i]);
-    if (d < bd) { bd = d; bi = i; }
+    if (d < bd) {
+      bd = d;
+      bi = i;
+    }
   }
   return bi;
 }
 
 /** עוקף את היבשה `land` בין a ל-b לאורך קו ההיסט, בכיוון הקצר */
-function detour(a: LngLat, b: LngLat, land: Land, lands: Land[]): LngLat[] {
+function detour(a: LngLat, b: LngLat, land: Land, lands: Land[], preferAlt = false): LngLat[] {
   let tmin = 1, tmax = 0;
   const r = land.ring;
   for (let i = 1; i < r.length; i++) {
     const t = segT(a, b, r[i - 1], r[i]);
-    if (t !== null) { if (t < tmin) tmin = t; if (t > tmax) tmax = t; }
+    if (t !== null) {
+      if (t < tmin) tmin = t;
+      if (t > tmax) tmax = t;
+    }
   }
-  if (tmax < tmin) { tmin = 0; tmax = 1; }
+  if (tmax < tmin) {
+    tmin = 0;
+    tmax = 1;
+  }
   const pt = (t: number): LngLat => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   const i1 = nearestIdx(pt(tmin), land.off);
   const i2 = nearestIdx(pt(tmax), land.off);
@@ -181,9 +226,54 @@ function detour(a: LngLat, b: LngLat, land: Land, lands: Land[]): LngLat[] {
     return { pts, len };
   };
   const fw = walk(1), bw = walk(-1);
-  const pick = fw.len <= bw.len ? fw.pts : bw.pts;
-  const safe = pick.filter((q) => !onLand(q, lands));
+  const fwSafe = fw.pts.filter((q) => !onLand(q, lands));
+  const bwSafe = bw.pts.filter((q) => !onLand(q, lands));
+  const fwLost = fw.pts.length - fwSafe.length;
+  const bwLost = bw.pts.length - bwSafe.length;
+  let safe: LngLat[];
+  if (preferAlt) safe = fw.len <= bw.len ? bwSafe : fwSafe;
+  else if (fwLost !== bwLost) safe = fwLost < bwLost ? fwSafe : bwSafe;
+  else safe = fw.len <= bw.len ? fwSafe : bwSafe;
+  if (safe.length === 0) return nudgeMid(a, b, lands);
   return [a, ...safe, b];
+}
+
+/** דחיפה מקומית לצדדים עבור קטע קצר שפוגע בקצה שובר גלים / לשון יבשה */
+function nudgeMid(a: LngLat, b: LngLat, lands: Land[]): LngLat[] {
+  const mid: LngLat = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const dx = (b[0] - a[0]) * KX, dy = b[1] - a[1];
+  const l = Math.hypot(dx, dy) || 1;
+  const nx = -dy / l, ny = dx / l;
+  for (const step of [0.0008, 0.0015, 0.003, 0.006, 0.012, 0.02, 0.035]) {
+    for (const s of [1, -1]) {
+      const cand: LngLat = [mid[0] + (nx * step * s) / KX, mid[1] + ny * step * s];
+      if (!onLand(cand, lands) && !firstBlock(a, cand, lands) && !firstBlock(cand, b, lands)) {
+        return [a, cand, b];
+      }
+      const c1: LngLat = [a[0] + (nx * step * s) / KX, a[1] + ny * step * s];
+      const c2: LngLat = [b[0] + (nx * step * s) / KX, b[1] + ny * step * s];
+      if (
+        !onLand(c1, lands) &&
+        !onLand(c2, lands) &&
+        !firstBlock(a, c1, lands) &&
+        !firstBlock(c1, c2, lands) &&
+        !firstBlock(c2, b, lands)
+      ) {
+        return [a, c1, c2, b];
+      }
+    }
+  }
+  // חיפוש רדיאלי סביב האמצע (עוקף קבוצות איונים צמודים)
+  for (const r of [0.005, 0.01, 0.018, 0.03, 0.05]) {
+    for (let k = 0; k < 16; k++) {
+      const ang = (k * Math.PI * 2) / 16;
+      const cand: LngLat = [mid[0] + (Math.cos(ang) * r) / KX, mid[1] + Math.sin(ang) * r];
+      if (!onLand(cand, lands) && !firstBlock(a, cand, lands) && !firstBlock(cand, b, lands)) {
+        return [a, cand, b];
+      }
+    }
+  }
+  return [a, b];
 }
 
 /** string-pulling: מדלג על נקודות ביניים שאפשר לעקוף בקו ישר נקי */
@@ -199,18 +289,22 @@ function pull(path: LngLat[], lands: Land[]): LngLat[] {
   return out;
 }
 
-/** clearLeg: מקטע a→b בלי חציית יבשה (detour + פיצול עד שכל תת-קטע נקי) */
+/** clearLeg: מקטע a→b בלי חציית יבשה (detour + דחיפה מקומית + string-pulling) */
 export function clearLeg(a: LngLat, b: LngLat, lands: Land[]): LngLat[] {
   let path: LngLat[] = [a, b];
-  for (let iter = 0; iter < 12; iter++) {
+  for (let iter = 0; iter < 24; iter++) {
     let changed = false;
     const next: LngLat[] = [path[0]];
     for (let i = 1; i < path.length; i++) {
-      const blk = firstBlock(path[i - 1], path[i], lands);
+      const u = path[i - 1], v = path[i];
+      const blk = firstBlock(u, v, lands);
       if (blk) {
-        next.push(...detour(path[i - 1], path[i], blk, lands).slice(1));
+        const tryNudge = dist(u, v) < 0.03 || iter >= 8;
+        const nudged = tryNudge ? nudgeMid(u, v, lands) : [u, v];
+        const res = nudged.length > 2 ? nudged : detour(u, v, blk, lands, iter >= 12);
+        next.push(...res.slice(1));
         changed = true;
-      } else next.push(path[i]);
+      } else next.push(v);
     }
     path = pull(next, lands);
     if (!changed) break;
@@ -223,19 +317,58 @@ export function densify(path: LngLat[], step = 0.004): LngLat[] {
   for (let i = 1; i < path.length; i++) {
     const a = path[i - 1], b = path[i];
     const n = Math.max(1, Math.ceil(dist(a, b) / step));
-    for (let k = 1; k <= n; k++) out.push([a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n]);
+    for (let k = 1; k <= n; k++)
+      out.push([a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n]);
   }
   return out;
 }
 
 export type BuiltRoute = { stops: LngLat[]; legs: LngLat[][] };
 
+/** נקודות יציאה/כניסה נקיות לפתח מרינות עם שובר גלים מנותק (כמו מרינת נאוסה) */
+const HARBOR_EXITS: Record<string, LngLat[]> = {
+  naoussa: [
+    [25.23545, 37.12525],
+    [25.2333, 37.1256],
+  ],
+};
+
+/** נקודות מעבר בים הפתוח כדי לעקוף ערוצי סלעים צרים מדי לשיט בטוח (כמו דרום סכינוסה–אופידוסה) */
+const SEA_WAYPOINTS: Record<string, LngLat[]> = {
+  "koufonisia-port->schinoussa-tsigouri": [
+    [25.555, 36.915],
+    [25.502, 36.892],
+  ],
+};
+
 /** buildRoute: מצמיד עצירות למים, מעביר כל leg דרך clearLeg ומצפף */
-export function buildRoute(stops: LngLat[], polys: Ring[], margin = 0.006): BuiltRoute {
+export function buildRoute(
+  stops: LngLat[],
+  polys: Ring[],
+  margin = 0.0025,
+  stopIds?: string[],
+): BuiltRoute {
   const lands = prepareLand(polys, margin);
-  const snapped = stops.map((s) => avoid(s, lands, margin));
+  const snapped = stops.map((s, idx) => (stopIds?.[idx] === "naoussa" ? s : avoid(s, lands, margin)));
   const legs: LngLat[][] = [];
-  for (let i = 1; i < snapped.length; i++) legs.push(densify(clearLeg(snapped[i - 1], snapped[i], lands)));
+  for (let i = 1; i < snapped.length; i++) {
+    const fromId = stopIds?.[i - 1];
+    const toId = stopIds?.[i];
+    const wps: LngLat[] = [snapped[i - 1]];
+    if (fromId && HARBOR_EXITS[fromId]) wps.push(...HARBOR_EXITS[fromId]);
+    if (fromId && toId && SEA_WAYPOINTS[`${fromId}->${toId}`]) {
+      wps.push(...SEA_WAYPOINTS[`${fromId}->${toId}`]);
+    }
+    if (toId && HARBOR_EXITS[toId]) wps.push(...[...HARBOR_EXITS[toId]].reverse());
+    wps.push(snapped[i]);
+
+    const combined: LngLat[] = [wps[0]];
+    for (let k = 1; k < wps.length; k++) {
+      const sub = clearLeg(wps[k - 1], wps[k], lands);
+      combined.push(...sub.slice(1));
+    }
+    legs.push(densify(combined));
+  }
   return { stops: snapped, legs };
 }
 

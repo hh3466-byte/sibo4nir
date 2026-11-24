@@ -37,7 +37,7 @@ h1, h2, h3 {
 .overline {
   color: var(--brass);
   font-size: 0.75rem;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.24em;
   font-weight: 500;
 }
 
@@ -55,25 +55,56 @@ h1, h2, h3 {
 .btn-brass:hover:not(:disabled) { background: var(--brass-d); }
 .btn-brass:disabled { opacity: 0.55; cursor: default; }
 
-/* Hero */
+/* Hero עם קרוסלת תמונות אמיתיות */
 .hero {
   position: relative;
-  min-height: 78vh;
+  min-height: 82vh;
   display: flex;
   align-items: flex-end;
   color: var(--paper);
-  background:
-    linear-gradient(180deg, rgba(11, 30, 40, 0.35) 0%, rgba(11, 30, 40, 0.88) 100%),
-    radial-gradient(circle at 70% 20%, var(--teal) 0%, var(--ink2) 55%, var(--ink) 100%);
+  background: var(--ink);
+  overflow: hidden;
 }
-.hero-inner { max-width: 62rem; margin: 0 auto; padding: 5rem 1.5rem 4.5rem; width: 100%; }
+.hero-slides {
+  position: absolute;
+  inset: 0;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 1.4s ease, transform 6.5s ease;
+}
+.hero-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 30, 40, 0.28) 0%, rgba(11, 30, 40, 0.45) 45%, rgba(11, 30, 40, 0.84) 100%);
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 4.5rem;
+  width: 100%;
+}
 .hero h1 { font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.05; margin: 0.8rem 0 1.4rem; }
-.hero p.sub { font-size: 1.15rem; line-height: 1.8; max-width: 38rem; opacity: 0.9; }
+.hero p.sub { font-size: 1.15rem; line-height: 1.8; max-width: 38rem; opacity: 0.94; }
 
 .section { padding: 5rem 1.5rem; }
+.section-cream { background: var(--cream); }
 .section-head { max-width: 62rem; margin: 0 auto 2rem; }
 .section-head h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin-top: 0.5rem; }
-.section-head p { margin-top: 0.8rem; line-height: 1.8; max-width: 38rem; opacity: 0.8; }
+.section-head p { margin-top: 0.8rem; line-height: 1.8; max-width: 38rem; opacity: 0.82; }
+.social-proof { margin-top: 1.5rem; opacity: 0.82; font-size: 0.95rem; }
 
 .closing {
   background: var(--ink);
@@ -86,15 +117,32 @@ h1, h2, h3 {
 
 /* מפה */
 .tmo-map-wrap { position: relative; max-width: 72rem; margin: 0 auto; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 20px 60px rgba(11, 30, 40, 0.3); }
-.tmo-map { height: min(70vh, 640px); width: 100%; }
+.tmo-map { height: min(72vh, 660px); width: 100%; }
 .tmo-map-fallback { max-width: 72rem; margin: 0 auto; padding: 4rem; text-align: center; border-radius: 1.25rem; background: var(--ink2); color: var(--cream); }
+
+.tmo-clock {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(11, 30, 40, 0.84);
+  backdrop-filter: blur(8px);
+  color: var(--paper);
+  border: 1px solid rgba(198, 163, 90, 0.35);
+  border-radius: 0.9rem;
+  padding: 0.75rem 1.1rem;
+  min-width: 13.5rem;
+}
+.tmo-clock-mode { color: var(--brass); font-size: 0.72rem; letter-spacing: 0.12em; margin-bottom: 0.2rem; }
+.tmo-clock-main { font-family: var(--font-frank), serif; font-size: 1.35rem; font-weight: 700; line-height: 1.2; }
+.tmo-clock-sub { font-size: 0.78rem; opacity: 0.82; margin-top: 0.25rem; }
+
 .tmo-map-panel {
-  position: absolute; bottom: 1.25rem; right: 1.25rem; max-width: 20rem;
-  background: rgba(11, 30, 40, 0.82); backdrop-filter: blur(8px);
+  position: absolute; bottom: 1.25rem; right: 1.25rem; max-width: 21rem;
+  background: rgba(11, 30, 40, 0.84); backdrop-filter: blur(8px);
   color: var(--paper); border-radius: 1rem; padding: 1.25rem 1.4rem;
 }
-.tmo-map-panel h3 { font-size: 1.5rem; margin: 0.2rem 0 0.4rem; }
-.tmo-map-now { font-size: 0.95rem; opacity: 0.85; margin-bottom: 1rem; line-height: 1.6; }
+.tmo-map-panel h3 { font-size: 1.45rem; margin: 0.2rem 0 0.4rem; }
+.tmo-map-now { font-size: 0.95rem; opacity: 0.88; margin-bottom: 1rem; line-height: 1.6; }
 
 .tmo-marker {
   width: 14px; height: 14px; border-radius: 50%;
@@ -102,11 +150,55 @@ h1, h2, h3 {
   box-shadow: 0 0 0 4px rgba(198, 163, 90, 0.25);
 }
 .tmo-marker--night { background: var(--brass); }
-.tmo-boat {
-  width: 22px; height: 22px; background: var(--brass); border: 3px solid var(--paper);
-  border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+.tmo-marker--base { width: 18px; height: 18px; background: var(--brass); border: 3px solid var(--paper); }
+
+.tmo-popup .mapboxgl-popup-content {
+  background: var(--paper); color: var(--ink); border-radius: 0.85rem; padding: 0.75rem;
+  max-width: 17rem; font-family: var(--font-heebo), sans-serif;
 }
-.tmo-popup .mapboxgl-popup-content { background: var(--paper); color: var(--ink); border-radius: 0.75rem; padding: 0.9rem 1rem; max-width: 16rem; font-family: var(--font-heebo), sans-serif; }
 .tmo-popup .mapboxgl-popup-tip { border-top-color: var(--paper); border-bottom-color: var(--paper); }
+.tmo-popup-img { width: 100%; height: 7.5rem; object-fit: cover; border-radius: 0.55rem; margin-bottom: 0.55rem; display: block; }
 .tmo-popup-title { font-family: var(--font-frank), serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
 .tmo-popup-text { font-size: 0.85rem; line-height: 1.5; }
+
+/* כרטיסי עצירות, טברנות ומלונות */
+.stops-grid {
+  max-width: 72rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1.75rem;
+}
+.stop-card {
+  background: var(--paper);
+  border-radius: 1.1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(11, 30, 40, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+.stop-media { position: relative; aspect-ratio: 16 / 10; background: var(--ink2); overflow: hidden; }
+.stop-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stop-tag {
+  position: absolute; top: 0.85rem; right: 0.85rem;
+  background: rgba(11, 30, 40, 0.78); color: var(--paper);
+  font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 999px;
+}
+.stop-body { padding: 1.35rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 0.45rem; flex: 1; }
+.stop-body h3 { font-size: 1.45rem; line-height: 1.2; }
+.stop-desc { font-size: 0.94rem; line-height: 1.65; opacity: 0.85; }
+.photo-attr { font-size: 0.7rem; opacity: 0.55; margin-top: 0.2rem; }
+
+.sub-list { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid rgba(11, 30, 40, 0.09); }
+.sub-title { font-size: 0.78rem; font-weight: 600; color: var(--brass-d); margin-bottom: 0.55rem; letter-spacing: 0.06em; }
+.mini-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.mini-card { display: flex; gap: 0.7rem; align-items: center; }
+.mini-card img { width: 3.5rem; height: 3.5rem; border-radius: 0.55rem; object-fit: cover; flex-shrink: 0; background: var(--ink2); }
+.mini-card strong { display: block; font-size: 0.9rem; line-height: 1.25; }
+.mini-card span { display: block; font-size: 0.8rem; opacity: 0.78; }
+.mini-card small { display: block; font-size: 0.66rem; opacity: 0.52; }
+
+@media (max-width: 640px) {
+  .tmo-clock { top: 0.75rem; right: 0.75rem; left: 3.25rem; min-width: 0; }
+  .tmo-map-panel { right: 0.75rem; left: 0.75rem; bottom: 0.75rem; max-width: none; }
+}
