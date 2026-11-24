@@ -202,6 +202,8 @@ function OptionCarousel<T extends { id: number; name: string; photoUrl: string }
   renderMeta: (item: T) => React.ReactNode;
   onSelect: (item: T) => void;
 }) {
+  // עצירת הקרוסלה בריחוף — דרך state מובטח, כדי שלחיצה על אריח נע תמיד תיפתח
+  const [paused, setPaused] = useState(false);
   if (items.length === 0) return null;
   const isSingle = items.length <= 1;
   const strip = isSingle ? items : [...items, ...items];
@@ -210,10 +212,14 @@ function OptionCarousel<T extends { id: number; name: string; photoUrl: string }
   return (
     <div className="tmo-stop-section">
       <p className="sub-title">{title}</p>
-      <div className="tmo-opt-strip">
+      <div
+        className="tmo-opt-strip"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <div
           className={`tmo-opt-track ${isSingle ? "is-single" : ""}`}
-          style={isSingle ? undefined : { animationDuration: `${durationSec}s` }}
+          style={isSingle ? undefined : { animationDuration: `${durationSec}s`, ...(paused ? { animationPlayState: "paused" } : {}) }}
         >
           {strip.map((item, i) => {
             const isSelected = selectedId !== undefined && selectedId === item.id;
@@ -222,7 +228,7 @@ function OptionCarousel<T extends { id: number; name: string; photoUrl: string }
                 key={`${item.id}-${i}`}
                 type="button"
                 className={`tmo-opt-tile ${isSelected ? "is-selected" : ""}`}
-                onClick={() => onSelect(item)}
+                onPointerDown={() => onSelect(item)}
               >
                 <img src={item.photoUrl} alt={item.name} />
                 <div className="tmo-opt-tile-label">
