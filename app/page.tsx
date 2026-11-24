@@ -29,18 +29,10 @@ export default async function Home() {
         <p className="section-head social-proof">{route.socialProof}</p>
       </section>
 
-      <section className="section">
-        <div className="section-head">
-          <p className="overline">תכנון אישי</p>
-          <h2>תנו לקפטן ספירוס לתכנן לכם</h2>
-          <p>
-            לא כל אחד מחפש את אותו הים. ספרו לקפטן כמה ימים יש לכם, באיזה קצב ומה האווירה — והוא ירכיב לכם מסלול משלכם.
-          </p>
-        </div>
-        <CaptainSpiros places={places} />
-      </section>
-
       <section className="closing">פחות מסכים, יותר מלח על העור. זה הקיץ שתזכרו.</section>
+
+      {/* קפטן ספירוס וגברת ספירוס — קונסיירז' צף שנוכח לאורך כל השיחה */}
+      <CaptainSpiros places={places} />
     </main>
   );
 }
