@@ -350,6 +350,12 @@ h1, h2, h3 {
 .tmo-anchor-note strong { display: block; font-size: 0.9rem; line-height: 1.25; }
 .tmo-anchor-note span { display: block; font-size: 0.74rem; opacity: 0.68; margin-top: 0.1rem; line-height: 1.4; }
 
+/* טיול בתוך האי — המלצה לאטרקציות ביבשה */
+.tmo-island { margin-top: 0.6rem; padding-top: 0.55rem; border-top: 1px solid rgba(11, 30, 40, 0.1); }
+.tmo-island-head { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+.tmo-island-ico { display: inline-flex; color: var(--teal); flex-shrink: 0; }
+.tmo-island-note { font-size: 0.78rem; line-height: 1.5; opacity: 0.78; }
+
 /* בקרת מהירות ב-HUD */
 .tmo-speed {
   display: flex; align-items: center; gap: 0.4rem;
