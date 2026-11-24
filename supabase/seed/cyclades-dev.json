@@ -1,98 +1,472 @@
 {
   "meta": {
-    "region": "Cyclades",
+    "region": "Lavrio → Cyclades",
     "status": "dev-seed",
-    "note": "אזור פיתוח בלבד — לא החלטה על אזור ההשקה הסופי. מסלול דגל של שבוע (7 ימים) מהמרינה בנאוסה, פארוס.",
+    "note": "מסלול דגל שבועי מלבריון (נקודת המוצא של מסלול ה-14 יום). כל נקודת עצירה ממוקמת במים (מעגן/נמל/נקודת עגינה) ולא במרכז עיר ביבשה. כל יום שייט בטווח 20–80 מייל ימי.",
     "source": "עבודת Take Me Out, נובמבר 2026",
     "crs": "WGS84 (lon/lat)"
   },
   "activities": [
-    {"type": "base",      "label": "בסיס יציאה", "default_dwell_min": 0},
-    {"type": "swim",      "label": "שחייה",      "default_dwell_min": 90},
-    {"type": "snorkel",   "label": "שנירקול",    "default_dwell_min": 90},
-    {"type": "anchor",    "label": "עוגן/צילום", "default_dwell_min": 75},
-    {"type": "lunch",     "label": "צהריים",     "default_dwell_min": 120},
-    {"type": "overnight", "label": "לינה",       "default_dwell_min": 0}
+    {
+      "type": "base",
+      "label": "מרינת יציאה",
+      "default_dwell_min": 0
+    },
+    {
+      "type": "swim",
+      "label": "שחייה",
+      "default_dwell_min": 90
+    },
+    {
+      "type": "snorkel",
+      "label": "שנירקול",
+      "default_dwell_min": 90
+    },
+    {
+      "type": "anchor",
+      "label": "עוגן/צילום",
+      "default_dwell_min": 75
+    },
+    {
+      "type": "lunch",
+      "label": "צהריים",
+      "default_dwell_min": 120
+    },
+    {
+      "type": "overnight",
+      "label": "לינה",
+      "default_dwell_min": 0
+    }
   ],
   "islands": [
-    {"id": "paros",       "name": "פארוס",      "name_en": "Paros"},
-    {"id": "naxos",       "name": "נאקסוס",     "name_en": "Naxos"},
-    {"id": "koufonisia",  "name": "קופוניסיה",  "name_en": "Koufonisia"},
-    {"id": "schinoussa",  "name": "סכינוסה",    "name_en": "Schinoussa"},
-    {"id": "iraklia",     "name": "איראקליה",   "name_en": "Iraklia"},
-    {"id": "ios",         "name": "איוס",       "name_en": "Ios"},
-    {"id": "sifnos",      "name": "סיפנוס",     "name_en": "Sifnos"},
-    {"id": "antiparos",   "name": "אנטיפארוס",  "name_en": "Antiparos"}
+    {
+      "id": "attica",
+      "name": "לבריון, אטיקה",
+      "name_en": "Lavrio, Attica"
+    },
+    {
+      "id": "kea",
+      "name": "קיאה",
+      "name_en": "Kea"
+    },
+    {
+      "id": "kythnos",
+      "name": "קיתנוס",
+      "name_en": "Kythnos"
+    },
+    {
+      "id": "syros",
+      "name": "סירוס",
+      "name_en": "Syros"
+    },
+    {
+      "id": "paros",
+      "name": "פארוס",
+      "name_en": "Paros"
+    },
+    {
+      "id": "naxos",
+      "name": "נאקסוס",
+      "name_en": "Naxos"
+    },
+    {
+      "id": "koufonisia",
+      "name": "קופוניסיה",
+      "name_en": "Koufonisia"
+    },
+    {
+      "id": "schinoussa",
+      "name": "סכינוסה",
+      "name_en": "Schinoussa"
+    },
+    {
+      "id": "iraklia",
+      "name": "איראקליה",
+      "name_en": "Iraklia"
+    },
+    {
+      "id": "ios",
+      "name": "איוס",
+      "name_en": "Ios"
+    },
+    {
+      "id": "sifnos",
+      "name": "סיפנוס",
+      "name_en": "Sifnos"
+    },
+    {
+      "id": "antiparos",
+      "name": "אנטיפארוס",
+      "name_en": "Antiparos"
+    },
+    {
+      "id": "serifos",
+      "name": "סריפוס",
+      "name_en": "Serifos"
+    }
   ],
   "places": [
-    {"id": "naoussa",             "name": "מרינת נאוסה, פארוס",     "query": "Naoussa Marina Paros Greece",          "island": "paros",      "type": "base",      "overnight": false, "lat": 37.12453, "lon": 25.23514, "approx": false, "dwell_min": 0,   "desc": "מרינת הדייגים הציורית של נאוסה — מעמיסים ציוד ויוצאים לים הפתוח עם הבוקר."},
-    {"id": "kolimbithres",        "name": "מפרץ קולימביתרס",        "query": "Kolymbithres Beach Paros Greece",      "island": "paros",      "type": "swim",      "overnight": false, "lat": 37.126,   "lon": 25.219,   "approx": true,  "dwell_min": 90,  "desc": "סלעי גרניט מפוסלים ומים טורקיז רדודים — עוגנים, קופצים למים ונחים על הסיפון."},
-    {"id": "chora-naxos",         "name": "חוֹרה, נאקסוס",          "query": "Naxos Port Chora Greece",              "island": "naxos",      "type": "lunch",     "overnight": false, "lat": 37.106,   "lon": 25.376,   "approx": true,  "dwell_min": 120, "desc": "עוצרים לצהריים בעיר העתיקה — דגים טריים ומזטים על קו המים."},
-    {"id": "portara",             "name": "פורטרה, נאקסוס",         "query": "Portara Temple of Apollo Naxos Greece","island": "naxos",      "type": "anchor",    "overnight": false, "lat": 37.110,   "lon": 25.368,   "approx": true,  "dwell_min": 75,  "desc": "שער השיש העתיק של אפולו מול הים — עוגנים לצילומים ולשקיעה."},
-    {"id": "plaka-beach",         "name": "חוף פלאקה, נאקסוס",      "query": "Plaka Beach Naxos Greece",             "island": "naxos",      "type": "overnight", "overnight": true,  "lat": 37.050,   "lon": 25.370,   "approx": true,  "dwell_min": 0,   "desc": "חוף חול ארוך ורגוע עם טברנות על המים — עוגנים ללילה הראשון."},
-    {"id": "koufonisia-bays",     "name": "מפרצי קופוניסיה",        "query": "Piscina Koufonisia Greece",            "island": "koufonisia", "type": "snorkel",   "overnight": false, "lat": 36.937,   "lon": 25.603,   "approx": true,  "dwell_min": 90,  "desc": "מפרצים נסתרים ומים צלולים כמו בריכה — שנירקול בין הדגים וקפיצות מהסלעים."},
-    {"id": "pori",                "name": "פּוֹרי, קופוניסיה",       "query": "Pori Beach Koufonisia Greece",         "island": "koufonisia", "type": "lunch",     "overnight": false, "lat": 36.950,   "lon": 25.610,   "approx": true,  "dwell_min": 120, "desc": "עוגנים מול חוף פורי לצהריים — טברנה על החול, רגליים במים."},
-    {"id": "koufonisia-port",     "name": "נמל קופוניסיה",          "query": "Koufonisia Port Greece",               "island": "koufonisia", "type": "overnight", "overnight": true,  "lat": 36.937,   "lon": 25.608,   "approx": true,  "dwell_min": 0,   "desc": "כפר קטן, לבן ושקט — ערב בטברנות הנמל ולינה לילה שני."},
-    {"id": "schinoussa-tsigouri", "name": "מפרץ ציגורי, סכינוסה",   "query": "Tsigouri Beach Schinoussa Greece",     "island": "schinoussa", "type": "swim",      "overnight": false, "lat": 36.868,   "lon": 25.515,   "approx": true,  "dwell_min": 90,  "desc": "לגונה שלווה בקיקלדים הקטנים — שחייה במים צלולים בלי כביש ובלי רעש."},
-    {"id": "iraklia-alimia",      "name": "מפרץ אלימיה, איראקליה",  "query": "Alimia Beach Iraklia Greece",          "island": "iraklia",    "type": "snorkel",   "overnight": false, "lat": 36.834,   "lon": 25.436,   "approx": true,  "dwell_min": 90,  "desc": "מפרץ חבוי שמגיעים אליו רק מהים — שנירקול מעל מטוס טבוע ומים בגוון אזמרגד."},
-    {"id": "iraklia-port",        "name": "אגיוס גאורגיוס, איראקליה","query": "Agios Georgios Port Iraklia Greece",   "island": "iraklia",    "type": "overnight", "overnight": true,  "lat": 36.862,   "lon": 25.473,   "approx": true,  "dwell_min": 0,   "desc": "נמל אינטימי ושקט של אי קטן — דגים שעלו הבוקר ולילה שלישי מול הסירה."},
-    {"id": "ios-manganari",       "name": "מפרץ מנגנארי, איוס",     "query": "Manganari Beach Ios Greece",           "island": "ios",        "type": "lunch",     "overnight": false, "lat": 36.660,   "lon": 25.371,   "approx": true,  "dwell_min": 120, "desc": "מפרץ חולי רחב ומוגן בצבע טורקיז עמוק — עוגן לצהריים ושחייה רגועה."},
-    {"id": "ios-port",            "name": "נמל איוס",               "query": "Ios Port Gialos Greece",               "island": "ios",        "type": "overnight", "overnight": true,  "lat": 36.723,   "lon": 25.272,   "approx": true,  "dwell_min": 0,   "desc": "מפרץ מוגן עם סמטאות לבנות מעל המים — ערב נעים ולינה לילה רביעי."},
-    {"id": "sifnos-chrysopigi",   "name": "כריסופיגי, סיפנוס",      "query": "Chrysopigi Monastery Sifnos Greece",   "island": "sifnos",     "type": "swim",      "overnight": false, "lat": 36.938,   "lon": 24.746,   "approx": true,  "dwell_min": 90,  "desc": "מנזר לבן על צוק מעל סלעים חלקים ומים עמוקים — קפיצה מהסיפון למים צלולים."},
-    {"id": "sifnos-vathi",        "name": "מפרץ ואתי, סיפנוס",      "query": "Vathi Beach Sifnos Greece",            "island": "sifnos",     "type": "overnight", "overnight": true,  "lat": 36.933,   "lon": 24.688,   "approx": true,  "dwell_min": 0,   "desc": "מפרץ סגור ושליו עם טברנות על החול — אחת הפינות הקסומות ללילה חמישי."},
-    {"id": "despotiko-bay",       "name": "לגונת דספוטיקו",         "query": "Despotiko Island Antiparos Greece",    "island": "antiparos",  "type": "snorkel",   "overnight": false, "lat": 36.968,   "lon": 25.002,   "approx": true,  "dwell_min": 120, "desc": "אי לא מיושב עם מים טורקיז שקופים — עוגן בלגונה שאין אליה כביש."},
-    {"id": "antiparos-port",      "name": "נמל אנטיפארוס",          "query": "Antiparos Port Greece",                "island": "antiparos",  "type": "overnight", "overnight": true,  "lat": 37.041,   "lon": 25.083,   "approx": true,  "dwell_min": 0,   "desc": "עיירת אי נינוחה ומזמינה למשפחות — גלידה בטיילת ולילה שישי אחרון בדרך."},
-    {"id": "antiparos-bay",       "name": "מפרץ אנטיפארוס",         "query": "Soros Beach Antiparos Greece",         "island": "antiparos",  "type": "swim",      "overnight": false, "lat": 36.988,   "lon": 25.075,   "approx": true,  "dwell_min": 90,  "desc": "עצירת שחייה אחרונה במים חמים וצלולים לפני השיט חזרה למרינת נאוסה."}
+    {
+      "id": "lavrio",
+      "name": "מרינת לבריון, אטיקה",
+      "query": "Lavrio Port Marina Greece",
+      "island": "attica",
+      "type": "base",
+      "overnight": false,
+      "lat": 37.7128,
+      "lon": 24.0608,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "נקודת המוצא אל הקיקלדים — מעמיסים ציוד במרינת לבריון ויוצאים לים הפתוח עם הבוקר."
+    },
+    {
+      "id": "kea-koundouros",
+      "name": "מפרץ קונדורוס, קיאה",
+      "query": "Koundouros Beach Kea Greece",
+      "island": "kea",
+      "type": "swim",
+      "overnight": false,
+      "lat": 37.579443,
+      "lon": 24.269219,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "מפרץ מוגן עם טחנות רוח ומים צלולים — עצירת השחייה הראשונה של המסע."
+    },
+    {
+      "id": "kythnos-kolona",
+      "name": "מפרץ קולונה, קיתנוס",
+      "query": "Kolona Beach Kythnos Greece",
+      "island": "kythnos",
+      "type": "lunch",
+      "overnight": false,
+      "lat": 37.4095,
+      "lon": 24.3775,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "לשון חול כפולה בין שתי לגונות טורקיז — עוגנים במים ונהנים מצהריים מול הנוף."
+    },
+    {
+      "id": "kythnos-loutra",
+      "name": "נמל לוטרה, קיתנוס",
+      "query": "Loutra Port Kythnos Greece",
+      "island": "kythnos",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 37.4435,
+      "lon": 24.4325,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "מרינה שלווה עם מעיינות חמים וטברנות על קו המים — לילה ראשון בקיקלדים."
+    },
+    {
+      "id": "syros-finikas",
+      "name": "מפרץ פיניקאס, סירוס",
+      "query": "Finikas Marina Syros Greece",
+      "island": "syros",
+      "type": "swim",
+      "overnight": false,
+      "lat": 37.393878,
+      "lon": 24.876311,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "מפרץ מוגן בדרום-מערב סירוס — מים רגועים וצלולים להפסקת שחייה בדרך לפארוס."
+    },
+    {
+      "id": "kolimbithres",
+      "name": "מפרץ קולימביתרס, פארוס",
+      "query": "Kolymbithres Beach Paros Greece",
+      "island": "paros",
+      "type": "lunch",
+      "overnight": false,
+      "lat": 37.1255,
+      "lon": 25.2225,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "סלעי גרניט מפוסלים ומים טורקיז רדודים — עוגנים במפרץ ונהנים מצהריים מול הים."
+    },
+    {
+      "id": "naoussa",
+      "name": "מרינת נאוסה, פארוס",
+      "query": "Naoussa Marina Paros Greece",
+      "island": "paros",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 37.12453,
+      "lon": 25.23514,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "מרינת הדייגים הציורית של נאוסה — סמטאות לבנות, טברנות על הרציף ולילה שני."
+    },
+    {
+      "id": "portara",
+      "name": "פורטרה ונמל נאקסוס",
+      "query": "Portara Temple of Apollo Naxos Greece",
+      "island": "naxos",
+      "type": "lunch",
+      "overnight": false,
+      "lat": 37.1072,
+      "lon": 25.3712,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "עוגנים במים ממש מול שער השיש העתיק של אפולו — צהריים של דגים טריים על קו המים."
+    },
+    {
+      "id": "plaka-beach",
+      "name": "חוף פלאקה, נאקסוס",
+      "query": "Plaka Beach Naxos Greece",
+      "island": "naxos",
+      "type": "swim",
+      "overnight": false,
+      "lat": 37.049,
+      "lon": 25.362,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "עגינה מול חוף חול זהוב ארוך ומים טורקיז שקופים — קפיצה מרעננת לפני הקיקלדים הקטנים."
+    },
+    {
+      "id": "koufonisia-port",
+      "name": "נמל קופוניסיה",
+      "query": "Koufonisia Port Greece",
+      "island": "koufonisia",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 36.9308,
+      "lon": 25.6025,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "כפר קטן, לבן ושקט בקיקלדים הקטנים — ערב רגוע בנמל ולילה שלישי."
+    },
+    {
+      "id": "pori",
+      "name": "מפרץ פּוֹרי, קופוניסיה",
+      "query": "Pori Beach Koufonisia Greece",
+      "island": "koufonisia",
+      "type": "swim",
+      "overnight": false,
+      "lat": 36.9495,
+      "lon": 25.6225,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "מפרץ חצי-סהר בצבע בריכה — עוגנים במים הצלולים של הבוקר לשחייה ושנירקול."
+    },
+    {
+      "id": "iraklia-alimia",
+      "name": "מפרץ אלימיה, איראקליה",
+      "query": "Alimia Beach Iraklia Greece",
+      "island": "iraklia",
+      "type": "snorkel",
+      "overnight": false,
+      "lat": 36.82017,
+      "lon": 25.432453,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "מפרץ חבוי שמגיעים אליו רק מהים — שנירקול מעל מטוס טבוע ומים בגוון אזמרגד."
+    },
+    {
+      "id": "ios-port",
+      "name": "נמל איוס",
+      "query": "Ios Port Gialos Greece",
+      "island": "ios",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 36.7225,
+      "lon": 25.2715,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "מפרץ טבעי מוגן עם סמטאות לבנות מעל המים — ערב נעים ולילה רביעי."
+    },
+    {
+      "id": "ios-manganari",
+      "name": "מפרץ מנגנארי, איוס",
+      "query": "Manganari Beach Ios Greece",
+      "island": "ios",
+      "type": "swim",
+      "overnight": false,
+      "lat": 36.656,
+      "lon": 25.3735,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "מפרץ חולי רחב ומוגן בצבע טורקיז עמוק — שחייה של בוקר לפני החצייה לסיפנוס."
+    },
+    {
+      "id": "sifnos-chrysopigi",
+      "name": "כריסופיגי, סיפנוס",
+      "query": "Chrysopigi Monastery Sifnos Greece",
+      "island": "sifnos",
+      "type": "lunch",
+      "overnight": false,
+      "lat": 36.935,
+      "lon": 24.7495,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "מנזר לבן על צוק מעל סלעים חלקים ומים עמוקים — עגינה לצהריים ושחייה."
+    },
+    {
+      "id": "sifnos-vathi",
+      "name": "מפרץ ואתי, סיפנוס",
+      "query": "Vathi Beach Sifnos Greece",
+      "island": "sifnos",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 36.928019,
+      "lon": 24.687555,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "מפרץ סגור ושליו עם טברנות על החול — אחת הפינות הקסומות ללילה חמישי."
+    },
+    {
+      "id": "despotiko-bay",
+      "name": "לגונת דספוטיקו, אנטיפארוס",
+      "query": "Despotiko Island Antiparos Greece",
+      "island": "antiparos",
+      "type": "snorkel",
+      "overnight": false,
+      "lat": 36.971007,
+      "lon": 25.003212,
+      "approx": false,
+      "dwell_min": 120,
+      "desc": "אי לא מיושב עם מים טורקיז שקופים — עוגן בלגונה שאין אליה כביש."
+    },
+    {
+      "id": "serifos-livadi",
+      "name": "נמל ליבאדי, סריפוס",
+      "query": "Livadi Port Serifos Greece",
+      "island": "serifos",
+      "type": "overnight",
+      "overnight": true,
+      "lat": 37.1395,
+      "lon": 24.5175,
+      "approx": false,
+      "dwell_min": 0,
+      "desc": "מפרץ מוגן עם כפר לבן שמתנוסס מעל ההר — ערב בטברנות הרציף ולילה שישי אחרון."
+    },
+    {
+      "id": "kythnos-apokrousi",
+      "name": "מפרץ אפוקרוסי, קיתנוס",
+      "query": "Apokrousi Beach Kythnos Greece",
+      "island": "kythnos",
+      "type": "swim",
+      "overnight": false,
+      "lat": 37.4125,
+      "lon": 24.3945,
+      "approx": false,
+      "dwell_min": 90,
+      "desc": "עצירת שחייה אחרונה במים רגועים לפני השיט חזרה למרינת לבריון."
+    }
   ],
   "tavernas": [
-    {"place_id": "chora-naxos",  "name": "To Elliniko",      "query": "To Elliniko Restaurant Naxos Greece",       "note": "מטבח יווני ביתי בעיר העתיקה"},
-    {"place_id": "chora-naxos",  "name": "Meze²",            "query": "Meze2 Naxos Greece",                        "note": "דגים טריים ומזטים על קו המים"},
-    {"place_id": "pori",         "name": "Captain Nikolas",  "query": "Captain Nikolas Koufonisia Greece",         "note": "דגה מקומית מול המפרץ"},
-    {"place_id": "pori",         "name": "Kalofego",         "query": "Kalofego Pori Beach Koufonisia Greece",     "note": "טברנה על החול, רגליים במים"},
-    {"place_id": "iraklia-port", "name": "Maistrali",        "query": "Maistrali Taverna Iraklia Greece",          "note": "דגים שעלו הבוקר בנמל"},
-    {"place_id": "ios-manganari","name": "Antonios Taverna", "query": "Antonios Taverna Manganari Ios Greece",     "note": "צהריים מול מפרץ הטורקיז"},
-    {"place_id": "sifnos-vathi", "name": "Tsikali",          "query": "Tsikali Taverna Vathi Sifnos Greece",       "note": "קדירות מקומיות על שפת המים"},
-    {"place_id": "antiparos-port","name": "Captain Pipinos", "query": "Captain Pipinos Antiparos Greece",          "note": "דגים טריים על הרציף"}
+    {
+      "place_id": "kythnos-kolona",
+      "name": "Kolona Beach Bar & Taverna",
+      "query": "Kolona Beach Kythnos Taverna Greece",
+      "note": "צהריים מול לשון החול הכפולה"
+    },
+    {
+      "place_id": "kythnos-loutra",
+      "name": "Kandouni",
+      "query": "Kandouni Loutra Kythnos Greece",
+      "note": "דגים טריים על המזח בלוטרה"
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Sigi Ikthios",
+      "query": "Sigi Ikthios Naoussa Paros Greece",
+      "note": "דגים ומזטים במרינת נאוסה"
+    },
+    {
+      "place_id": "portara",
+      "name": "To Elliniko",
+      "query": "To Elliniko Restaurant Naxos Greece",
+      "note": "מטבח יווני ביתי בעיר העתיקה"
+    },
+    {
+      "place_id": "pori",
+      "name": "Kalofego",
+      "query": "Kalofego Pori Beach Koufonisia Greece",
+      "note": "טברנה על החול, רגליים במים"
+    },
+    {
+      "place_id": "sifnos-vathi",
+      "name": "Tsikali",
+      "query": "Tsikali Taverna Vathi Sifnos Greece",
+      "note": "קדירות מקומיות על שפת המים"
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Kalis",
+      "query": "Kalis Taverna Livadi Serifos Greece",
+      "note": "דגה מקומית במפרץ ליבאדי"
+    }
   ],
   "hotels": [
-    {"place_id": "plaka-beach",    "name": "Plaka Beach Studios",  "query": "Plaka Beach Resort Naxos Greece",        "price_eur": 115},
-    {"place_id": "plaka-beach",    "name": "Medusa Beach Resort",  "query": "Medusa Beach Resort Plaka Naxos Greece", "price_eur": 140},
-    {"place_id": "koufonisia-port","name": "Koufonisia Hotel",     "query": "Koufonisia Hotel Resort Greece",         "price_eur": 130},
-    {"place_id": "iraklia-port",   "name": "Speires Hotel",        "query": "Speires Hotel Iraklia Greece",           "price_eur": 110},
-    {"place_id": "ios-port",       "name": "Ios Palace Hotel",     "query": "Ios Palace Hotel Greece",                "price_eur": 165},
-    {"place_id": "sifnos-vathi",   "name": "Elies Resorts",        "query": "Elies Resorts Vathi Sifnos Greece",      "price_eur": 220},
-    {"place_id": "antiparos-port", "name": "Kastro Antiparos",     "query": "Kastro Antiparos Hotel Greece",          "price_eur": 145}
+    {
+      "place_id": "kythnos-loutra",
+      "name": "Kythnos Bay Hotel",
+      "query": "Kythnos Bay Hotel Loutra Greece",
+      "price_eur": 125
+    },
+    {
+      "place_id": "naoussa",
+      "name": "Kalypso Hotel Paros",
+      "query": "Kalypso Hotel Naoussa Paros Greece",
+      "price_eur": 160
+    },
+    {
+      "place_id": "koufonisia-port",
+      "name": "Koufonisia Hotel",
+      "query": "Koufonisia Hotel Resort Greece",
+      "price_eur": 130
+    },
+    {
+      "place_id": "ios-port",
+      "name": "Ios Palace Hotel",
+      "query": "Ios Palace Hotel Greece",
+      "price_eur": 165
+    },
+    {
+      "place_id": "sifnos-vathi",
+      "name": "Elies Resorts",
+      "query": "Elies Resorts Vathi Sifnos Greece",
+      "price_eur": 220
+    },
+    {
+      "place_id": "serifos-livadi",
+      "name": "Coco-Mat Eco Residences Serifos",
+      "query": "Coco-Mat Eco Residences Serifos Greece",
+      "price_eur": 190
+    }
   ],
   "flagship_routes": [
     {
-      "id": "cyclades-heart-7d",
-      "name": "לב הקיקלדים — שבוע בין מפרצים",
+      "id": "cyclades-lavrio-7d",
+      "name": "לב הקיקלדים — שבוע מלבריון",
       "days": 7,
       "single_boat": true,
-      "base": "naoussa",
+      "base": "lavrio",
       "stops": [
-        "naoussa",
+        "lavrio",
+        "kea-koundouros",
+        "kythnos-kolona",
+        "kythnos-loutra",
+        "syros-finikas",
         "kolimbithres",
-        "chora-naxos",
+        "naoussa",
         "portara",
         "plaka-beach",
-        "koufonisia-bays",
-        "pori",
         "koufonisia-port",
-        "schinoussa-tsigouri",
+        "pori",
         "iraklia-alimia",
-        "iraklia-port",
-        "ios-manganari",
         "ios-port",
+        "ios-manganari",
         "sifnos-chrysopigi",
         "sifnos-vathi",
         "despotiko-bay",
-        "antiparos-port",
-        "antiparos-bay",
-        "naoussa"
+        "serifos-livadi",
+        "kythnos-apokrousi",
+        "lavrio"
       ],
       "social_proof": "15 משפחות כבר עשו את זה ונהנו",
-      "note": "מסלול דגל שבועי — דילוג מאי לאי בקיקלדים, יציאה וחזרה ממרינת נאוסה בפארוס, אותה סירה לכל אורכו, לינות ביבשה."
+      "note": "מסלול דגל שבועי מלבריון אל לב הקיקלדים ובחזרה — 20–80 מייל ימי בכל יום שייט, אותה סירה לכל אורכו, לינות ביבשה."
     }
   ]
 }

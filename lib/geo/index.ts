@@ -1,4 +1,4 @@
-﻿import "server-only";
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { cacheLife } from "next/cache";
 import seed from "@/supabase/seed/cyclades-dev.json";

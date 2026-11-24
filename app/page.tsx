@@ -1,4 +1,4 @@
-﻿import HeroCarousel from "@/components/HeroCarousel";
+import HeroCarousel from "@/components/HeroCarousel";
 import MapSection from "@/components/MapSection";
 import { getGeoData } from "@/lib/geo";
 

@@ -103,21 +103,8 @@ try {
     const q = placeQueries.get(p.id) || `${p.id} Cyclades Greece`;
     const found = await searchPlace(q);
 
-    // עדכון קואורדינטות ממקור Google Places עבור מקומות approx בלבד (לא נוגעים במרינת נאוסה)
-    if (found?.location && p.approx && p.id !== "naoussa") {
-      const d = Math.hypot(found.location.latitude - p.lat, found.location.longitude - p.lon);
-      if (d < 0.12) {
-        await pgClient.query("update places set lat=$1, lon=$2, approx=false, google_place_id=$3 where id=$4", [
-          +found.location.latitude.toFixed(6),
-          +found.location.longitude.toFixed(6),
-          found.id,
-          p.id,
-        ]);
-        stats.geocoded++;
-      } else {
-        await pgClient.query("update places set google_place_id=$1 where id=$2", [found.id, p.id]);
-      }
-    } else if (found?.id) {
+    // לעולם לא דורסים קואורדינטות עגינה במים בקואורדינטות מרכז-עיר מ-Google Places! שומרים רק google_place_id.
+    if (found?.id) {
       await pgClient.query("update places set google_place_id=$1 where id=$2", [found.id, p.id]);
     }
 

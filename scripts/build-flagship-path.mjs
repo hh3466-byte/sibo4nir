@@ -1,9 +1,9 @@
-﻿// בונה ושומר נתיב מים למסלולי דגל ב-Supabase test + מאמת 0 חציות יבשה.
-// שימוש: node scripts/build-flagship-path.mjs   (דורש lib/geo/coastline.json מ-build-coastline.mjs)
+// בונה ושומר נתיב מים למסלולי דגל ב-Supabase test + מאמת 0 חציות יבשה + מאמת 20–80 מייל ימי לכל יום שייט.
+// שימוש: node scripts/build-flagship-path.mjs
 import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
-import { buildRoute, validate } from "../lib/geo/routing.ts";
+import { buildRoute, pathLengthNm, validate } from "../lib/geo/routing.ts";
 
 const root = process.cwd();
 const env = Object.fromEntries(
@@ -20,7 +20,9 @@ const client = new pg.Client({
 });
 await client.connect();
 try {
-  const places = new Map((await client.query("select id,lon,lat from places")).rows.map((p) => [p.id, [p.lon, p.lat]]));
+  const placeRows = (await client.query("select id,lon,lat,overnight from places")).rows;
+  const places = new Map(placeRows.map((p) => [p.id, [p.lon, p.lat]]));
+  const overnightById = new Map(placeRows.map((p) => [p.id, p.overnight]));
   const routes = (await client.query("select id,stops from routes where not hidden")).rows;
   let totalLand = 0, totalCross = 0;
   for (const r of routes) {
@@ -28,6 +30,26 @@ try {
     const v = validate(built.legs, polys);
     totalLand += v.inLand; totalCross += v.crossings;
     console.log(`${r.id}: ${built.legs.length} מקטעים, ${built.legs.reduce((s, l) => s + l.length, 0)} נקודות | דגימות ${v.samples}, על יבשה ${v.inLand}, חציות מדויקות ${v.crossings}`);
+
+    // חישוב מיילים ימיים לכל יום שייט (20–80 מייל ליום)
+    let day = 1, dayNm = 0, totalNm = 0;
+    let dayRangeOk = true;
+    for (let i = 0; i < built.legs.length; i++) {
+      const nm = pathLengthNm(built.legs[i]);
+      dayNm += nm;
+      totalNm += nm;
+      const toId = r.stops[i + 1];
+      const isDayEnd = overnightById.get(toId) || i === built.legs.length - 1;
+      if (isDayEnd) {
+        const ok = dayNm >= 20 && dayNm <= 80;
+        if (!ok) dayRangeOk = false;
+        console.log(`  יום ${day}: ${dayNm.toFixed(1)} מייל ימי (סיום ב-${toId}) ${ok ? "✔" : "✖ חריגה מ-20–80"}`);
+        day++;
+        dayNm = 0;
+      }
+    }
+    console.log(`  סה"כ: ${totalNm.toFixed(1)} מייל ימי | טווח 20–80 לכל יום: ${dayRangeOk ? "תקין" : "לא תקין"}`);
+
     if (v.inLand === 0 && v.crossings === 0) {
       await client.query("update routes set water_path=$1 where id=$2", [JSON.stringify(built), r.id]);
       console.log("נשמר ב-DB");
@@ -37,4 +59,3 @@ try {
 } finally {
   await client.end();
 }
-

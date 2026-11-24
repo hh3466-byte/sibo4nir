@@ -63,7 +63,7 @@ export default function LiveMap({
   const boatRef = useRef<mapboxgl.Marker | null>(null);
   const runId = useRef(0);
   const autoPlayed = useRef(false);
-  const sailRef = useRef<() => void>(() => {});
+  const sailRef = useRef<() => void>(() => { });
   const [done, setDone] = useState(false);
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -389,7 +389,7 @@ export default function LiveMap({
         <p className="overline">מסלול דגל שבועי</p>
         <h3>{routeName}</h3>
         <p className="tmo-map-now">
-          {current ? `${current.name} — ${current.islandName}` : "יציאה וחזרה ממרינת נאוסה, פארוס."}
+          {current ? `${current.name} — ${current.islandName}` : "יציאה וחזרה ממרינת לבריון, אטיקה."}
         </p>
         <button className="btn-brass" onClick={playing ? stop : sail} disabled={!ready}>
           {playing ? "נעצור לרגע" : done ? "שוב להפלגה" : "צאו איתנו להפלגה"}
