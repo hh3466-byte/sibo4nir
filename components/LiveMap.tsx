@@ -99,8 +99,8 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
   const pt = map.project(coord);
   const isMobile = W < 640;
 
-  const cardW = isMobile ? W - 24 : Math.min(380, W - 40);
-  const cardH = Math.min(560, Math.round(H * 0.86));
+  const cardW = isMobile ? W - 24 : Math.min(480, W - 40);
+  const cardH = Math.min(600, Math.round(H * 0.88));
 
   if (isMobile) {
     const cardLeft = 12;
@@ -135,7 +135,7 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
   };
 }
 
-/** קרוסלת תמונות אמיתיות של מקום/טברנה/מלון (~3.5 שניות + נקודות וחצים; ללא סיבוב אם יש תמונה אחת) */
+/** רצועת תמונות אופקית (filmstrip marquee) דומיננטית (~290px) — 3-4 תמונות בו-זמנית, גלילה רציפה, pause on hover */
 function PhotoCarousel({
   photos,
   alt,
@@ -146,71 +146,28 @@ function PhotoCarousel({
   children?: React.ReactNode;
 }) {
   const list = photos.length > 0 ? photos : ["/img/e1.jpg"];
-  const [idx, setIdx] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => {
-    if (list.length <= 1 || paused) return;
-    const id = setInterval(() => setIdx((i) => (i + 1) % list.length), 3500);
-    return () => clearInterval(id);
-  }, [list.length, paused]);
-
-  const safeIdx = idx % list.length;
+  const isSingle = list.length <= 1;
+  const trackItems = isSingle ? list : [...list, ...list];
+  const durationSec = Math.max(16, list.length * 4.2);
 
   return (
     <div
       className="tmo-stop-modal-media"
-      style={{ position: "relative", height: 130, flexShrink: 0, overflow: "hidden" }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      style={{ position: "relative", flexShrink: 0, overflow: "hidden" }}
     >
-      {list.map((src, i) => (
-        <img
-          key={`${src}-${i}`}
-          src={src}
-          alt={alt}
-          className={`tmo-photo-slide ${i === safeIdx ? "is-active" : ""}`}
-        />
-      ))}
-
-      {list.length > 1 && (
-        <>
-          <button
-            type="button"
-            className="tmo-photo-nav tmo-photo-prev"
-            aria-label="תמונה קודמת"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIdx((i) => (i - 1 + list.length) % list.length);
-            }}
-          >
-            ›
-          </button>
-          <button
-            type="button"
-            className="tmo-photo-nav tmo-photo-next"
-            aria-label="תמונה הבאה"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIdx((i) => (i + 1) % list.length);
-            }}
-          >
-            ‹
-          </button>
-          <div className="tmo-photo-dots" aria-hidden="true">
-            {list.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`tmo-dot ${i === safeIdx ? "is-active" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIdx(i);
-                }}
-              />
-            ))}
-          </div>
-        </>
+      {isSingle ? (
+        <img src={list[0]} alt={alt} className="tmo-photo-single" />
+      ) : (
+        <div
+          className="tmo-filmstrip-track"
+          style={{ animationDuration: `${durationSec}s` }}
+        >
+          {trackItems.map((src, i) => (
+            <div key={`${src}-${i}`} className="tmo-filmstrip-item">
+              <img src={src} alt={alt} />
+            </div>
+          ))}
+        </div>
       )}
       {children}
     </div>
@@ -325,7 +282,7 @@ export default function LiveMap({
   const boatRef = useRef<mapboxgl.Marker | null>(null);
   const runId = useRef(0);
   const autoPlayed = useRef(false);
-  const sailRef = useRef<() => void>(() => {});
+  const sailRef = useRef<() => void>(() => { });
   const continueResolver = useRef<(() => void) | null>(null);
 
   const [done, setDone] = useState(false);
@@ -795,8 +752,8 @@ export default function LiveMap({
             position: "absolute",
             left: `${anchor.cardLeft}px`,
             top: `${anchor.cardTop}px`,
-            maxWidth: anchor.isMobile ? "calc(100% - 24px)" : "380px",
-            maxHeight: "min(86%, 560px)",
+            maxWidth: anchor.isMobile ? "calc(100% - 24px)" : "480px",
+            maxHeight: "min(88%, 600px)",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",

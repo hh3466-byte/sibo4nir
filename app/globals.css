@@ -179,7 +179,9 @@ h1, h2, h3 {
 @media (max-width: 640px) {
   .tmo-clock { top: 0.75rem; right: 0.75rem; left: 3.25rem; min-width: 0; }
   .tmo-map-panel { right: 0.75rem; left: 0.75rem; bottom: 0.75rem; max-width: none; }
-  .tmo-stop-pop { width: calc(100% - 24px) !important; max-height: 68% !important; }
+  .tmo-stop-pop { width: calc(100% - 24px) !important; max-height: 82% !important; }
+  .tmo-stop-modal-media { height: 220px !important; }
+  .tmo-filmstrip-item { flex: 0 0 120px !important; }
 }
 
 /* טבעת דופק על נקודת העצירה על המפה */
@@ -208,9 +210,9 @@ h1, h2, h3 {
 }
 .tmo-stop-pop {
   position: absolute;
-  width: min(380px, calc(100% - 32px));
-  max-width: 380px;
-  max-height: min(86%, 560px);
+  width: min(480px, calc(100% - 32px));
+  max-width: 480px;
+  max-height: min(88%, 600px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -222,30 +224,47 @@ h1, h2, h3 {
   z-index: 12;
   animation: tmoPopFromMap 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.tmo-stop-modal-media { position: relative; height: 130px; flex-shrink: 0; background: var(--ink2); overflow: hidden; }
-.tmo-photo-slide {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
-  opacity: 0; transition: opacity 0.6s ease;
+/* רצועת תמונות אופקית דומיננטית (filmstrip marquee) — 3-4 תמונות בו-זמנית, נעצרת בריחוף */
+.tmo-stop-modal-media {
+  position: relative;
+  height: 290px;
+  flex-shrink: 0;
+  background: var(--ink);
+  overflow: hidden;
 }
-.tmo-photo-slide.is-active { opacity: 1; }
-.tmo-photo-nav {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 1.7rem; height: 1.7rem; border-radius: 999px; border: 0;
-  background: rgba(11, 30, 40, 0.62); color: var(--paper);
-  font-size: 1.1rem; line-height: 1; cursor: pointer; z-index: 3;
+.tmo-photo-single {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
-.tmo-photo-nav:hover { background: var(--ink); }
-.tmo-photo-prev { right: 0.45rem; }
-.tmo-photo-next { left: 0.45rem; }
-.tmo-photo-dots {
-  position: absolute; bottom: 0.45rem; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 0.3rem; z-index: 3;
+@keyframes tmoMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-.tmo-dot {
-  width: 6px; height: 6px; border-radius: 999px; border: 0; padding: 0; cursor: pointer;
-  background: rgba(251, 248, 241, 0.5); transition: background 0.2s, transform 0.2s;
+.tmo-filmstrip-track {
+  direction: ltr;
+  display: flex;
+  gap: 4px;
+  height: 100%;
+  width: max-content;
+  animation: tmoMarquee 22s linear infinite;
+  will-change: transform;
 }
-.tmo-dot.is-active { background: var(--brass); transform: scale(1.25); }
+.tmo-stop-modal-media:hover .tmo-filmstrip-track {
+  animation-play-state: paused;
+}
+.tmo-filmstrip-item {
+  flex: 0 0 155px;
+  height: 100%;
+  overflow: hidden;
+}
+.tmo-filmstrip-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* בקרי קרוסלת אופציות (מלונות / טברנות) */
 .tmo-opt-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
