@@ -170,18 +170,21 @@ h1, h2, h3 {
 .photo-attr { font-size: 0.7rem; opacity: 0.55; margin-top: 0.2rem; }
 .sub-title { font-size: 0.78rem; font-weight: 600; color: var(--brass-d); margin-bottom: 0.55rem; letter-spacing: 0.06em; }
 .mini-grid { display: flex; flex-direction: column; gap: 0.55rem; }
-.mini-card { display: flex; gap: 0.65rem; align-items: center; }
-.mini-card img { width: 3.25rem; height: 3.25rem; border-radius: 0.5rem; object-fit: cover; flex-shrink: 0; background: var(--ink2); }
-.mini-card strong { display: block; font-size: 0.88rem; line-height: 1.25; }
-.mini-card span { display: block; font-size: 0.78rem; opacity: 0.78; }
+.mini-card { display: block; position: relative; }
+.mini-card img { width: 100%; height: 11rem; border-radius: 0; object-fit: cover; display: block; background: var(--ink2); }
+.mini-card strong { display: block; font-size: 1rem; line-height: 1.25; }
+.mini-card span { display: block; font-size: 0.82rem; opacity: 0.8; }
 .mini-card small { display: block; font-size: 0.66rem; opacity: 0.52; }
 
 @media (max-width: 640px) {
   .tmo-clock { top: 0.75rem; right: 0.75rem; left: 3.25rem; min-width: 0; }
   .tmo-map-panel { right: 0.75rem; left: 0.75rem; bottom: 0.75rem; max-width: none; }
-  .tmo-stop-pop { width: calc(100% - 24px) !important; max-height: 82% !important; }
-  .tmo-stop-modal-media { height: 220px !important; }
+  .tmo-stop-pop { width: calc(100% - 24px) !important; max-height: 84% !important; }
+  .tmo-stop-modal-media { height: 200px !important; }
   .tmo-filmstrip-item { flex: 0 0 120px !important; }
+  .tmo-opt-tile { flex: 0 0 150px !important; height: 108px !important; }
+  .tmo-clock-main { font-size: 1.15rem; }
+  .tmo-clock-sub { font-size: 0.72rem; }
 }
 
 /* טבעת דופק על נקודת העצירה על המפה */
@@ -227,7 +230,7 @@ h1, h2, h3 {
 /* רצועת תמונות אופקית דומיננטית (filmstrip marquee) — 3-4 תמונות בו-זמנית, נעצרת בריחוף */
 .tmo-stop-modal-media {
   position: relative;
-  height: 290px;
+  height: 250px;
   flex-shrink: 0;
   background: var(--ink);
   overflow: hidden;
@@ -258,6 +261,12 @@ h1, h2, h3 {
   flex: 0 0 155px;
   height: 100%;
   overflow: hidden;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  cursor: zoom-in;
+  display: block;
 }
 .tmo-filmstrip-item img {
   width: 100%;
@@ -266,22 +275,113 @@ h1, h2, h3 {
   display: block;
 }
 
-/* בקרי קרוסלת אופציות (מלונות / טברנות) */
-.tmo-opt-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
-.tmo-opt-head .sub-title { margin-bottom: 0; }
-.tmo-opt-controls { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
-.tmo-opt-arrow {
-  width: 1.45rem; height: 1.45rem; border-radius: 999px; border: 1px solid rgba(11, 30, 40, 0.16);
-  background: var(--paper); color: var(--ink); font-size: 0.95rem; line-height: 1; cursor: pointer;
+/* מבחר אופציות (מלונות / טברנות) — רצועה אופקית מסתובבת כמו התמונות */
+.tmo-opt-strip { overflow: hidden; border-radius: 0.7rem; background: var(--ink2); }
+.tmo-opt-track {
+  direction: ltr;
+  display: flex;
+  gap: 0.4rem;
+  width: max-content;
+  animation: tmoMarquee linear infinite;
+  will-change: transform;
 }
-.tmo-opt-arrow:hover { border-color: var(--brass); color: var(--brass-d); }
-.tmo-opt-count { font-size: 0.72rem; opacity: 0.65; min-width: 1.8rem; text-align: center; }
-.tmo-opt-dots { display: flex; justify-content: center; gap: 0.35rem; margin-top: 0.45rem; }
-.tmo-opt-dot {
-  width: 6px; height: 6px; border-radius: 999px; border: 0; padding: 0; cursor: pointer;
-  background: rgba(11, 30, 40, 0.2); transition: background 0.2s, width 0.2s;
+.tmo-opt-track.is-single { width: 100%; animation: none; }
+.tmo-opt-strip:hover .tmo-opt-track { animation-play-state: paused; }
+.tmo-opt-tile {
+  position: relative;
+  flex: 0 0 160px;
+  height: 118px;
+  border: 0;
+  padding: 0;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--ink2);
 }
-.tmo-opt-dot.is-active { background: var(--brass); width: 16px; }
+.tmo-opt-track.is-single .tmo-opt-tile { flex: 1 1 100%; height: 150px; }
+.tmo-opt-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tmo-opt-tile.is-selected { outline: 3px solid var(--brass); outline-offset: -3px; }
+.tmo-opt-tile-label {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  direction: rtl;
+  text-align: right;
+  padding: 0.85rem 0.6rem 0.4rem;
+  background: linear-gradient(transparent, rgba(11, 30, 40, 0.92));
+  color: var(--paper);
+}
+.tmo-opt-tile-label strong { display: block; font-size: 0.86rem; line-height: 1.2; }
+.tmo-opt-tile-meta { font-size: 0.72rem; opacity: 0.92; }
+.tmo-opt-tile-meta .tmo-kind-tag { background: rgba(255, 255, 255, 0.24); color: var(--paper); }
+
+/* פריסת מבחרים: במחשב זה-לצד-זה (ניצול רוחב), בטלפון מוערם */
+.tmo-stop-selections { display: flex; flex-direction: column; gap: 0.5rem; }
+@media (min-width: 641px) {
+  .tmo-stop-selections { flex-direction: row; align-items: flex-start; }
+  .tmo-stop-selections .tmo-stop-section { flex: 1; min-width: 0; }
+}
+
+/* עגינה והגעה לחוף — בורר לחיץ הניתן לעריכה לכל תחנה */
+.tmo-mooring { margin-top: 0.5rem; }
+.tmo-mooring .sub-title { margin-bottom: 0.4rem; }
+.tmo-mooring-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.tmo-mooring-chip {
+  flex: 1 1 0; min-width: 8.5rem; text-align: right; cursor: pointer;
+  border: 1.5px solid rgba(11, 30, 40, 0.14); border-radius: 0.7rem;
+  background: var(--cream); color: var(--ink); padding: 0.5rem 0.65rem;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.tmo-mooring-chip:hover { border-color: var(--brass); }
+.tmo-mooring-chip.is-on { border-color: var(--brass); background: #fff; box-shadow: 0 0 0 1.5px var(--brass); }
+.tmo-mooring-chip strong { display: block; font-size: 0.84rem; line-height: 1.25; }
+.tmo-mooring-chip em { display: block; font-style: normal; font-size: 0.7rem; opacity: 0.66; margin-top: 0.12rem; line-height: 1.35; }
+@media (max-width: 640px) { .tmo-mooring-chip { flex: 1 1 100%; } }
+/* כותרת עם אייקון עוגן */
+.tmo-mooring-head { display: flex; align-items: center; gap: 0.4rem; }
+.tmo-anchor-ico { display: inline-flex; color: var(--brass-d); flex-shrink: 0; }
+/* מפרץ שחייה — תג עוגן בולט (לא יורדים לחוף) */
+.tmo-anchor-note {
+  display: flex; align-items: center; gap: 0.65rem;
+  margin-top: 0.5rem; padding: 0.6rem 0.8rem; border-radius: 0.7rem;
+  background: var(--cream); border: 1px solid rgba(198, 163, 90, 0.4); color: var(--ink);
+}
+.tmo-anchor-note .tmo-anchor-ico svg { width: 26px; height: 26px; }
+.tmo-anchor-note strong { display: block; font-size: 0.9rem; line-height: 1.25; }
+.tmo-anchor-note span { display: block; font-size: 0.74rem; opacity: 0.68; margin-top: 0.1rem; line-height: 1.4; }
+
+/* בקרת מהירות ב-HUD */
+.tmo-speed {
+  display: flex; align-items: center; gap: 0.4rem;
+  margin-top: 0.5rem; padding-top: 0.45rem;
+  border-top: 1px solid rgba(198, 163, 90, 0.25);
+}
+.tmo-speed-label { font-size: 0.72rem; color: var(--brass); letter-spacing: 0.08em; }
+.tmo-speed-btn {
+  width: 1.5rem; height: 1.5rem; border-radius: 999px;
+  border: 1px solid rgba(198, 163, 90, 0.5); background: transparent; color: var(--paper);
+  font-size: 1rem; line-height: 1; cursor: pointer;
+}
+.tmo-speed-btn:hover { background: rgba(198, 163, 90, 0.25); }
+.tmo-speed-val { font-size: 0.85rem; font-weight: 600; min-width: 3.6rem; text-align: center; }
+
+/* תצוגת תמונה מוגדלת (lightbox) — נפתחת בלחיצה על תמונה */
+.tmo-lightbox {
+  position: absolute; inset: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(11, 30, 40, 0.88); backdrop-filter: blur(4px);
+  cursor: zoom-out; padding: 1.5rem;
+}
+.tmo-lightbox img {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  border-radius: 0.6rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.tmo-lightbox-close {
+  position: absolute; top: 1rem; left: 1rem;
+  width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 0;
+  background: rgba(11, 30, 40, 0.85); color: var(--paper);
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
 .tmo-stop-close {
   position: absolute; top: 0.65rem; left: 0.65rem;
   width: 2rem; height: 2rem; border-radius: 999px; border: 0;
@@ -312,13 +412,18 @@ h1, h2, h3 {
 
 .mini-card-pick {
   width: 100%; text-align: right; background: var(--cream);
-  border: 1.5px solid transparent; border-radius: 0.7rem;
-  padding: 0.45rem 0.6rem; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  border: 1.5px solid transparent; border-radius: 0.85rem;
+  padding: 0; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
 }
-.mini-card-pick:hover { border-color: var(--brass); }
-.mini-card-pick.is-selected { border-color: var(--brass); background: rgba(198, 163, 90, 0.16); }
-.mini-card-info { flex: 1; min-width: 0; }
-.mini-chevron { font-size: 1.25rem; color: var(--brass-d); padding-inline: 0.2rem; line-height: 1; }
+.mini-card-pick:hover { border-color: var(--brass); box-shadow: 0 10px 24px rgba(11, 30, 40, 0.16); }
+.mini-card-pick.is-selected { border-color: var(--brass); box-shadow: 0 0 0 2px var(--brass); }
+.mini-card-info { padding: 0.55rem 0.85rem 0.75rem; }
+.mini-chevron {
+  position: absolute; top: 0.55rem; left: 0.55rem;
+  width: 1.85rem; height: 1.85rem; display: flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: rgba(11, 30, 40, 0.62); color: var(--paper);
+  font-size: 1.15rem; line-height: 1;
+}
 .pick-badge { color: var(--brass-d); font-weight: 600; font-size: 0.74rem !important; opacity: 1 !important; }
 .tmo-kind-row { display: inline-flex !important; align-items: center; gap: 0.4rem; flex-wrap: wrap; opacity: 1 !important; }
 .tmo-kind-tag {
@@ -356,3 +461,5 @@ h1, h2, h3 {
   border-top: 1px solid rgba(11, 30, 40, 0.1);
 }
 .tmo-stop-next { width: 100%; text-align: center; }
+
+/* v0.3.8 visual card rebuild */

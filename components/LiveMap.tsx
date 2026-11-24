@@ -99,7 +99,7 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
   const pt = map.project(coord);
   const isMobile = W < 640;
 
-  const cardW = isMobile ? W - 24 : Math.min(480, W - 40);
+  const cardW = isMobile ? W - 24 : Math.min(560, W - 40);
   const cardH = Math.min(600, Math.round(H * 0.88));
 
   if (isMobile) {
@@ -139,10 +139,12 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
 function PhotoCarousel({
   photos,
   alt,
+  onPhotoClick,
   children,
 }: {
   photos: string[];
   alt: string;
+  onPhotoClick?: (src: string) => void;
   children?: React.ReactNode;
 }) {
   const list = photos.length > 0 ? photos : ["/img/e1.jpg"];
@@ -153,19 +155,31 @@ function PhotoCarousel({
   return (
     <div
       className="tmo-stop-modal-media"
-      style={{ position: "relative", flexShrink: 0, overflow: "hidden" }}
+      style={{ position: "relative", flexShrink: 0, overflow: "hidden", direction: "ltr" }}
     >
       {isSingle ? (
-        <img src={list[0]} alt={alt} className="tmo-photo-single" />
+        <img
+          src={list[0]}
+          alt={alt}
+          className="tmo-photo-single"
+          style={onPhotoClick ? { cursor: "zoom-in" } : undefined}
+          onClick={onPhotoClick ? () => onPhotoClick(list[0]) : undefined}
+        />
       ) : (
         <div
           className="tmo-filmstrip-track"
           style={{ animationDuration: `${durationSec}s` }}
         >
           {trackItems.map((src, i) => (
-            <div key={`${src}-${i}`} className="tmo-filmstrip-item">
+            <button
+              key={`${src}-${i}`}
+              type="button"
+              className="tmo-filmstrip-item"
+              aria-label={alt}
+              onClick={onPhotoClick ? () => onPhotoClick(src) : undefined}
+            >
               <img src={src} alt={alt} />
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -174,7 +188,7 @@ function PhotoCarousel({
   );
 }
 
-/** קרוסלת אופציות (מלונות או טברנות) — כרטיס אחד בכל רגע, החלפה כל ~4 שניות + חצים ונקודות */
+/** מבחר אופציות (מלונות/טברנות) — רצועה אופקית מסתובבת כמו התמונות, נעצרת בריחוף, כל אריח לחיץ */
 function OptionCarousel<T extends { id: number; name: string; photoUrl: string }>({
   title,
   items,
@@ -188,82 +202,40 @@ function OptionCarousel<T extends { id: number; name: string; photoUrl: string }
   renderMeta: (item: T) => React.ReactNode;
   onSelect: (item: T) => void;
 }) {
-  const [idx, setIdx] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => {
-    if (items.length <= 1 || paused) return;
-    const id = setInterval(() => setIdx((i) => (i + 1) % items.length), 4000);
-    return () => clearInterval(id);
-  }, [items.length, paused]);
-
   if (items.length === 0) return null;
-  const safeIdx = idx % items.length;
-  const item = items[safeIdx];
-  const isSelected = selectedId !== undefined && selectedId === item.id;
+  const isSingle = items.length <= 1;
+  const strip = isSingle ? items : [...items, ...items];
+  const durationSec = Math.max(14, items.length * 5);
 
   return (
-    <div
-      className="tmo-stop-section"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="tmo-opt-head">
-        <p className="sub-title">{title}</p>
-        {items.length > 1 && (
-          <div className="tmo-opt-controls">
-            <button
-              type="button"
-              className="tmo-opt-arrow"
-              aria-label="אפשרות קודמת"
-              onClick={() => setIdx((i) => (i - 1 + items.length) % items.length)}
-            >
-              ›
-            </button>
-            <span className="tmo-opt-count">
-              {safeIdx + 1}/{items.length}
-            </span>
-            <button
-              type="button"
-              className="tmo-opt-arrow"
-              aria-label="אפשרות הבאה"
-              onClick={() => setIdx((i) => (i + 1) % items.length)}
-            >
-              ‹
-            </button>
-          </div>
-        )}
+    <div className="tmo-stop-section">
+      <p className="sub-title">{title}</p>
+      <div className="tmo-opt-strip">
+        <div
+          className={`tmo-opt-track ${isSingle ? "is-single" : ""}`}
+          style={isSingle ? undefined : { animationDuration: `${durationSec}s` }}
+        >
+          {strip.map((item, i) => {
+            const isSelected = selectedId !== undefined && selectedId === item.id;
+            return (
+              <button
+                key={`${item.id}-${i}`}
+                type="button"
+                className={`tmo-opt-tile ${isSelected ? "is-selected" : ""}`}
+                onClick={() => onSelect(item)}
+              >
+                <img src={item.photoUrl} alt={item.name} />
+                <div className="tmo-opt-tile-label">
+                  <strong>
+                    {item.name} {isSelected ? "✓" : ""}
+                  </strong>
+                  <span className="tmo-opt-tile-meta">{renderMeta(item)}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-
-      <button
-        type="button"
-        className={`mini-card mini-card-pick ${isSelected ? "is-selected" : ""}`}
-        onClick={() => onSelect(item)}
-      >
-        <img src={item.photoUrl} alt={item.name} />
-        <div className="mini-card-info">
-          <strong>
-            {item.name} {isSelected ? "✓" : ""}
-          </strong>
-          {renderMeta(item)}
-          {isSelected && <span className="pick-badge">נבחר ללילה הזה</span>}
-        </div>
-        <span className="mini-chevron" aria-hidden="true">‹</span>
-      </button>
-
-      {items.length > 1 && (
-        <div className="tmo-opt-dots">
-          {items.map((it, i) => (
-            <button
-              key={it.id}
-              type="button"
-              aria-label={it.name}
-              className={`tmo-opt-dot ${i === safeIdx ? "is-active" : ""}`}
-              onClick={() => setIdx(i)}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -292,9 +264,15 @@ export default function LiveMap({
   const [activeStop, setActiveStop] = useState<ActiveStop | null>(null);
   const [anchor, setAnchor] = useState<AnchorPos | null>(null);
   const [detail, setDetail] = useState<DetailView>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
   const [selectedHotels, setSelectedHotels] = useState<Record<string, number>>({});
+  // עגינה והגעה לחוף לכל תחנה — ניתן לעריכה; בעתיד יוזן ע״י השייטים (רשת חברתית)
+  const [mooring, setMooring] = useState<Record<string, string>>({});
   const [clock, setClock] = useState<ClockState>(() => hoursToClock(START_HOUR));
   const [sailedNm, setSailedNm] = useState(0);
+  const [legNm, setLegNm] = useState(0);
+  const [dayNm, setDayNm] = useState(0);
+  const [speed, setSpeed] = useState(CRUISE_KNOTS);
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
   const legNms = useMemo(() => waterPath.legs.map((l) => pathLengthNm(l)), [waterPath]);
@@ -510,6 +488,8 @@ export default function LiveMap({
     setPlaying(true);
     setDone(false);
     setSailedNm(0);
+    setLegNm(0);
+    setDayNm(0);
     showFullLine(false);
 
     const drawn = map.getSource("route-drawn") as mapboxgl.GeoJSONSource;
@@ -535,6 +515,7 @@ export default function LiveMap({
 
     let tripHours = START_HOUR;
     let completedNm = 0;
+    let dayStartNm = 0;
     setClock(hoursToClock(tripHours));
 
     const trail: LngLat[] = [waterPath.stops[0]];
@@ -573,6 +554,8 @@ export default function LiveMap({
           const nextMorning = (Math.floor(tripHours / 24) + 1) * 24 + START_HOUR;
           await animateClock(tripHours, nextMorning, 900, alive);
           tripHours = nextMorning;
+          dayStartNm = completedNm;
+          setDayNm(0);
         } else if (s.dwellMin > 0) {
           const afterDwell = tripHours + s.dwellMin / 60;
           await animateClock(tripHours, afterDwell, 650, alive);
@@ -584,7 +567,8 @@ export default function LiveMap({
 
       const path = waterPath.legs[i];
       const nm = legNms[i];
-      const sailHours = nm / CRUISE_KNOTS;
+      const sailHours = nm / speed;
+      setLegNm(nm);
       const lons = path.map((p) => p[0]);
       const lats = path.map((p) => p[1]);
       map.fitBounds(
@@ -615,6 +599,7 @@ export default function LiveMap({
           setClock(hoursToClock(legStartH + sailHours * f));
           // אודומטר חי: מתעדכן בזמן אמת תוך כדי כל לג
           setSailedNm(legStartNm + nm * f);
+          setDayNm(legStartNm + nm * f - dayStartNm);
           if (raw < 1) requestAnimationFrame(step);
           else resolve();
         };
@@ -623,6 +608,7 @@ export default function LiveMap({
       tripHours = legStartH + sailHours;
       completedNm = legStartNm + nm;
       setSailedNm(completedNm);
+      setDayNm(completedNm - dayStartNm);
       trail.push(...path.slice(1));
     }
 
@@ -674,7 +660,7 @@ export default function LiveMap({
   }
 
   // חישוב שעות שיט נטו (בלי שעות לינה) מתוך האודומטר החי
-  const sailTotalMin = Math.round((sailedNm / CRUISE_KNOTS) * 60);
+  const sailTotalMin = Math.round((sailedNm / speed) * 60);
   const sailH = Math.floor(sailTotalMin / 60);
   const sailM = sailTotalMin % 60;
 
@@ -722,13 +708,22 @@ export default function LiveMap({
       {/* אודומטר ושעון מסע חי — ימים + שעה + מיילים ושעות שיט נטו */}
       <div className="tmo-clock" aria-live="polite">
         <div className="tmo-clock-mode">
-          {mode === "planning" ? "מצב תכנון · 20 קשר" : "הפלגה בפועל"}
+          {mode === "planning" ? "מצב תכנון" : "הפלגה בפועל"}
         </div>
         <div className="tmo-clock-main">
           יום {clock.day} · {pad2(clock.hour)}:{pad2(clock.minute)}
         </div>
         <div className="tmo-clock-sub">
-          שיט מצטבר: {Math.round(sailedNm)} מייל ימי · {sailH}ש׳ {sailM}ד׳ · מתוך {totalNm}
+          לג נוכחי: {Math.round(legNm)} מ״י · היום: {Math.round(dayNm)} מ״י
+        </div>
+        <div className="tmo-clock-sub">
+          מצטבר: {Math.round(sailedNm)}/{totalNm} מ״י · {sailH}ש׳ {sailM}ד׳
+        </div>
+        <div className="tmo-speed">
+          <span className="tmo-speed-label">מהירות</span>
+          <button type="button" className="tmo-speed-btn" aria-label="האט" onClick={() => setSpeed((s) => Math.max(6, s - 1))}>−</button>
+          <span className="tmo-speed-val">{speed} קשר</span>
+          <button type="button" className="tmo-speed-btn" aria-label="האץ" onClick={() => setSpeed((s) => Math.min(35, s + 1))}>+</button>
         </div>
       </div>
 
@@ -752,7 +747,7 @@ export default function LiveMap({
             position: "absolute",
             left: `${anchor.cardLeft}px`,
             top: `${anchor.cardTop}px`,
-            maxWidth: anchor.isMobile ? "calc(100% - 24px)" : "480px",
+            maxWidth: anchor.isMobile ? "calc(100% - 24px)" : "560px",
             maxHeight: "min(88%, 600px)",
             display: "flex",
             flexDirection: "column",
@@ -762,7 +757,7 @@ export default function LiveMap({
         >
           {detail?.kind === "taverna" ? (
             <>
-              <PhotoCarousel key={`${detail.kind}-${detail.item.id}`} photos={detail.item.photoUrls} alt={detail.item.name}>
+              <PhotoCarousel key={`${detail.kind}-${detail.item.id}`} photos={detail.item.photoUrls} alt={detail.item.name} onPhotoClick={setLightbox}>
                 <button type="button" className="tmo-stop-back" onClick={() => setDetail(null)}>
                   חזרה לטברנות →
                 </button>
@@ -802,7 +797,7 @@ export default function LiveMap({
             </>
           ) : detail?.kind === "hotel" ? (
             <>
-              <PhotoCarousel key={`${detail.kind}-${detail.item.id}`} photos={detail.item.photoUrls} alt={detail.item.name}>
+              <PhotoCarousel key={`${detail.kind}-${detail.item.id}`} photos={detail.item.photoUrls} alt={detail.item.name} onPhotoClick={setLightbox}>
                 <button type="button" className="tmo-stop-back" onClick={() => setDetail(null)}>
                   חזרה למלונות →
                 </button>
@@ -859,7 +854,7 @@ export default function LiveMap({
             </>
           ) : (
             <>
-              <PhotoCarousel key={`p-${activeStop.place.id}`} photos={activeStop.place.photoUrls} alt={activeStop.place.name}>
+              <PhotoCarousel key={`p-${activeStop.place.id}`} photos={activeStop.place.photoUrls} alt={activeStop.place.name} onPhotoClick={setLightbox}>
                 <span className="stop-tag">
                   {TYPE_LABEL[activeStop.place.type] ?? activeStop.place.type}
                 </span>
@@ -877,20 +872,77 @@ export default function LiveMap({
                   יום {clock.day} · {activeStop.place.islandName}
                 </p>
                 <h3>{activeStop.place.name}</h3>
-                <p className="tmo-stop-modal-desc">{activeStop.place.desc}</p>
                 {activeStop.place.photoAttribution && (
                   <p className="photo-attr">{activeStop.place.photoAttribution}</p>
                 )}
 
-                {/* בעצירת לינה: קודם מלונות, ואז טברנות לארוחת ערב; בעצירת צהריים: טברנות */}
-                {activeStop.place.overnight ? (
-                  <>
-                    {hotelsCarousel}
-                    {tavernasCarousel}
-                  </>
-                ) : (
-                  tavernasCarousel
-                )}
+                {/* בעצירת לינה: מלונות + טברנות (זה-לצד-זה במחשב, מוערם בטלפון); בצהריים: טברנות — קודם, כי זו הבחירה המרכזית */}
+                <div className="tmo-stop-selections">
+                  {activeStop.place.overnight ? (
+                    <>
+                      {hotelsCarousel}
+                      {tavernasCarousel}
+                    </>
+                  ) : (
+                    tavernasCarousel
+                  )}
+                </div>
+
+                {/* עגינה והגעה לחוף — מפרץ שחייה: תג עוגן; תחנה עם טברנה/מלון: בורר הגעה-לחוף הניתן לעריכה */}
+                {!activeStop.isFirst && !activeStop.isLast && (() => {
+                  const anchorIcon = (
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="5" r="2.2" />
+                      <line x1="12" y1="22" x2="12" y2="7.2" />
+                      <path d="M5 12H2a10 10 0 0 0 20 0h-3" />
+                      <line x1="8.4" y1="10.6" x2="15.6" y2="10.6" />
+                    </svg>
+                  );
+                  // מפרץ שחייה / שנירקול / עוגן-וצילום — עוגנים בלבד, לא יורדים לחוף
+                  const anchorOnly = ["swim", "snorkel", "anchor"].includes(activeStop.place.type);
+                  if (anchorOnly) {
+                    return (
+                      <div className="tmo-mooring">
+                        <div className="tmo-anchor-note">
+                          <span className="tmo-anchor-ico">{anchorIcon}</span>
+                          <div>
+                            <strong>עוגנים כאן · {TYPE_LABEL[activeStop.place.type] ?? "מפרץ שחייה"}</strong>
+                            <span>עוגנים מול החוף · שחייה מהסירה או אל החוף</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  const modes = [
+                    { id: "med", label: "היקשרות לרציף", sub: "ירכתיים או צד (long-side) · יורדים ישר למזח" },
+                    { id: "anchor", label: "עוגן · שחייה או סאפ", sub: "נקשרים מול החוף וחוצים מים קצר" },
+                    { id: "pickup", label: "איסוף בסירה", sub: "הטברנה או המלון אוספים מהעוגן" },
+                  ];
+                  const cur = mooring[activeStop.place.id];
+                  return (
+                    <div className="tmo-mooring">
+                      <p className="sub-title tmo-mooring-head">
+                        <span className="tmo-anchor-ico">{anchorIcon}</span>
+                        עגינה והגעה לחוף{cur ? "" : " · לבדוק"}
+                      </p>
+                      <div className="tmo-mooring-chips">
+                        {modes.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            className={`tmo-mooring-chip ${cur === m.id ? "is-on" : ""}`}
+                            onClick={() =>
+                              setMooring((p) => ({ ...p, [activeStop.place.id]: m.id }))
+                            }
+                          >
+                            <strong>{m.label}</strong>
+                            <em>{m.sub}</em>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </>
           )}
@@ -902,6 +954,21 @@ export default function LiveMap({
             </button>
           </div>
         </aside>
+      )}
+
+      {/* תצוגת תמונה מוגדלת (lightbox) — נפתחת בלחיצה על כל תמונה */}
+      {lightbox && (
+        <div className="tmo-lightbox" onClick={() => setLightbox(null)}>
+          <img src={lightbox} alt="" />
+          <button
+            type="button"
+            className="tmo-lightbox-close"
+            aria-label="סגור"
+            onClick={() => setLightbox(null)}
+          >
+            ×
+          </button>
+        </div>
       )}
 
       {!activeStop && (
