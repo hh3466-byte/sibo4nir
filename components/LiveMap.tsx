@@ -93,12 +93,12 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
   const pt = map.project(coord);
   const isMobile = W < 640;
 
-  const cardW = isMobile ? W - 24 : Math.min(390, W - 40);
-  const cardH = isMobile ? Math.min(440, H * 0.68) : Math.min(480, H - 110);
+  const cardW = isMobile ? W - 24 : Math.min(380, W - 40);
+  const cardH = Math.round(H * 0.72);
 
   if (isMobile) {
     const cardLeft = 12;
-    const cardTop = Math.max(74, H - cardH - 12);
+    const cardTop = Math.max(76, H - cardH - 12);
     return {
       markerX: pt.x,
       markerY: pt.y,
@@ -110,13 +110,13 @@ function computeAnchor(map: mapboxgl.Map, coord: LngLat): AnchorPos {
     };
   }
 
-  // ממקמים את הכרטיס צמוד לנקודת העצירה (משמאל או מימין לה) בלי לחרוג מגבולות המפה
-  const gap = 22;
-  const preferLeft = pt.x - gap - cardW >= 16;
-  const rawLeft = preferLeft ? pt.x - gap - cardW : pt.x + gap;
+  // ממקמים את הכרטיס בצד הנגדי לנקודת העצירה כדי שלא יסתיר אותה
+  const markerOnRight = pt.x >= W * 0.5;
+  const gap = 24;
+  const rawLeft = markerOnRight ? pt.x - gap - cardW : pt.x + gap;
   const cardLeft = Math.max(16, Math.min(W - cardW - 16, rawLeft));
   const rawTop = pt.y - cardH * 0.45;
-  const cardTop = Math.max(96, Math.min(H - cardH - 16, rawTop));
+  const cardTop = Math.max(92, Math.min(H - cardH - 16, rawTop));
 
   return {
     markerX: pt.x,
@@ -143,7 +143,7 @@ export default function LiveMap({
   const boatRef = useRef<mapboxgl.Marker | null>(null);
   const runId = useRef(0);
   const autoPlayed = useRef(false);
-  const sailRef = useRef<() => void>(() => {});
+  const sailRef = useRef<() => void>(() => { });
   const continueResolver = useRef<(() => void) | null>(null);
 
   const [done, setDone] = useState(false);
@@ -201,6 +201,7 @@ export default function LiveMap({
       center: [24.85, 37.2],
       zoom: 8,
       attributionControl: true,
+      cooperativeGestures: true,
     });
     mapRef.current = map;
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left");
@@ -543,7 +544,7 @@ export default function LiveMap({
     : "";
 
   return (
-    <div className="tmo-map-wrap">
+    <div className="tmo-map-wrap" style={{ position: "relative" }}>
       <div ref={container} className="tmo-map" />
 
       {/* שעון מסע רץ — ימים + שעות בקצב 20 קשר */}
@@ -576,15 +577,21 @@ export default function LiveMap({
           role="dialog"
           aria-label={activeStop.place.name}
           style={{
+            position: "absolute",
             left: `${anchor.cardLeft}px`,
             top: `${anchor.cardTop}px`,
+            maxWidth: anchor.isMobile ? "calc(100% - 24px)" : "380px",
+            maxHeight: "72%",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
             transformOrigin: `${anchor.originX}px ${anchor.originY}px`,
           }}
         >
           {/* תצוגת Detail של טברנה */}
           {detail?.kind === "taverna" ? (
             <>
-              <div className="tmo-stop-modal-media">
+              <div className="tmo-stop-modal-media" style={{ position: "relative", height: 150, flexShrink: 0, overflow: "hidden" }}>
                 <img src={detail.item.photoUrl} alt={detail.item.name} />
                 <button
                   type="button"
@@ -602,7 +609,7 @@ export default function LiveMap({
                   ×
                 </button>
               </div>
-              <div className="tmo-stop-scroll">
+              <div className="tmo-stop-scroll" style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
                 <p className="overline">טברנה על הרציף · {activeStop.place.islandName}</p>
                 <h3>{detail.item.name}</h3>
                 {detail.item.photoAttribution && (
@@ -630,7 +637,7 @@ export default function LiveMap({
           ) : detail?.kind === "hotel" ? (
             /* תצוגת Detail של מלון / מקום לינה */
             <>
-              <div className="tmo-stop-modal-media">
+              <div className="tmo-stop-modal-media" style={{ position: "relative", height: 150, flexShrink: 0, overflow: "hidden" }}>
                 <img src={detail.item.photoUrl} alt={detail.item.name} />
                 <button
                   type="button"
@@ -648,7 +655,7 @@ export default function LiveMap({
                   ×
                 </button>
               </div>
-              <div className="tmo-stop-scroll">
+              <div className="tmo-stop-scroll" style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
                 <p className="overline">לינה על קו המים · {activeStop.place.islandName}</p>
                 <h3>{detail.item.name}</h3>
                 <p className="tmo-detail-price">
@@ -690,7 +697,7 @@ export default function LiveMap({
           ) : (
             /* תצוגת עצירה ראשית */
             <>
-              <div className="tmo-stop-modal-media">
+              <div className="tmo-stop-modal-media" style={{ position: "relative", height: 150, flexShrink: 0, overflow: "hidden" }}>
                 <img src={activeStop.place.photoUrl} alt={activeStop.place.name} />
                 <span className="stop-tag">
                   {TYPE_LABEL[activeStop.place.type] ?? activeStop.place.type}
@@ -704,7 +711,7 @@ export default function LiveMap({
                   ×
                 </button>
               </div>
-              <div className="tmo-stop-scroll">
+              <div className="tmo-stop-scroll" style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
                 <p className="overline">
                   יום {clock.day} · {activeStop.place.islandName}
                 </p>
@@ -770,7 +777,7 @@ export default function LiveMap({
           )}
 
           {/* כפתור המשך קבוע (sticky) — גלוי תמיד גם בגלילה וגם ב-detail */}
-          <div className="tmo-stop-footer">
+          <div className="tmo-stop-footer" style={{ position: "sticky", bottom: 0, flexShrink: 0 }}>
             <button type="button" className="btn-brass tmo-stop-next" onClick={handleContinue}>
               {continueLabel}
             </button>
