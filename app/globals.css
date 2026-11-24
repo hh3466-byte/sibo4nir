@@ -301,6 +301,17 @@ h1, h2, h3 {
 .mini-card-info { flex: 1; min-width: 0; }
 .mini-chevron { font-size: 1.25rem; color: var(--brass-d); padding-inline: 0.2rem; line-height: 1; }
 .pick-badge { color: var(--brass-d); font-weight: 600; font-size: 0.74rem !important; opacity: 1 !important; }
+.tmo-kind-row { display: inline-flex !important; align-items: center; gap: 0.4rem; flex-wrap: wrap; opacity: 1 !important; }
+.tmo-kind-tag {
+  display: inline-block !important;
+  font-size: 0.68rem !important;
+  font-weight: 600;
+  padding: 0.12rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(11, 30, 40, 0.1);
+  color: var(--ink);
+  opacity: 1 !important;
+}
 
 .tmo-detail-price { font-size: 1.05rem; font-weight: 600; color: var(--brass-d); }
 .tmo-detail-block { margin-top: 0.55rem; padding-top: 0.6rem; border-top: 1px solid rgba(11, 30, 40, 0.09); }

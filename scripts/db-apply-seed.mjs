@@ -61,8 +61,8 @@ try {
     );
   for (const h of seed.hotels)
     await client.query(
-      "insert into hotels(place_id,name,price_eur_cents) values($1,$2,$3) on conflict (place_id,name) do update set price_eur_cents=excluded.price_eur_cents",
-      [h.place_id, h.name, Math.round(h.price_eur * 100)],
+      "insert into hotels(place_id,name,price_eur_cents,kind) values($1,$2,$3,$4) on conflict (place_id,name) do update set price_eur_cents=excluded.price_eur_cents, kind=excluded.kind",
+      [h.place_id, h.name, Math.round(h.price_eur * 100), h.kind || "hotel"],
     );
   for (const r of seed.flagship_routes)
     await client.query(

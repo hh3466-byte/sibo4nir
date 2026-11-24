@@ -535,109 +535,127 @@
       "place_id": "kythnos-loutra",
       "name": "Kythnos Bay Hotel",
       "query": "Kythnos Bay Hotel Loutra Greece",
-      "price_eur": 125
+      "price_eur": 125,
+      "kind": "hotel"
     },
     {
       "place_id": "kythnos-loutra",
       "name": "Porto Klaras",
       "query": "Porto Klaras Hotel Loutra Kythnos Greece",
-      "price_eur": 115
+      "price_eur": 115,
+      "kind": "guesthouse"
     },
     {
       "place_id": "kythnos-loutra",
       "name": "Meltemi Hotel Loutra",
       "query": "Meltemi Hotel Loutra Kythnos Greece",
-      "price_eur": 105
+      "price_eur": 105,
+      "kind": "room"
     },
     {
       "place_id": "naoussa",
       "name": "Kalypso Hotel Paros",
       "query": "Kalypso Hotel Naoussa Paros Greece",
-      "price_eur": 160
+      "price_eur": 160,
+      "kind": "hotel"
     },
     {
       "place_id": "naoussa",
       "name": "Cove Paros",
       "query": "Cove Paros Hotel Naoussa Greece",
-      "price_eur": 240
+      "price_eur": 240,
+      "kind": "airbnb"
     },
     {
       "place_id": "naoussa",
       "name": "Paliomylos Spa Hotel",
       "query": "Paliomylos Spa Hotel Naoussa Paros Greece",
-      "price_eur": 150
+      "price_eur": 150,
+      "kind": "guesthouse"
     },
     {
       "place_id": "koufonisia-port",
       "name": "Koufonisia Hotel",
       "query": "Koufonisia Hotel Resort Greece",
-      "price_eur": 130
+      "price_eur": 130,
+      "kind": "hotel"
     },
     {
       "place_id": "koufonisia-port",
       "name": "Anna Studios",
       "query": "Anna Studios Koufonisia Greece",
-      "price_eur": 95
+      "price_eur": 95,
+      "kind": "room"
     },
     {
       "place_id": "koufonisia-port",
       "name": "Keros Art Hotel",
       "query": "Keros Art Hotel Koufonisia Greece",
-      "price_eur": 145
+      "price_eur": 145,
+      "kind": "guesthouse"
     },
     {
       "place_id": "ios-port",
       "name": "Ios Palace Hotel",
       "query": "Ios Palace Hotel Greece",
-      "price_eur": 165
+      "price_eur": 165,
+      "kind": "hotel"
     },
     {
       "place_id": "ios-port",
       "name": "Liostasi Hotel",
       "query": "Liostasi Hotel Ios Greece",
-      "price_eur": 260
+      "price_eur": 260,
+      "kind": "guesthouse"
     },
     {
       "place_id": "ios-port",
       "name": "Yialos Ios Hotel",
       "query": "Yialos Ios Hotel Greece",
-      "price_eur": 115
+      "price_eur": 115,
+      "kind": "room"
     },
     {
       "place_id": "sifnos-vathi",
       "name": "Elies Resorts",
       "query": "Elies Resorts Vathi Sifnos Greece",
-      "price_eur": 220
+      "price_eur": 220,
+      "kind": "hotel"
     },
     {
       "place_id": "sifnos-vathi",
       "name": "Aerides Boutique Rooms",
       "query": "Aerides Boutique Rooms Vathi Sifnos Greece",
-      "price_eur": 140
+      "price_eur": 140,
+      "kind": "room"
     },
     {
       "place_id": "sifnos-vathi",
       "name": "Vathi Blue Suites",
       "query": "Vathi Blue Suites Sifnos Greece",
-      "price_eur": 130
+      "price_eur": 130,
+      "kind": "airbnb"
     },
     {
       "place_id": "serifos-livadi",
       "name": "Coco-Mat Eco Residences Serifos",
       "query": "Coco-Mat Eco Residences Serifos Greece",
-      "price_eur": 190
+      "price_eur": 190,
+      "kind": "airbnb"
     },
     {
       "place_id": "serifos-livadi",
       "name": "Rizes Hotel Serifos",
       "query": "Rizes Hotel Serifos Greece",
-      "price_eur": 155
+      "price_eur": 155,
+      "kind": "hotel"
     },
     {
       "place_id": "serifos-livadi",
       "name": "Alexandros by the Beach",
       "query": "Alexandros by the Beach Serifos Greece",
-      "price_eur": 120
+      "price_eur": 120,
+      "kind": "guesthouse"
     }
   ],
   "flagship_routes": [

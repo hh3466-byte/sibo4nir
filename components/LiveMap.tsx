@@ -26,6 +26,13 @@ const TYPE_LABEL: Record<string, string> = {
   overnight: "לינה על קו המים",
 };
 
+const KIND_LABEL: Record<string, string> = {
+  hotel: "מלון",
+  airbnb: "Airbnb",
+  guesthouse: "בית אירוח",
+  room: "חדר אירוח",
+};
+
 const CRUISE_KNOTS = 20;
 const START_HOUR = 9; // יציאה יום 1 בשעה 09:00
 
@@ -728,10 +735,15 @@ export default function LiveMap({
   const hotelsCarousel = activeStop && stopHotels.length > 0 && (
     <OptionCarousel
       key={`hotels-${activeStop.place.id}`}
-      title="איפה ישנים הלילה? — בחרו מלון"
+      title="איפה ישנים הלילה?"
       items={stopHotels}
       selectedId={selectedHotels[activeStop.place.id]}
-      renderMeta={(h) => <span>מ-€{Math.round(h.priceEurCents / 100)} ללילה · לחצו לפרטים</span>}
+      renderMeta={(h) => (
+        <span className="tmo-kind-row">
+          <span className="tmo-kind-tag">{KIND_LABEL[h.kind] ?? "מלון"}</span>
+          <span>מ-€{Math.round(h.priceEurCents / 100)} ללילה</span>
+        </span>
+      )}
       onSelect={(h) => setDetail({ kind: "hotel", item: h })}
     />
   );
@@ -847,9 +859,12 @@ export default function LiveMap({
                 </button>
               </PhotoCarousel>
               <div className="tmo-stop-scroll" style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-                <p className="overline">לינה על קו המים · {activeStop.place.islandName}</p>
+                <p className="overline">
+                  {KIND_LABEL[detail.item.kind] ?? "לינה"} על קו המים · {activeStop.place.islandName}
+                </p>
                 <h3>{detail.item.name}</h3>
                 <p className="tmo-detail-price">
+                  <span className="tmo-kind-tag">{KIND_LABEL[detail.item.kind] ?? "מלון"}</span>{" "}
                   מ-€{Math.round(detail.item.priceEurCents / 100)} ללילה
                 </p>
                 {detail.item.photoAttribution && (

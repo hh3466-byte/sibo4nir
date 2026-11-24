@@ -33,10 +33,13 @@ export type Taverna = {
   photoAttribution: string;
 };
 
+export type AccommodationKind = "hotel" | "airbnb" | "guesthouse" | "room";
+
 export type Hotel = {
   id: number;
   placeId: string;
   name: string;
+  kind: AccommodationKind;
   priceEurCents: number;
   photoUrl: string;
   photoUrls: string[];
@@ -156,6 +159,7 @@ export async function getGeoData(): Promise<GeoData> {
       id: i + 1,
       place_id: h.place_id,
       name: h.name,
+      kind: (h as { kind?: string }).kind ?? "hotel",
       price_eur_cents: Math.round(h.price_eur * 100),
     }));
     const r = seed.flagship_routes[0];
@@ -213,6 +217,7 @@ export async function getGeoData(): Promise<GeoData> {
       id: h.id,
       placeId: h.place_id,
       name: h.name,
+      kind: (h.kind ?? "hotel") as AccommodationKind,
       priceEurCents: h.price_eur_cents,
       photoUrl: urls[0],
       photoUrls: urls,
