@@ -481,7 +481,7 @@ export default function LiveMap({
     });
   }
 
-  async function sail() {
+  async function sail(startIndex = 0) {
     const map = mapRef.current;
     if (!map || !ready) return;
     const id = ++runId.current;
@@ -512,20 +512,26 @@ export default function LiveMap({
         .addTo(map);
     }
     const boat = boatRef.current;
-    boat.setLngLat(waterPath.stops[0]);
+    const legIdx = Math.min(startIndex, waterPath.legs.length - 1);
+    boat.setLngLat(waterPath.stops[startIndex]);
     let heading = bearing(
-      waterPath.legs[0][0],
-      waterPath.legs[0][Math.min(4, waterPath.legs[0].length - 1)],
+      waterPath.legs[legIdx][0],
+      waterPath.legs[legIdx][Math.min(4, waterPath.legs[legIdx].length - 1)],
     );
     boat.setRotation(heading);
 
-    let tripHours = START_HOUR;
-    let completedNm = 0;
-    let dayStartNm = 0;
+    // מצב מצטבר עד תחנת ההתחלה — מאפשר קפיצה אחורה/קדימה בלי לאבד את האודומטר
+    let completedNm = legNms.slice(0, startIndex).reduce((a, b) => a + b, 0);
+    let tripHours = START_HOUR + completedNm / speed;
+    let dayStartNm = completedNm;
+    setSailedNm(completedNm);
     setClock(hoursToClock(tripHours));
 
+    // הקו שכבר הושט עד תחנת ההתחלה
     const trail: LngLat[] = [waterPath.stops[0]];
-    for (let i = 0; i < stops.length; i++) {
+    for (let j = 0; j < startIndex; j++) trail.push(...waterPath.legs[j].slice(1));
+    if (startIndex > 0) setLine(trail);
+    for (let i = startIndex; i < stops.length; i++) {
       if (!alive()) return;
       const s = stops[i];
       const stopCoord = waterPath.stops[i];
@@ -974,8 +980,29 @@ export default function LiveMap({
           )}
 
           {/* כפתור המשך קבוע (sticky) בתחתית הכרטיס — גלוי תמיד */}
-          <div className="tmo-stop-footer" style={{ position: "sticky", bottom: 0, flexShrink: 0 }}>
-            <button type="button" className="btn-brass tmo-stop-next" onClick={handleContinue}>
+          <div className="tmo-stop-footer" style={{ position: "sticky", bottom: 0, flexShrink: 0, display: "flex", gap: 8, alignItems: "stretch" }}>
+            {!activeStop.isFirst && (
+              <button
+                type="button"
+                className="tmo-stop-prev"
+                onClick={() => sail(Math.max(0, activeStop.index - 1))}
+                title="חזרה לתחנה הקודמת"
+                aria-label="חזרה לתחנה הקודמת"
+                style={{
+                  flexShrink: 0,
+                  padding: "0 16px",
+                  borderRadius: 12,
+                  border: "1px solid rgba(255,255,255,0.22)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "var(--sand, #f4ecd8)",
+                  fontSize: 18,
+                  cursor: "pointer",
+                }}
+              >
+                ▶
+              </button>
+            )}
+            <button type="button" className="btn-brass tmo-stop-next" onClick={handleContinue} style={{ flex: 1 }}>
               {continueLabel}
             </button>
           </div>
@@ -1004,7 +1031,7 @@ export default function LiveMap({
           <p className="tmo-map-now">
             {current ? `${current.name} — ${current.islandName}` : "יציאה וחזרה ממרינת לבריון, אטיקה."}
           </p>
-          <button className="btn-brass" onClick={playing ? stop : sail} disabled={!ready}>
+          <button className="btn-brass" onClick={playing ? stop : () => sail(0)} disabled={!ready}>
             {playing ? "נעצור לרגע" : done ? "שוב להפלגה" : "צאו איתנו להפלגה"}
           </button>
         </div>
