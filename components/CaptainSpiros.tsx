@@ -316,12 +316,28 @@ export default function CaptainSpiros({ places, tavernas, hotels }: { places: Pl
       )}
 
       {launched && spirosRoute && (
-        <div className="spiros-voyage" role="dialog" aria-label="המסלול שלכם על המפה">
-          <div className="spiros-voyage-head">
-            <strong>המסלול שלכם עם קפטן ספירוס</strong>
-            <button type="button" className="spiros-voyage-close" onClick={() => setLaunched(false)} aria-label="סגירה">✕</button>
+        <div
+          className="spiros-voyage"
+          role="dialog"
+          aria-label="המסלול שלכם על המפה"
+          style={{ position: "fixed", inset: 0, zIndex: 80, background: "var(--ink)", display: "flex", flexDirection: "column" }}
+        >
+          <div
+            className="spiros-voyage-head"
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", padding: "0.7rem 1.1rem", color: "var(--paper)", borderBottom: "1px solid rgba(198,163,90,0.3)", flexShrink: 0 }}
+          >
+            <strong style={{ fontFamily: "var(--font-frank), serif", fontSize: "1.05rem" }}>המסלול שלכם עם קפטן ספירוס</strong>
+            <button
+              type="button"
+              className="spiros-voyage-close"
+              onClick={() => setLaunched(false)}
+              aria-label="סגירה"
+              style={{ width: "2.2rem", height: "2.2rem", borderRadius: "999px", border: 0, background: "rgba(255,255,255,0.16)", color: "var(--paper)", cursor: "pointer", fontSize: "1rem", flexShrink: 0 }}
+            >
+              ✕
+            </button>
           </div>
-          <div className="spiros-voyage-map">
+          <div className="spiros-voyage-map" style={{ flex: 1, minHeight: 0, position: "relative" }}>
             <MapSection
               places={places}
               stops={spirosRoute.stops}
