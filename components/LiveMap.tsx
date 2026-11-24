@@ -1,21 +1,22 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import type { Place } from "@/lib/geo";
-import { waterPath, type LngLat } from "@/lib/geo/routing";
+import type { Place, WaterPath } from "@/lib/geo";
+import type { LngLat } from "@/lib/geo/routing";
 
 type Props = {
   places: Place[];
   stops: Place[];
+  waterPath: WaterPath;
   routeName: string;
 };
 
 const BRASS = "#c6a35a";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export default function LiveMap({ places, stops, routeName }: Props) {
+export default function LiveMap({ places, stops, waterPath, routeName }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const boatRef = useRef<mapboxgl.Marker | null>(null);
@@ -39,12 +40,7 @@ export default function LiveMap({ places, stops, routeName }: Props) {
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left");
 
     map.on("load", () => {
-      const full: LngLat[] = [];
-      stops.forEach((s, i) => {
-        if (i === 0) return;
-        const seg = waterPath([stops[i - 1].lon, stops[i - 1].lat], [s.lon, s.lat]);
-        full.push(...(i === 1 ? seg : seg.slice(1)));
-      });
+      const full: LngLat[] = waterPath.legs.flatMap((l, i) => (i === 0 ? l : l.slice(1)));
       const line = (coords: LngLat[]) => ({
         type: "Feature" as const,
         properties: {},
@@ -84,7 +80,7 @@ export default function LiveMap({ places, stops, routeName }: Props) {
       mapRef.current = null;
       boatRef.current = null;
     };
-  }, [places, stops, token]);
+  }, [places, waterPath, token]);
 
   async function sail() {
     const map = mapRef.current;
@@ -102,26 +98,27 @@ export default function LiveMap({ places, stops, routeName }: Props) {
     if (!boatRef.current) {
       const el = document.createElement("div");
       el.className = "tmo-boat";
-      boatRef.current = new mapboxgl.Marker({ element: el }).setLngLat([stops[0].lon, stops[0].lat]).addTo(map);
+      boatRef.current = new mapboxgl.Marker({ element: el }).setLngLat(waterPath.stops[0]).addTo(map);
     }
     const boat = boatRef.current;
-    boat.setLngLat([stops[0].lon, stops[0].lat]);
+    boat.setLngLat(waterPath.stops[0]);
 
-    const trail: LngLat[] = [[stops[0].lon, stops[0].lat]];
+    const trail: LngLat[] = [waterPath.stops[0]];
     for (let i = 0; i < stops.length; i++) {
       if (!alive()) return;
       const s = stops[i];
       setCurrent(s);
-      map.flyTo({ center: [s.lon, s.lat], zoom: 12.8, duration: 2600, essential: true });
+      map.flyTo({ center: waterPath.stops[i], zoom: 12.8, duration: 2600, essential: true });
       await sleep(3200);
       if (!alive() || i === stops.length - 1) break;
 
-      const next = stops[i + 1];
-      const path = waterPath([s.lon, s.lat], [next.lon, next.lat]);
+      const path = waterPath.legs[i];
+      const lons = path.map((p) => p[0]);
+      const lats = path.map((p) => p[1]);
       map.fitBounds(
         [
-          [Math.min(s.lon, next.lon), Math.min(s.lat, next.lat)],
-          [Math.max(s.lon, next.lon), Math.max(s.lat, next.lat)],
+          [Math.min(...lons), Math.min(...lats)],
+          [Math.max(...lons), Math.max(...lats)],
         ],
         { padding: 140, duration: 1600, maxZoom: 12 },
       );
@@ -202,3 +199,4 @@ function pointAlong(path: LngLat[], f: number): LngLat {
 function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
+

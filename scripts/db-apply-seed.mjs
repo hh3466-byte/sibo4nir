@@ -41,6 +41,11 @@ try {
       "insert into islands(id,name,name_en) values($1,$2,$3) on conflict (id) do update set name=excluded.name, name_en=excluded.name_en",
       [i.id, i.name, i.name_en],
     );
+  for (const a of seed.activities)
+    await client.query(
+      "insert into activities(type,label,default_dwell_min) values($1,$2,$3) on conflict (type) do update set label=excluded.label, default_dwell_min=excluded.default_dwell_min",
+      [a.type, a.label, a.default_dwell_min],
+    );
   for (const p of seed.places)
     await client.query(
       `insert into places(id,island_id,name,type,overnight,lat,lon,approx,dwell_min,description)
@@ -69,7 +74,7 @@ try {
     );
   await client.query("commit");
 
-  for (const t of ["islands", "places", "tavernas", "hotels", "routes"]) {
+  for (const t of ["islands", "places", "tavernas", "hotels", "routes", "activities"]) {
     const n = (await client.query(`select count(*)::int c from ${t}`)).rows[0].c;
     const rls = (await client.query("select relrowsecurity r from pg_class where oid=$1::regclass", [`public.${t}`])).rows[0].r;
     console.log(`${t}: ${n} שורות, RLS=${rls}`);

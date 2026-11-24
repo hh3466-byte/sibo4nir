@@ -1,8 +1,10 @@
-import MapSection from "@/components/MapSection";
+﻿import MapSection from "@/components/MapSection";
 import { getGeoData } from "@/lib/geo";
 
-export default function Home() {
-  const { places, route, stopsInOrder } = getGeoData();
+export const revalidate = 60;
+
+export default async function Home() {
+  const { places, route, stopsInOrder, waterPath } = await getGeoData();
   return (
     <main>
       <section className="hero">
@@ -23,7 +25,7 @@ export default function Home() {
             בוקר של צלילה במים טורקיז, עוגן בלגונה שאין אליה כביש, צהריים בטברנה על הרציף עם דגים שעלו הבוקר. דילוג מאי לאי, בקצב שלכם.
           </p>
         </div>
-        <MapSection places={places} stops={stopsInOrder} routeName={route.name} />
+        <MapSection places={places} stops={stopsInOrder} waterPath={waterPath} routeName={route.name} />
         <p className="section-head" style={{ marginTop: "1.5rem", opacity: 0.8 }}>{route.socialProof}</p>
       </section>
 
@@ -31,3 +33,4 @@ export default function Home() {
     </main>
   );
 }
+
