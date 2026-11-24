@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "region": "Cyclades",
+    "status": "dev-seed",
+    "note": "אזור פיתוח בלבד — לא החלטה על אזור ההשקה הסופי. הקואורדינטות approx (רמת דיוק ~0.01°) כרמז לגאוקודינג — לאמת/לדייק דרך Mapbox או Google Places לפני פרודקשן.",
+    "source": "עבודת Take Me Out, נובמבר 2026 (אבות-טיפוס)",
+    "crs": "WGS84 (lon/lat)"
+  },
+  "activities": [
+    {"type": "base",      "label": "בסיס יציאה", "default_dwell_min": 0},
+    {"type": "swim",      "label": "שחייה",      "default_dwell_min": 90},
+    {"type": "snorkel",   "label": "שנירקול",    "default_dwell_min": 90},
+    {"type": "anchor",    "label": "עוגן/צילום", "default_dwell_min": 75},
+    {"type": "lunch",     "label": "צהריים",     "default_dwell_min": 120},
+    {"type": "overnight", "label": "לינה",       "default_dwell_min": 0}
+  ],
+  "islands": [
+    {"id": "paros",       "name": "פארוס",     "name_en": "Paros"},
+    {"id": "naxos",       "name": "נאקסוס",    "name_en": "Naxos"},
+    {"id": "antiparos",   "name": "אנטיפארוס", "name_en": "Antiparos"},
+    {"id": "koufonisia",  "name": "קופוניסיה", "name_en": "Koufonisia"}
+  ],
+  "places": [
+    {"id": "naoussa",        "name": "נאוסה, פארוס",        "island": "paros",      "type": "base",      "overnight": false, "lat": 37.123, "lon": 25.238, "approx": true, "dwell_min": 0,   "desc": "כפר דייגים ציורי — מעמיסים ציוד ויוצאים מהמזח עם הבוקר."},
+    {"id": "kolimbithres",   "name": "מפרץ קולימביתרס",     "island": "paros",      "type": "swim",      "overnight": false, "lat": 37.126, "lon": 25.219, "approx": true, "dwell_min": 90,  "desc": "סלעי גרניט מפוסלים ומים טורקיז רדודים — עוגנים, קופצים למים ונחים על הסיפון."},
+    {"id": "chora-naxos",    "name": "חוֹרה, נאקסוס",       "island": "naxos",      "type": "lunch",     "overnight": false, "lat": 37.106, "lon": 25.376, "approx": true, "dwell_min": 120, "desc": "עוצרים לצהריים בעיר העתיקה — דגים טריים ומזטים על קו המים."},
+    {"id": "portara",        "name": "פורטרה, נאקסוס",      "island": "naxos",      "type": "anchor",    "overnight": false, "lat": 37.110, "lon": 25.368, "approx": true, "dwell_min": 75,  "desc": "שער השיש העתיק של אפולו מול הים — עוגנים לצילומים ולשקיעה."},
+    {"id": "plaka-beach",    "name": "חוף פלאקה",           "island": "naxos",      "type": "overnight", "overnight": true,  "lat": 37.050, "lon": 25.370, "approx": true, "dwell_min": 0,   "desc": "חוף חול ארוך עם טברנות — עוגנים ללילה, יורדים לחוף וישנים כמו מלכים."},
+    {"id": "koufonisia-bays","name": "מפרצי קופוניסיה",     "island": "koufonisia", "type": "snorkel",   "overnight": false, "lat": 36.937, "lon": 25.603, "approx": true, "dwell_min": 90,  "desc": "מפרצים נסתרים ומים צלולים כמו בריכה — שנירקול בין הדגים וקפיצות מהסלעים."},
+    {"id": "pori",           "name": "פּוֹרי, קופוניסיה",    "island": "koufonisia", "type": "lunch",     "overnight": false, "lat": 36.950, "lon": 25.610, "approx": true, "dwell_min": 120, "desc": "עוגנים מול חוף פורי לצהריים — טברנה על החול, רגליים במים."},
+    {"id": "koufonisia-port","name": "נמל קופוניסיה",       "island": "koufonisia", "type": "overnight", "overnight": true,  "lat": 36.937, "lon": 25.608, "approx": true, "dwell_min": 0,   "desc": "כפר קטן, לבן ושקט — ערב בטברנות הנמל ולינה לילה שני."},
+    {"id": "antiparos-bay",  "name": "מפרץ אנטיפארוס",      "island": "antiparos",  "type": "swim",      "overnight": false, "lat": 37.045, "lon": 25.082, "approx": true, "dwell_min": 75,  "desc": "עצירת שחייה אחרונה במים רדודים וחמים לפני סגירת המעגל."}
+  ],
+  "tavernas": [
+    {"place_id": "chora-naxos", "name": "Το Ελιά",          "note": "דגים טריים ליד הנמל"},
+    {"place_id": "chora-naxos", "name": "Meze²",            "note": "מזטים ואוזו"},
+    {"place_id": "chora-naxos", "name": "Axiotissa",        "note": "מטבח יווני ביתי"},
+    {"place_id": "pori",        "name": "Captain Nikolas",  "note": "דגה מקומית"},
+    {"place_id": "pori",        "name": "Mikres Kyklades",  "note": "מול המפרץ"},
+    {"place_id": "pori",        "name": "To Kalofego",      "note": "מזטים וים"}
+  ],
+  "hotels": [
+    {"place_id": "plaka-beach",    "name": "Plaka Beach Studios", "price_eur": 95},
+    {"place_id": "plaka-beach",    "name": "Naxos Palace Hotel",  "price_eur": 140},
+    {"place_id": "plaka-beach",    "name": "Medusa Beach Resort", "price_eur": 120},
+    {"place_id": "koufonisia-port","name": "Koufonisia Resort",   "price_eur": 110},
+    {"place_id": "koufonisia-port","name": "Anna Studios",        "price_eur": 80},
+    {"place_id": "koufonisia-port","name": "Keros Art Hotel",     "price_eur": 135}
+  ],
+  "flagship_routes": [
+    {
+      "id": "cyclades-heart-2d",
+      "name": "לב הקיקלדים",
+      "days": 2,
+      "single_boat": true,
+      "base": "naoussa",
+      "stops": ["naoussa", "kolimbithres", "chora-naxos", "portara", "plaka-beach", "koufonisia-bays", "pori", "koufonisia-port", "antiparos-bay", "naoussa"],
+      "social_proof": "15 משפחות כבר עשו את זה ונהנו",
+      "note": "מסלול דגל לדוגמה — דילוג מאי לאי, אותה סירה לכל אורכו, לינות ביבשה."
+    }
+  ]
+}
