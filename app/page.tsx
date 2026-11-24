@@ -1,10 +1,33 @@
-import { t } from "@/lib/i18n";
+import MapSection from "@/components/MapSection";
+import { getGeoData } from "@/lib/geo";
 
 export default function Home() {
+  const { places, route, stopsInOrder } = getGeoData();
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-      <h1 className="text-3xl font-bold">{t("home.title")}</h1>
-      <p className="text-lg opacity-80">{t("home.comingSoon")}</p>
+    <main>
+      <section className="hero">
+        <div className="hero-inner">
+          <p className="overline">TAKE ME OUT</p>
+          <h1>בואו נגלה את הקיקלדים.</h1>
+          <p className="sub">
+            מפרצים נסתרים שמגיעים אליהם רק מהים, מים בצבע שלא תאמינו, ולילות על קו המים. ספרו לנו מה אתם אוהבים — ונבנה לכם קיץ בלתי-נשכח.
+          </p>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <p className="overline">המסע שלכם</p>
+          <h2>{route.name}</h2>
+          <p>
+            בוקר של צלילה במים טורקיז, עוגן בלגונה שאין אליה כביש, צהריים בטברנה על הרציף עם דגים שעלו הבוקר. דילוג מאי לאי, בקצב שלכם.
+          </p>
+        </div>
+        <MapSection places={places} stops={stopsInOrder} routeName={route.name} />
+        <p className="section-head" style={{ marginTop: "1.5rem", opacity: 0.8 }}>{route.socialProof}</p>
+      </section>
+
+      <section className="closing">פחות מסכים, יותר מלח על העור. זה הקיץ שתזכרו.</section>
     </main>
   );
 }

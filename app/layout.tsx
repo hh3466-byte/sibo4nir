@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Heebo } from "next/font/google";
+import { Frank_Ruhl_Libre, Heebo } from "next/font/google";
 import { defaultLocale, getDirection } from "@/lib/i18n";
 import "./globals.css";
 
 const heebo = Heebo({
   variable: "--font-heebo",
   subsets: ["hebrew", "latin"],
+});
+
+const frank = Frank_Ruhl_Libre({
+  variable: "--font-frank",
+  subsets: ["hebrew", "latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -15,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b4f71",
+  themeColor: "#0b1e28",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -23,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={defaultLocale}
       dir={getDirection(defaultLocale)}
-      className={`${heebo.variable} h-full antialiased`}
+      className={`${heebo.variable} ${frank.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

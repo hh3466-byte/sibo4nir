@@ -1,25 +1,112 @@
 @import "tailwindcss";
 
+/* מערכת עיצוב – docs/specs/design-system.md */
 :root {
-  --background: #ffffff;
-  --foreground: #10202b;
+  --ink: #0b1e28;
+  --ink2: #14313d;
+  --cream: #f3ede1;
+  --paper: #fbf8f1;
+  --brass: #c6a35a;
+  --brass-d: #a9863f;
+  --teal: #2d6e73;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-brass: var(--brass);
+  --color-brass-d: var(--brass-d);
+  --color-teal: var(--teal);
   --font-sans: var(--font-heebo);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a141b;
-    --foreground: #e8f0f4;
-  }
+  --font-serif: var(--font-frank);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-heebo), Arial, sans-serif;
 }
+
+h1, h2, h3 {
+  font-family: var(--font-frank), serif;
+  font-weight: 700;
+}
+
+.overline {
+  color: var(--brass);
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  font-weight: 500;
+}
+
+.btn-brass {
+  background: var(--brass);
+  color: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.85rem 1.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(11, 30, 40, 0.25);
+  transition: background 0.2s;
+}
+.btn-brass:hover:not(:disabled) { background: var(--brass-d); }
+.btn-brass:disabled { opacity: 0.55; cursor: default; }
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 78vh;
+  display: flex;
+  align-items: flex-end;
+  color: var(--paper);
+  background:
+    linear-gradient(180deg, rgba(11, 30, 40, 0.35) 0%, rgba(11, 30, 40, 0.88) 100%),
+    radial-gradient(circle at 70% 20%, var(--teal) 0%, var(--ink2) 55%, var(--ink) 100%);
+}
+.hero-inner { max-width: 62rem; margin: 0 auto; padding: 5rem 1.5rem 4.5rem; width: 100%; }
+.hero h1 { font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.05; margin: 0.8rem 0 1.4rem; }
+.hero p.sub { font-size: 1.15rem; line-height: 1.8; max-width: 38rem; opacity: 0.9; }
+
+.section { padding: 5rem 1.5rem; }
+.section-head { max-width: 62rem; margin: 0 auto 2rem; }
+.section-head h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin-top: 0.5rem; }
+.section-head p { margin-top: 0.8rem; line-height: 1.8; max-width: 38rem; opacity: 0.8; }
+
+.closing {
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  padding: 5rem 1.5rem;
+  font-family: var(--font-frank), serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+}
+
+/* מפה */
+.tmo-map-wrap { position: relative; max-width: 72rem; margin: 0 auto; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 20px 60px rgba(11, 30, 40, 0.3); }
+.tmo-map { height: min(70vh, 640px); width: 100%; }
+.tmo-map-fallback { max-width: 72rem; margin: 0 auto; padding: 4rem; text-align: center; border-radius: 1.25rem; background: var(--ink2); color: var(--cream); }
+.tmo-map-panel {
+  position: absolute; bottom: 1.25rem; right: 1.25rem; max-width: 20rem;
+  background: rgba(11, 30, 40, 0.82); backdrop-filter: blur(8px);
+  color: var(--paper); border-radius: 1rem; padding: 1.25rem 1.4rem;
+}
+.tmo-map-panel h3 { font-size: 1.5rem; margin: 0.2rem 0 0.4rem; }
+.tmo-map-now { font-size: 0.95rem; opacity: 0.85; margin-bottom: 1rem; line-height: 1.6; }
+
+.tmo-marker {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--brass); cursor: pointer; padding: 0;
+  box-shadow: 0 0 0 4px rgba(198, 163, 90, 0.25);
+}
+.tmo-marker--night { background: var(--brass); }
+.tmo-boat {
+  width: 22px; height: 22px; background: var(--brass); border: 3px solid var(--paper);
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.tmo-popup .mapboxgl-popup-content { background: var(--paper); color: var(--ink); border-radius: 0.75rem; padding: 0.9rem 1rem; max-width: 16rem; font-family: var(--font-heebo), sans-serif; }
+.tmo-popup .mapboxgl-popup-tip { border-top-color: var(--paper); border-bottom-color: var(--paper); }
+.tmo-popup-title { font-family: var(--font-frank), serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
+.tmo-popup-text { font-size: 0.85rem; line-height: 1.5; }
