@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
-import type { Place } from "@/lib/geo";
+import type { Place, Taverna, Hotel, WaterPath } from "@/lib/geo";
+import MapSection from "@/components/MapSection";
 
 /** קפטן ספירוס — קונסיירז' קבוע וצף של Take Me Out.
  *  נוכח לאורך כל השיחה, אפשר תמיד לדבר איתו, לתכנן ולשאול. */
@@ -154,12 +155,13 @@ function spirosReply(qRaw: string): Msg[] {
   return pair("ספרו לי עוד — כמה ימים, איזה קצב, ומה הראש. בחרו למעלה ואני אתכנן, או פשוט תשאלו אותי כל דבר על הקיקלדים.");
 }
 
-export default function CaptainSpiros({ places }: { places: Place[] }) {
+export default function CaptainSpiros({ places, tavernas, hotels }: { places: Place[]; tavernas: Taverna[]; hotels: Hotel[] }) {
   const [open, setOpen] = useState(false);
   const [days, setDays] = useState(7);
   const [pace, setPace] = useState<Pace>("balanced");
   const [vibes, setVibes] = useState<Set<Vibe>>(new Set());
   const [planned, setPlanned] = useState(false);
+  const [launched, setLaunched] = useState(false);
   const [chat, setChat] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -179,6 +181,24 @@ export default function CaptainSpiros({ places }: { places: Place[] }) {
 
   const plan = useMemo(() => (planned ? buildPlan(islandSet, days, pace, vibes) : null), [planned, islandSet, days, pace, vibes]);
   const paceMeta = PACES.find((p) => p.id === pace)!;
+
+  // מסלול להרצה על המפה: נמל מייצג לכל אי + לבריון בהתחלה ובסוף, עם נתיב קו-ישר
+  const spirosRoute = useMemo(() => {
+    if (!plan) return null;
+    const lavrio = places.find((p) => p.id === "lavrio");
+    const byIsland = new Map<string, Place>();
+    for (const p of places) {
+      if (p.island === "attica") continue;
+      const cur = byIsland.get(p.island);
+      if (!cur || (p.overnight && !cur.overnight)) byIsland.set(p.island, p);
+    }
+    const mid = plan.islands.map((id) => byIsland.get(id)).filter((p): p is Place => !!p);
+    const stops = [lavrio, ...mid, lavrio].filter((p): p is Place => !!p);
+    if (stops.length < 2) return null;
+    const pts = stops.map((s) => [s.lon, s.lat] as [number, number]);
+    const waterPath: WaterPath = { stops: pts, legs: pts.slice(1).map((p, i) => [pts[i], p]) };
+    return { stops, waterPath };
+  }, [plan, places]);
   const chosenVibes = VIBES.filter((v) => vibes.has(v.id)).map((v) => v.label);
 
   useEffect(() => {
@@ -192,6 +212,7 @@ export default function CaptainSpiros({ places }: { places: Place[] }) {
 
   function doPlan() {
     setPlanned(true);
+    setLaunched(false);
     const line = `${days} ימים, ${paceMeta.knots} קשר, ${chosenVibes.length ? chosenVibes.join(" ו") : "קצת מהכול"}. קיבלתי — הרכבתי לכם מסלול, הנה הוא יום-אחר-יום.`;
     setChat((c) => [...c, { from: "spiros", text: line }, { from: "mrs", text: mrsApprove() }]);
   }
@@ -267,6 +288,11 @@ export default function CaptainSpiros({ places }: { places: Place[] }) {
                     </div>
                   );
                 })}
+                {spirosRoute && (
+                  <button type="button" className="btn-brass spiros-launch" onClick={() => setLaunched(true)}>
+                    צאו להפלגה במסלול הזה →
+                  </button>
+                )}
               </div>
             )}
 
@@ -285,6 +311,25 @@ export default function CaptainSpiros({ places }: { places: Place[] }) {
               aria-label="הודעה לקפטן ספירוס"
             />
             <button type="button" onClick={send} aria-label="שליחה">➤</button>
+          </div>
+        </div>
+      )}
+
+      {launched && spirosRoute && (
+        <div className="spiros-voyage" role="dialog" aria-label="המסלול שלכם על המפה">
+          <div className="spiros-voyage-head">
+            <strong>המסלול שלכם עם קפטן ספירוס</strong>
+            <button type="button" className="spiros-voyage-close" onClick={() => setLaunched(false)} aria-label="סגירה">✕</button>
+          </div>
+          <div className="spiros-voyage-map">
+            <MapSection
+              places={places}
+              stops={spirosRoute.stops}
+              tavernas={tavernas}
+              hotels={hotels}
+              waterPath={spirosRoute.waterPath}
+              routeName="המסלול שלכם עם ספירוס"
+            />
           </div>
         </div>
       )}

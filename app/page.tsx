@@ -32,7 +32,7 @@ export default async function Home() {
       <section className="closing">פחות מסכים, יותר מלח על העור. זה הקיץ שתזכרו.</section>
 
       {/* קפטן ספירוס וגברת ספירוס — קונסיירז' צף שנוכח לאורך כל השיחה */}
-      <CaptainSpiros places={places} />
+      <CaptainSpiros places={places} tavernas={tavernas} hotels={hotels} />
     </main>
   );
 }
