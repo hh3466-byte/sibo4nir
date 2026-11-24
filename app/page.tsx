@@ -41,7 +41,14 @@ export default async function Home() {
             בוקר של צלילה במים טורקיז, עוגן בלגונה שאין אליה כביש, צהריים בטברנה על הרציף עם דגים שעלו הבוקר. דילוג מאי לאי, בקצב שלכם.
           </p>
         </div>
-        <MapSection places={places} stops={stopsInOrder} waterPath={waterPath} routeName={route.name} />
+        <MapSection
+          places={places}
+          stops={stopsInOrder}
+          tavernas={tavernas}
+          hotels={hotels}
+          waterPath={waterPath}
+          routeName={route.name}
+        />
         <p className="section-head social-proof">{route.socialProof}</p>
       </section>
 
