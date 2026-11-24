@@ -1,4 +1,4 @@
-// בונה ושומר נתיב מים למסלולי דגל ב-Supabase test + מאמת 0 חציות יבשה.
+﻿// בונה ושומר נתיב מים למסלולי דגל ב-Supabase test + מאמת 0 חציות יבשה.
 // שימוש: node scripts/build-flagship-path.mjs   (דורש lib/geo/coastline.json מ-build-coastline.mjs)
 import fs from "node:fs";
 import path from "node:path";
@@ -22,11 +22,11 @@ await client.connect();
 try {
   const places = new Map((await client.query("select id,lon,lat from places")).rows.map((p) => [p.id, [p.lon, p.lat]]));
   const routes = (await client.query("select id,stops from routes")).rows;
-  let totalSamples = 0, totalLand = 0, totalCross = 0;
+  let totalLand = 0, totalCross = 0;
   for (const r of routes) {
     const built = buildRoute(r.stops.map((id) => places.get(id)), polys);
     const v = validate(built.legs, polys);
-    totalSamples += v.samples; totalLand += v.inLand; totalCross += v.crossings;
+    totalLand += v.inLand; totalCross += v.crossings;
     console.log(`${r.id}: ${built.legs.length} מקטעים, ${built.legs.reduce((s, l) => s + l.length, 0)} נקודות | דגימות ${v.samples}, על יבשה ${v.inLand}, חציות מדויקות ${v.crossings}`);
     if (v.inLand === 0 && v.crossings === 0) {
       await client.query("update routes set water_path=$1 where id=$2", [JSON.stringify(built), r.id]);
@@ -37,3 +37,4 @@ try {
 } finally {
   await client.end();
 }
+

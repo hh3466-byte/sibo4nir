@@ -1,8 +1,6 @@
 ﻿import MapSection from "@/components/MapSection";
 import { getGeoData } from "@/lib/geo";
 
-export const revalidate = 60;
-
 export default async function Home() {
   const { places, route, stopsInOrder, waterPath } = await getGeoData();
   return (
@@ -33,4 +31,5 @@ export default async function Home() {
     </main>
   );
 }
+
 

@@ -1,5 +1,6 @@
-import "server-only";
+﻿import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { cacheLife } from "next/cache";
 import seed from "@/supabase/seed/cyclades-dev.json";
 import type { LngLat } from "./routing";
 
@@ -58,6 +59,8 @@ async function fromSupabase() {
 }
 
 export async function getGeoData(): Promise<GeoData> {
+  "use cache";
+  cacheLife("minutes");
   let placeRows: Row[];
   let routeRow: Row;
   let source: GeoData["source"] = "supabase";
@@ -116,3 +119,4 @@ export async function getGeoData(): Promise<GeoData> {
   }
   return { places, route, stopsInOrder, waterPath, source, pathSource };
 }
+
