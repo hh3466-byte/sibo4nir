@@ -170,7 +170,7 @@ export async function getGeoData(): Promise<GeoData> {
       single_boat: r.single_boat,
       stops: r.stops,
       social_proof: r.social_proof,
-      water_path: null,
+      water_path: ((r as unknown) as { water_path?: WaterPath | null }).water_path ?? null,
     };
   }
 

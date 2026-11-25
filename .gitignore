@@ -51,5 +51,13 @@ supabase/.branches/
 .vercel
 .env*
 
+# סקריפטי עזר זמניים ופלטים – מקומי בלבד, לא ל-git
+/*.ps1
+*.tmp
+/deploy_out.txt
+/deploy-out2.txt
+/env-out.txt
+/seed-prod-out.txt
+
 # קובץ דוגמה בלי סודות – כן נכנס ל-git (חייב להיות אחרון)
 !.env.example
