@@ -255,10 +255,16 @@ export default function CaptainSpiros({ places, tavernas, hotels }: { places: Pl
   return (
     <div className={`spiros-dock ${open ? "is-open" : ""}`}>
       {!open ? (
-        <button type="button" className="spiros-fab" onClick={() => setOpen(true)} aria-label="פתחו את קפטן ספירוס">
-          <SpirosAvatar size={46} />
-          <span className="spiros-fab-label">דברו עם<br /><strong>קפטן ספירוס</strong></span>
-        </button>
+        <div className="spiros-fab-wrap">
+          <button type="button" className="spiros-teaser" onClick={() => setOpen(true)} aria-label="פתחו את קפטן ספירוס">
+            <span className="spiros-teaser-arm">יאסו! 🧭 אני <strong>קפטן ספירוס</strong> — ספרו לי מה בא לכם ואבנה לכם מסלול מושלם.</span>
+            <span className="spiros-teaser-mrs">— וגברת ספירוס תפקח שלא אגזים 😉</span>
+          </button>
+          <button type="button" className="spiros-fab" onClick={() => setOpen(true)} aria-label="פתחו את קפטן ספירוס">
+            <SpirosAvatar size={58} />
+            <span className="spiros-fab-label">דברו עם<br /><strong>קפטן ספירוס</strong><br /><em>מתכנן המסע שלכם</em></span>
+          </button>
+        </div>
       ) : (
         <div className="spiros-panel" role="dialog" aria-label="קפטן ספירוס">
           <header className="spiros-panel-head">

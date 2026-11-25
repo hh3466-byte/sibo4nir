@@ -484,6 +484,36 @@ h1, h2, h3 {
 .spiros-fab:hover { box-shadow: 0 14px 38px rgba(11, 30, 40, 0.3); }
 .spiros-fab-label { font-size: 0.82rem; line-height: 1.25; color: var(--ink); text-align: right; }
 .spiros-fab-label strong { color: var(--brass-d); font-family: var(--font-frank), serif; }
+.spiros-fab-label em { display: inline-block; margin-top: 0.12rem; font-style: normal; font-size: 0.72rem; color: var(--brass-d); opacity: 0.92; }
+
+/* נוכחות קפטן ספירוס — בועת הסבר תפקיד + הדגשת ה-FAB */
+.spiros-fab-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; max-width: 20rem; }
+.spiros-fab { animation: spiros-pulse 3.4s ease-in-out infinite; }
+@keyframes spiros-pulse {
+  0%, 100% { box-shadow: 0 10px 30px rgba(11, 30, 40, 0.22); }
+  50% { box-shadow: 0 10px 30px rgba(11, 30, 40, 0.22), 0 0 0 7px rgba(198, 163, 90, 0.16); }
+}
+.spiros-teaser {
+  position: relative; text-align: right; cursor: pointer; display: block;
+  background: var(--paper); color: var(--ink); border: 1px solid rgba(198, 163, 90, 0.5);
+  border-radius: 0.9rem; padding: 0.7rem 0.9rem; box-shadow: 0 10px 30px rgba(11, 30, 40, 0.2);
+  font-size: 0.86rem; line-height: 1.5; max-width: 20rem;
+}
+.spiros-teaser::after {
+  content: ""; position: absolute; left: 1.6rem; bottom: -7px; width: 13px; height: 13px;
+  background: var(--paper); border-right: 1px solid rgba(198, 163, 90, 0.5); border-bottom: 1px solid rgba(198, 163, 90, 0.5);
+  transform: rotate(45deg);
+}
+.spiros-teaser strong { color: var(--brass-d); font-family: var(--font-frank), serif; }
+.spiros-teaser-mrs { display: block; margin-top: 0.35rem; font-size: 0.76rem; color: var(--ink2); opacity: 0.85; }
+
+/* כרטיס המסלול מצטמצם לכתובית בזמן הפלגה */
+.tmo-map-panel--mini {
+  max-width: 17rem; padding: 0.65rem 0.9rem;
+  display: flex; align-items: center; gap: 0.7rem;
+}
+.tmo-map-panel--mini .tmo-map-now { margin: 0; font-size: 0.85rem; opacity: 0.92; flex: 1; line-height: 1.4; }
+.tmo-map-panel--mini .btn-brass { padding: 0.4rem 0.85rem; font-size: 0.78rem; white-space: nowrap; }
 
 .spiros-panel {
   width: 360px; max-width: calc(100vw - 2rem); height: 560px; max-height: calc(100vh - 2.5rem);

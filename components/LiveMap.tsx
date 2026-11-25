@@ -1025,9 +1025,9 @@ export default function LiveMap({
       )}
 
       {!activeStop && (
-        <div className="tmo-map-panel">
-          <p className="overline">מסלול דגל שבועי</p>
-          <h3>{routeName}</h3>
+        <div className={`tmo-map-panel${playing ? " tmo-map-panel--mini" : ""}`}>
+          {!playing && <p className="overline">מסלול דגל שבועי</p>}
+          {!playing && <h3>{routeName}</h3>}
           <p className="tmo-map-now">
             {current ? `${current.name} — ${current.islandName}` : "יציאה וחזרה ממרינת לבריון, אטיקה."}
           </p>
