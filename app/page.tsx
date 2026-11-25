@@ -31,6 +31,11 @@ export default async function Home() {
 
       <section className="closing">פחות מסכים, יותר מלח על העור. זה הקיץ שתזכרו.</section>
 
+      <footer className="site-footer">
+        <img src="/logo.png" alt="Take Me Out" className="site-footer-logo" width={200} height={128} />
+        <p>Take Me Out · השכרת סירות ויאכטות ביוון</p>
+      </footer>
+
       {/* קפטן ספירוס וגברת ספירוס — קונסיירז' צף שנוכח לאורך כל השיחה */}
       <CaptainSpiros places={places} tavernas={tavernas} hotels={hotels} />
     </main>

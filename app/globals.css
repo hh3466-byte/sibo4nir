@@ -593,3 +593,31 @@ h1, h2, h3 {
 .spiros-voyage-map { flex: 1; min-height: 0; position: relative; }
 .spiros-voyage-map .tmo-map-wrap { height: 100%; }
 .spiros-voyage-map .tmo-map { height: 100% !important; }
+
+/* ---- לוגו Take Me Out: hero + footer ---- */
+.hero-logo {
+  display: block;
+  width: clamp(150px, 22vw, 240px);
+  height: auto;
+  margin: 0 0 1.1rem;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+}
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 1.5rem 3.5rem;
+  background: var(--ink);
+  color: var(--cream);
+  text-align: center;
+}
+.site-footer-logo {
+  width: clamp(140px, 30vw, 200px);
+  height: auto;
+}
+.site-footer p {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}

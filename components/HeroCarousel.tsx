@@ -39,7 +39,7 @@ export default function HeroCarousel() {
       </div>
       <div className="hero-scrim" aria-hidden="true" />
       <div className="hero-inner">
-        <p className="overline">TAKE ME OUT</p>
+        <img src="/logo.png" alt="Take Me Out" className="hero-logo" width={240} height={153} />
         <h1>בואו נגלה את הקיקלדים.</h1>
         <p className="sub">
           מפרצים נסתרים שמגיעים אליהם רק מהים, מים בצבע שלא תאמינו, ולילות על קו המים. ספרו לנו מה אתם אוהבים — ונבנה לכם קיץ בלתי-נשכח.

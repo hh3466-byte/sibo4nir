@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "Take Me Out",
   description: "השכרת סירות ויאכטות ביוון – בעברית",
   applicationName: "Take Me Out",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
